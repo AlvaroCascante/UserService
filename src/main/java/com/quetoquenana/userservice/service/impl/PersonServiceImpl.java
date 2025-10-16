@@ -6,8 +6,8 @@ import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.repository.PersonRepository;
+import com.quetoquenana.userservice.service.CurrentUserService;
 import com.quetoquenana.userservice.service.PersonService;
-import com.quetoquenana.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +23,7 @@ import java.util.UUID;
 public class PersonServiceImpl implements PersonService {
 
     private final PersonRepository personRepository;
-    private final UserService userService;
+    private final CurrentUserService currentUserService;
 
     @Override
     public List<Person> findAll() {
@@ -45,7 +45,7 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public Person save(PersonCreateRequest request) {
-        String username = userService.getCurrentUsername();
+        String username = currentUserService.getCurrentUsername();
         return personRepository.findByIdNumber(request.getIdNumber())
             .map(found -> {
                 if (found.isActive()) {
@@ -66,16 +66,30 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    public Person saveOrGet(PersonCreateRequest request) {
+        Person person = personRepository.findByIdNumber(request.getIdNumber())
+            .orElse(save(request));
+        if (!person.isActive()) {
+            person.setActive(true);
+            person.setUpdatedAt(LocalDateTime.now());
+            person.setUpdatedBy(currentUserService.getCurrentUsername());
+            return personRepository.save(person);
+        } else {
+            return person;
+        }
+    }
+
+    @Override
     public Person update(UUID id, PersonUpdateRequest request) {
         Person existingPerson = personRepository.findById(id)
             .orElseThrow(RecordNotFoundException::new);
-        existingPerson.updateFromRequest(request, userService.getCurrentUsername());
+        existingPerson.updateFromRequest(request, currentUserService.getCurrentUsername());
         return personRepository.save(existingPerson);
     }
 
     @Override
     public void deleteById(UUID id) {
-        String username = userService.getCurrentUsername();
+        String username = currentUserService.getCurrentUsername();
         Person existingPerson = personRepository.findById(id)
                 .orElseThrow(RecordNotFoundException::new);
         if (existingPerson.isActive()) {

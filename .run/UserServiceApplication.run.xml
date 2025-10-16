@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="PersonServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+  <configuration default="false" name="UserServiceApplication" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="com.quetoquenana.userservice.UserServiceApplication" />
-    <module name="personservice" />
+    <module name="userservice" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="com.quetoquenana.userservice.*" />

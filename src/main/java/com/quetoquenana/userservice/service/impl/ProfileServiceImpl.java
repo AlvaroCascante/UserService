@@ -10,7 +10,7 @@ import com.quetoquenana.userservice.model.Profile;
 import com.quetoquenana.userservice.repository.ProfileRepository;
 import com.quetoquenana.userservice.repository.PersonRepository;
 import com.quetoquenana.userservice.service.ProfileService;
-import com.quetoquenana.userservice.service.UserService;
+import com.quetoquenana.userservice.service.CurrentUserService;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -20,12 +20,12 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final PersonRepository personRepository;
     private final ProfileRepository profileRepository;
-    private final UserService userService;
+    private final CurrentUserService currentUserService;
 
-    public ProfileServiceImpl(PersonRepository personRepository, ProfileRepository profileRepository, UserService userService) {
+    public ProfileServiceImpl(PersonRepository personRepository, ProfileRepository profileRepository, CurrentUserService currentUserService) {
         this.personRepository = personRepository;
         this.profileRepository = profileRepository;
-        this.userService = userService;
+        this.currentUserService = currentUserService;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ProfileServiceImpl implements ProfileService {
         Profile profile = Profile.fromAddRequest(request);
         profile.setPerson(person);
         profile.setCreatedAt(java.time.LocalDateTime.now());
-        profile.setCreatedBy(userService.getCurrentUsername());
+        profile.setCreatedBy(currentUserService.getCurrentUsername());
         return profileRepository.save(profile);
     }
 
@@ -52,7 +52,7 @@ public class ProfileServiceImpl implements ProfileService {
     public Profile updateProfile(UUID idProfile, ProfileUpdateRequest request) {
         Profile profile = profileRepository.findById(idProfile)
             .orElseThrow(RecordNotFoundException::new);
-        profile.updateFromRequest(request, userService.getCurrentUsername());
+        profile.updateFromRequest(request, currentUserService.getCurrentUsername());
         return profileRepository.save(profile);
     }
 }

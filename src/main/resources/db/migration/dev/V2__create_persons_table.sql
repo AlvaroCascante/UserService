@@ -12,3 +12,6 @@ CREATE TABLE persons (
     updated_by VARCHAR(100),
     version BIGINT NOT NULL
 );
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_persons_id_number ON persons(id_number);

@@ -10,7 +10,7 @@ import com.quetoquenana.userservice.model.Phone;
 import com.quetoquenana.userservice.repository.PersonRepository;
 import com.quetoquenana.userservice.repository.PhoneRepository;
 import com.quetoquenana.userservice.service.PhoneService;
-import com.quetoquenana.userservice.service.UserService;
+import com.quetoquenana.userservice.service.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +24,7 @@ public class PhoneServiceImpl implements PhoneService {
 
     private final PhoneRepository phoneRepository;
     private final PersonRepository personRepository;
-    private final UserService userService;
+    private final CurrentUserService currentUserService;
 
     @Transactional
     @Override
@@ -39,7 +39,7 @@ public class PhoneServiceImpl implements PhoneService {
 
         person.addPhone(phone);
         person.setUpdatedAt(LocalDateTime.now());
-        person.setUpdatedBy(userService.getCurrentUsername());
+        person.setUpdatedBy(currentUserService.getCurrentUsername());
         phoneRepository.save(phone);
         if(phone.isMain()) {
             phoneRepository.clearMainForPerson(personId, phone.getId());

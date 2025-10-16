@@ -1,6 +1,8 @@
 package com.quetoquenana.userservice.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.quetoquenana.userservice.dto.UserCreateRequest;
+import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.model.*;
 import com.quetoquenana.userservice.dto.PersonCreateRequest;
 import com.quetoquenana.userservice.dto.PersonUpdateRequest;
@@ -38,6 +40,21 @@ public class TestEntityFactory {
         return createPerson(createdAt, createdBy, DEFAULT_ID_NUMBER, true);
     }
 
+    public static User createUser(
+            LocalDateTime createdAt,
+            String createdBy
+    ) {
+        User user = User.builder()
+                .username("username")
+                .passwordHash("passwordHash")
+                .nickname("nick")
+                .userStatus(UserStatus.ACTIVE)
+                .build();
+        user.setCreatedAt(createdAt);
+        user.setCreatedBy(createdBy);
+        return user;
+    }
+
     public static Person createPerson(
             LocalDateTime createdAt,
             String createdBy,
@@ -64,6 +81,25 @@ public class TestEntityFactory {
         return req;
     }
 
+    public static UserCreateRequest getUserCreateRequest() {
+        UserCreateRequest req = new UserCreateRequest();
+        req.setUsername("username");
+        req.setPassword("pass");
+        req.setNickname("nick");
+        req.setPerson(getPersonCreateRequest(DEFAULT_ID_NUMBER, true));
+        req.setUserStatus(UserStatus.ACTIVE);
+        return req;
+    }
+
+    public static String createUserPayload(ObjectMapper objectMapper) {
+        try {
+            UserCreateRequest req = getUserCreateRequest();
+            return objectMapper.writeValueAsString(req);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static String createPersonPayload(ObjectMapper objectMapper) {
         try {
             PersonCreateRequest req = getPersonCreateRequest(DEFAULT_ID_NUMBER, true);
@@ -87,6 +123,13 @@ public class TestEntityFactory {
         req.setName("John");
         req.setLastname("White");
         req.setIsActive(isActive);
+        return req;
+    }
+
+    public static UserUpdateRequest getUserUpdateRequest() {
+        UserUpdateRequest req = new UserUpdateRequest();
+        req.setNickname("nickname");
+        req.setUserStatus(UserStatus.ACTIVE.name());
         return req;
     }
 
@@ -149,11 +192,9 @@ public class TestEntityFactory {
                 .address("123 Main St")
                 .build();
     }
-
     public static Address createAddress(Person person) {
         return createAddress(person, "Country");
     }
-
     public static String createPhonePayload(ObjectMapper objectMapper, String phoneNumber) {
         try {
             return objectMapper.writeValueAsString(createPhone(null, phoneNumber));
@@ -161,7 +202,6 @@ public class TestEntityFactory {
             throw new RuntimeException("Failed to serialize phone payload", e);
         }
     }
-
     public static String createAddressPayload(ObjectMapper objectMapper, String country) {
         try {
             return objectMapper.writeValueAsString(createAddress(null, country));
@@ -169,7 +209,6 @@ public class TestEntityFactory {
             throw new RuntimeException("Failed to serialize phone payload", e);
         }
     }
-
     public static String createAddressPayload(ObjectMapper objectMapper) {
         try {
             return objectMapper.writeValueAsString(createAddress(null));

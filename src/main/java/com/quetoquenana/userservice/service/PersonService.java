@@ -19,6 +19,8 @@ public interface PersonService {
 
     Person save(PersonCreateRequest request);
 
+    Person saveOrGet(PersonCreateRequest request);
+
     Person update(UUID id, PersonUpdateRequest request);
 
     void deleteById(UUID id);

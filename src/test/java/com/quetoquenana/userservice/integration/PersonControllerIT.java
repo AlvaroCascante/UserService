@@ -161,7 +161,7 @@ class PersonControllerIT {
 
     @Test
     @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
-    void createPerson_withDuplicateIdNumber_shouldReturnBadRequest() throws Exception {
+    void createPerson_withDuplicateIdNumber_shouldReturnConflict() throws Exception {
         // Arrange: create and save an active person
         Person person = TestEntityFactory.createPerson(true);
         personRepository.save(person);
@@ -171,6 +171,6 @@ class PersonControllerIT {
         mockMvc.perform(post(BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict());
     }
 }

@@ -27,15 +27,18 @@ public class Person extends Auditable {
     private UUID id;
 
     @Column(name = "id_number", nullable = false, unique = true)
-    @JsonView(PersonList.class)
+    @JsonView({PersonList.class,
+            User.UserDetail.class})
     private String idNumber;
 
     @Column(name = "name", nullable = false)
-    @JsonView(PersonList.class)
+    @JsonView({PersonList.class,
+            User.UserDetail.class})
     private String name;
 
     @Column(name = "lastname", nullable = false)
-    @JsonView(PersonList.class)
+    @JsonView({PersonList.class,
+            User.UserDetail.class})
     private String lastname;
 
     @Column(name = "is_active", nullable = false)
@@ -83,9 +86,6 @@ public class Person extends Auditable {
             .build();
     }
 
-    /**
-     * Updates this Person with the non-null fields from the given PersonUpdateRequest.
-     */
     public void updateFromRequest(PersonUpdateRequest request, String username) {
         if (request.getName() != null) this.setName(request.getName());
         if (request.getLastname() != null) this.setLastname(request.getLastname());
