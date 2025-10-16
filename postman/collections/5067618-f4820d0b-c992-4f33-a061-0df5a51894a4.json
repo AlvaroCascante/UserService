@@ -1,0 +1,166 @@
+{
+	"info": {
+		"_postman_id": "5067618-f4820d0b-c992-4f33-a061-0df5a51894a4",
+		"name": "Spring Both Template",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"id": "5067618-cf2d39c6-be9f-4ea4-bf85-26cadfbaa198",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOST}}/template/actuator/health",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"template",
+						"actuator",
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find All Executions",
+			"id": "5067618-46560d3f-afa0-4393-a843-9b3bae7bb7f9",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOST}}/template/api/executions",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"template",
+						"api",
+						"executions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Paginate All Executions",
+			"id": "5067618-a6b8f257-add5-412b-a1ff-dc7c5961128f",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOST}}/template/api/executions/page?page=1&size=5",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"template",
+						"api",
+						"executions",
+						"page"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find By Id",
+			"id": "5067618-03b2ef3a-af1f-4824-ab9b-fc96fd3f15f8",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "es",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{HOST}}/template/api/executions/:id",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"template",
+						"api",
+						"executions",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "A3b46e3f-d946-40c5-a514-bf5953b3f9f7"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "password",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "user",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "72e5b2d3-a819-40d6-96c0-0aa1b4cdbc92",
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "01fa6972-988b-4333-954b-17e3131bde2c",
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
