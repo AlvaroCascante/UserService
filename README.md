@@ -5,9 +5,9 @@ This repository is a template for creating new Spring Boot projects with a pre-c
 ## Project Information
 
 - **Group:** `com.quetoquenana`
-- **Artifact:** `person-service`
-- **Name:** `Person Service`
-- **Description:** Person Service Spring Boot project
+- **Artifact:** `user-service`
+- **Name:** `User Service`
+- **Description:** User Service Spring Boot project
 - **Package name:** `com.quetoquenana.template`
 
 ## Included Dependencies
@@ -91,7 +91,7 @@ This project includes both unit and integration tests:
 - **Unit Tests:** Fast tests that mock dependencies and verify business logic in isolation.
 - **Integration Tests:** Use [Testcontainers](https://www.testcontainers.org/) to spin up real PostgreSQL containers for end-to-end testing of the application, including database interactions and REST endpoints.
 - **Test Structure:**
-  - Unit tests are located in `src/test/java/com/quetoquenana/personservice/controller/` and other relevant packages.
+  - Unit tests are located in `src/test/java/com/quetoquenana/userservice/controller/` and other relevant packages.
   - Integration tests use `@SpringBootTest` or `@Testcontainers` and are named with the `IT` suffix (e.g., `PersonControllerIT`).
 
 To run all tests:

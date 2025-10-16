@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.quetoquenana</groupId>
-	<artifactId>personservice</artifactId>
+	<artifactId>userservice</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Template</name>
-	<description>Person Service Spring Boot projects</description>
+	<description>User Service Spring Boot projects</description>
 	<url/>
 	<licenses>
 		<license/>
