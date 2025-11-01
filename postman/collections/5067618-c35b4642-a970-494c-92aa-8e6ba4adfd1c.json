@@ -812,6 +812,43 @@
 					"response": []
 				},
 				{
+					"name": "Get All Copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-d61806a3-2221-41e0-8749-55fd4a1bd2d1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create User",
 					"event": [
 						{
