@@ -775,7 +775,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete Address",
+					"name": "Delete Profile",
 					"id": "5067618-15a41000-5eff-4510-8880-a86117f85902",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
