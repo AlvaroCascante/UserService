@@ -789,7 +789,7 @@
 			"name": "Users",
 			"item": [
 				{
-					"name": "Create Person Copy",
+					"name": "Create User",
 					"event": [
 						{
 							"listen": "prerequest",
