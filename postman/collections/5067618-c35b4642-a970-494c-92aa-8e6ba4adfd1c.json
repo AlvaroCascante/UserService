@@ -230,7 +230,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/idNumber/:idNumber",
+							"raw": "{{HOST}}/{{path}}/api/persons/status/:status",
 							"host": [
 								"{{HOST}}"
 							],
@@ -238,14 +238,13 @@
 								"{{path}}",
 								"api",
 								"persons",
-								"idNumber",
-								":idNumber"
+								"status",
+								":status"
 							],
 							"variable": [
 								{
-									"id": "ed0fa844-f7c7-42a8-bfb9-6f3758cc9420",
-									"key": "idNumber",
-									"value": "d99fc53f-5b40-4712-8793-0316fcd82440"
+									"key": "status",
+									"value": "true"
 								}
 							]
 						}
