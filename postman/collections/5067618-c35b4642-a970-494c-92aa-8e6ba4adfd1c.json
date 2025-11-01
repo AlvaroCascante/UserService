@@ -1015,11 +1015,11 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "POST",
+						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"{{$randomEmail}}\",\n  \"password\": \"P@ssw0rd!\",\n  \"person\": {\n    \"idNumber\": \"{{$randomUUID}}\",\n    \"name\": \"John\",\n    \"lastname\": \"Doe\"\n  },\n  \"nickname\": \"Ksknt\"\n}",
+							"raw": "{\n  \"nickname\": \"New\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1027,14 +1027,21 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users",
+							"raw": "{{HOST}}/{{path}}/api/users/:id",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"users"
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
+								}
 							]
 						}
 					},
