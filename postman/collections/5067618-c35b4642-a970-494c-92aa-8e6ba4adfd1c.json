@@ -1046,6 +1046,60 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Delete User",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-d9154d6e-36b9-48fb-9eac-e1be19b9f6c9",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nickname\": \"New\",\n  \"userStatus\": \"INACTIVE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"id": "2f05243c-bd1b-4db6-b0a7-c4893e021083",
+									"key": "id",
+									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "5067618-d5288b57-f8cf-4f04-b072-f4cecc0b864d"
