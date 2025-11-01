@@ -883,7 +883,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/page?page=0&size=5",
+							"raw": "{{HOST}}/{{path}}/api/users/:id",
 							"host": [
 								"{{HOST}}"
 							],
@@ -891,16 +891,12 @@
 								"{{path}}",
 								"api",
 								"users",
-								"page"
+								":id"
 							],
-							"query": [
+							"variable": [
 								{
-									"key": "page",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "5"
+									"key": "id",
+									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
 								}
 							]
 						}
