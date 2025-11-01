@@ -860,7 +860,7 @@
 					"response": []
 				},
 				{
-					"name": "Get All Page Copy",
+					"name": "Get By Id",
 					"event": [
 						{
 							"listen": "prerequest",
