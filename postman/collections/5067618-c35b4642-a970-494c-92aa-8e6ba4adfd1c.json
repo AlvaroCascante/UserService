@@ -904,7 +904,7 @@
 					"response": []
 				},
 				{
-					"name": "Get By Id Copy",
+					"name": "Get By Username",
 					"event": [
 						{
 							"listen": "prerequest",
