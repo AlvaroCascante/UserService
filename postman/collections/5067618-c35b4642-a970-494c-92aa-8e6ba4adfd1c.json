@@ -1019,7 +1019,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"nickname\": \"New\"\n}",
+							"raw": "{\n  \"nickname\": \"New\",\n  \"userStatus\": \"INACTIVE\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
