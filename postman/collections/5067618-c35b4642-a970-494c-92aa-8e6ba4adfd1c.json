@@ -160,6 +160,36 @@
 					"response": []
 				},
 				{
+					"name": "Get By ID",
+					"id": "5067618-1426cf97-12e0-4079-a8f4-68ae7cbb1186",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "d2b70130-aea5-4257-bf2d-a43deeaed265"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get By IdNumber",
 					"id": "5067618-6f6dc0b6-daa5-4cb9-81a8-b7625e924894",
 					"protocolProfileBehavior": {
@@ -182,9 +212,8 @@
 							],
 							"variable": [
 								{
-									"id": "a78c1920-d174-4ee9-a83f-9b8b105958ff",
 									"key": "idNumber",
-									"value": "3c2f2844-02da-42c9-8670-a94c5d462306"
+									"value": "d99fc53f-5b40-4712-8793-0316fcd82440"
 								}
 							]
 						}
@@ -192,8 +221,8 @@
 					"response": []
 				},
 				{
-					"name": "Get By ID",
-					"id": "5067618-1426cf97-12e0-4079-a8f4-68ae7cbb1186",
+					"name": "Get By Status",
+					"id": "5067618-dd7d1c76-0d55-4718-9229-57363e81d4ac",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -201,7 +230,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/:id",
+							"raw": "{{HOST}}/{{path}}/api/persons/status/:status",
 							"host": [
 								"{{HOST}}"
 							],
@@ -209,13 +238,13 @@
 								"{{path}}",
 								"api",
 								"persons",
-								":id"
+								"status",
+								":status"
 							],
 							"variable": [
 								{
-									"id": "7d04f909-e021-4afc-ab54-67d0a0291d9c",
-									"key": "id",
-									"value": "de4772d2-adc3-4d45-acec-9ea499f19849"
+									"key": "status",
+									"value": "true"
 								}
 							]
 						}
@@ -304,9 +333,8 @@
 							],
 							"variable": [
 								{
-									"id": "a1865135-87f9-4d28-913f-252b6d72c841",
 									"key": "id",
-									"value": "b06032b8-530a-457c-afc4-cbb113893d06"
+									"value": "852d8640-26f5-44a1-b5b7-555c06bb4968"
 								}
 							]
 						}
@@ -359,9 +387,8 @@
 							],
 							"variable": [
 								{
-									"id": "32d59c62-ebb5-4fca-b153-58b7cf0be2dd",
 									"key": "idPerson",
-									"value": "56bcf4df-9139-4511-8467-184e9ab1d541"
+									"value": "852d8640-26f5-44a1-b5b7-555c06bb4968"
 								}
 							]
 						}
@@ -413,9 +440,8 @@
 							],
 							"variable": [
 								{
-									"id": "c14d2369-3f12-43e0-b91e-68fdb222a830",
 									"key": "id",
-									"value": "9fbe6619-5498-435c-864b-7072da3ea6b8"
+									"value": "852d8640-26f5-44a1-b5b7-555c06bb4968"
 								}
 							]
 						}
@@ -460,9 +486,8 @@
 							],
 							"variable": [
 								{
-									"id": "146e0941-cd9f-4c81-9c0d-a2b16af84e2a",
 									"key": "id",
-									"value": "9fbe6619-5498-435c-864b-7072da3ea6b8"
+									"value": "d2b70130-aea5-4257-bf2d-a43deeaed265"
 								}
 							]
 						}
@@ -501,9 +526,8 @@
 							],
 							"variable": [
 								{
-									"id": "83eb301f-8a52-412b-8107-89e71ddf515e",
 									"key": "id",
-									"value": "43ea2d48-7e05-4f7b-955b-6f5a50ffb3bb"
+									"value": "3c0f258e-51e5-47f3-8146-963ffa3897b3"
 								}
 							]
 						}
@@ -533,9 +557,8 @@
 							],
 							"variable": [
 								{
-									"id": "acd1df51-6f36-495e-b4b6-6f2bab819921",
 									"key": "id",
-									"value": "43ea2d48-7e05-4f7b-955b-6f5a50ffb3bb"
+									"value": "85c6a18b-2899-4e7d-99ec-5ce1b5e93d09"
 								}
 							]
 						}
@@ -580,9 +603,8 @@
 							],
 							"variable": [
 								{
-									"id": "6113e205-0b12-4805-81fe-06ec76cec96a",
 									"key": "id",
-									"value": "de4772d2-adc3-4d45-acec-9ea499f19849"
+									"value": "d2b70130-aea5-4257-bf2d-a43deeaed265"
 								}
 							]
 						}
@@ -621,9 +643,8 @@
 							],
 							"variable": [
 								{
-									"id": "1f7e1873-e202-49a1-b9d6-ae9e8e9b552d",
 									"key": "id",
-									"value": "7bbd6ac2-a292-45e2-9e86-3097cadb588d"
+									"value": "ba318d9e-4e01-41cc-908c-f7b286fe1cd2"
 								}
 							]
 						}
@@ -640,7 +661,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/phone/:id",
+							"raw": "{{HOST}}/{{path}}/api/persons/address/:id",
 							"host": [
 								"{{HOST}}"
 							],
@@ -648,14 +669,13 @@
 								"{{path}}",
 								"api",
 								"persons",
-								"phone",
+								"address",
 								":id"
 							],
 							"variable": [
 								{
-									"id": "c095dc7b-0a96-480b-a927-cd6e5ccbec30",
 									"key": "id",
-									"value": "43ea2d48-7e05-4f7b-955b-6f5a50ffb3bb"
+									"value": "e88f2a2b-49d2-40f2-bb69-0bb253255a1d"
 								}
 							]
 						}
@@ -700,9 +720,8 @@
 							],
 							"variable": [
 								{
-									"id": "a1d17831-05fb-4c1f-be2e-e901762c7a48",
 									"key": "id",
-									"value": "b06032b8-530a-457c-afc4-cbb113893d07"
+									"value": "d2b70130-aea5-4257-bf2d-a43deeaed265"
 								}
 							]
 						}
@@ -741,41 +760,8 @@
 							],
 							"variable": [
 								{
-									"id": "a6762229-bc6c-418d-849d-9b7fdc041dc8",
 									"key": "id",
-									"value": "431df104-83ef-4266-8265-146dda08f4be"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Address",
-					"id": "5067618-15a41000-5eff-4510-8880-a86117f85902",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/address/:id",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"persons",
-								"address",
-								":id"
-							],
-							"variable": [
-								{
-									"id": "79638953-b260-46e0-8eb2-42d1c0929580",
-									"key": "id",
-									"value": "58302ac7-04c7-4df9-8088-4b84f6b52014"
+									"value": "d2b70130-aea5-4257-bf2d-a43deeaed265"
 								}
 							]
 						}
@@ -787,7 +773,54 @@
 		},
 		{
 			"name": "Users",
-			"item": [],
+			"item": [
+				{
+					"name": "Create User",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-60ba27c5-73c4-4ec4-840f-e99728f8b53c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"{{$randomEmail}}\",\n  \"password\": \"P@ssw0rd!\",\n  \"person\": {\n    \"idNumber\": \"111080683\",\n    \"name\": \"John\",\n    \"lastname\": \"Doe\"\n  },\n  \"nickname\": \"Ksknt\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			],
 			"id": "5067618-d5288b57-f8cf-4f04-b072-f4cecc0b864d"
 		},
 		{
