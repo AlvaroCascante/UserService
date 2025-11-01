@@ -663,7 +663,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/phone/:id",
+							"raw": "{{HOST}}/{{path}}/api/persons/address/:id",
 							"host": [
 								"{{HOST}}"
 							],
@@ -671,14 +671,13 @@
 								"{{path}}",
 								"api",
 								"persons",
-								"phone",
+								"address",
 								":id"
 							],
 							"variable": [
 								{
-									"id": "c095dc7b-0a96-480b-a927-cd6e5ccbec30",
 									"key": "id",
-									"value": "43ea2d48-7e05-4f7b-955b-6f5a50ffb3bb"
+									"value": "e88f2a2b-49d2-40f2-bb69-0bb253255a1d"
 								}
 							]
 						}
