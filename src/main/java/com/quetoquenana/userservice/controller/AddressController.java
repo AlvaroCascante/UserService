@@ -24,7 +24,7 @@ public class AddressController {
 
     @PostMapping("/{idPerson}/address")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')") // ADMIN or USER roles can access
+    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<Address> createAddress(
             @PathVariable UUID idPerson,
             @RequestBody AddressCreateRequest request
@@ -36,7 +36,7 @@ public class AddressController {
 
     @PutMapping("/address/{idAddress}")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')") // ADMIN or USER roles can access
+    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<Address> updateAddress(
             @PathVariable UUID idAddress,
             @RequestBody AddressUpdateRequest request
@@ -47,7 +47,7 @@ public class AddressController {
     }
 
     @DeleteMapping("/address/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')") // ADMIN or USER roles can access
+    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<Void> deleteAddress(@PathVariable UUID id) {
         log.info("DELETE /api/persons/address/{} called", id);
         addressService.deleteById(id);

@@ -226,4 +226,47 @@ class PersonControllerTest {
         // For demonstration, we assert the mock setup
         assertFalse(inactivePerson.isActive());
     }
+
+    // java
+    @Test
+    void testGetPersonsByStatus_ReturnsActive() throws Exception {
+        List<Person> persons = Collections.singletonList(person); // person is active in setUp()
+        when(personService.findByIsActive(true)).thenReturn(persons);
+
+        ResponseEntity<ApiResponse> response = personController.getPersonsByStatus(true);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        ApiResponse apiResponse = response.getBody();
+        assertNotNull(apiResponse);
+        List<?> data = (List<?>) apiResponse.getData();
+        assertEquals(1, data.size());
+
+        String json = objectMapper.writerWithView(Person.PersonList.class).writeValueAsString(data);
+        assertTrue(json.contains("idNumber"));
+        assertTrue(json.contains("isActive"));
+    }
+
+    @Test
+    void testGetPersonsByStatus_ReturnsInactive() throws Exception {
+        Person inactivePerson = Person.builder()
+                .id(UUID.randomUUID())
+                .name("Jane")
+                .lastname("Doe")
+                .idNumber("ID999999")
+                .isActive(false)
+                .build();
+        when(personService.findByIsActive(false)).thenReturn(Collections.singletonList(inactivePerson));
+
+        ResponseEntity<ApiResponse> response = personController.getPersonsByStatus(false);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        ApiResponse apiResponse = response.getBody();
+        assertNotNull(apiResponse);
+        List<?> data = (List<?>) apiResponse.getData();
+        assertEquals(1, data.size());
+
+        String json = objectMapper.writerWithView(Person.PersonList.class).writeValueAsString(data);
+        assertTrue(json.contains("idNumber"));
+        assertTrue(json.contains("isActive"));
+    }
 }

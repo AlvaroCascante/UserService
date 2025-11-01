@@ -9,24 +9,20 @@ import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.model.Profile;
 import com.quetoquenana.userservice.repository.ProfileRepository;
 import com.quetoquenana.userservice.repository.PersonRepository;
-import com.quetoquenana.userservice.service.ProfileService;
 import com.quetoquenana.userservice.service.CurrentUserService;
+import com.quetoquenana.userservice.service.ProfileService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
 
     private final PersonRepository personRepository;
     private final ProfileRepository profileRepository;
     private final CurrentUserService currentUserService;
-
-    public ProfileServiceImpl(PersonRepository personRepository, ProfileRepository profileRepository, CurrentUserService currentUserService) {
-        this.personRepository = personRepository;
-        this.profileRepository = profileRepository;
-        this.currentUserService = currentUserService;
-    }
 
     @Override
     public Profile addProfileToPerson(UUID idPerson, ProfileCreateRequest request) {

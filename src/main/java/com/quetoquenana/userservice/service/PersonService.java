@@ -13,6 +13,8 @@ import java.util.UUID;
 public interface PersonService {
     List<Person> findAll();
 
+    List<Person> findByIsActive(boolean isActive);
+
     Page<Person> findAll(Pageable pageable);
 
     Optional<Person> findById(UUID id);

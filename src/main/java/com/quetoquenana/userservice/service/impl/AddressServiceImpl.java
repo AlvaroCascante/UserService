@@ -9,7 +9,6 @@ import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.repository.AddressRepository;
 import com.quetoquenana.userservice.repository.PersonRepository;
 import com.quetoquenana.userservice.service.AddressService;
-import com.quetoquenana.userservice.service.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +22,7 @@ public class AddressServiceImpl implements AddressService {
 
     private final AddressRepository addressRepository;
     private final PersonRepository personRepository;
-    private final CurrentUserService currentUserService;
+    private final CurrentUserServiceImpl currentUserService;
 
     @Transactional
     @Override

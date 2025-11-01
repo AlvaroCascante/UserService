@@ -14,6 +14,7 @@ public interface PhoneRepository extends JpaRepository<Phone, UUID> {
 
     @Modifying
     @Query("UPDATE Phone p SET p.isMain = false WHERE p.person.id = :personId AND p.id != :id")
+    // Update all phones of the person to set isMain to false, except the one with the given id
     void clearMainForPerson(
             @Param("personId") UUID personId,
             @Param("id") UUID id

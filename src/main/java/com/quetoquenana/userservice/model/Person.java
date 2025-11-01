@@ -45,17 +45,32 @@ public class Person extends Auditable {
     @JsonView(PersonList.class)
     private boolean isActive;
 
-    @OneToOne(mappedBy = "person", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonView(PersonDetail.class)
-    private Profile profile;
+    private Set<Profile> profile;
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonView(PersonDetail.class)
     private Set<Phone> phones = new HashSet<>();
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonView(PersonDetail.class)
     private Set<Address> addresses = new HashSet<>();
+
+    public Profile getProfile() {
+        if(profile == null || profile.isEmpty()) {
+            return null;
+        }
+        return profile.iterator().next();
+    }
+
+    public void setProfile(Profile profile) {
+        if(this.profile == null) {
+            this.profile = new HashSet<>();
+        }
+        this.profile.add(profile);
+        profile.setPerson(this);
+    }
 
     // JSON Views to control serialization responses
     public static class PersonList extends ApiBaseResponseView.Always {}

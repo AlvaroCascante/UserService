@@ -76,7 +76,7 @@ class PhoneControllerIT {
 
         List<Phone> phones = phoneRepository.findByPersonId(person.getId());
         assertThat(phones).isNotEmpty();
-        Phone addedPhone = phones.iterator().next();
+        Phone addedPhone = phones.getFirst();
         assertThat(addedPhone.getPhoneNumber()).isEqualTo("123456789");
     }
 
@@ -87,7 +87,7 @@ class PhoneControllerIT {
         Phone phone = TestEntityFactory.createPhone(person, "123456789");
         person.addPhone(phone);
         person = personRepository.save(person);
-        Phone savedPhone = phoneRepository.findByPersonId(person.getId()).iterator().next();
+        Phone savedPhone = phoneRepository.findByPersonId(person.getId()).getFirst();
 
         // Update phone
         savedPhone.setPhoneNumber("987654321");
@@ -97,7 +97,7 @@ class PhoneControllerIT {
                 .content(payload))
                 .andExpect(status().isOk());
 
-        Phone updatedPhone = phoneRepository.findByPersonId(person.getId()).iterator().next();
+        Phone updatedPhone = phoneRepository.findByPersonId(person.getId()).getFirst();
         assertThat(updatedPhone.getPhoneNumber()).isEqualTo("987654321");
     }
 

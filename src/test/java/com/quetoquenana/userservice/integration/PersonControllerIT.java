@@ -173,4 +173,37 @@ class PersonControllerIT {
                 .content(json))
                 .andExpect(status().isConflict());
     }
+
+    // java
+    @Test
+    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
+    void getPersonsByStatus_returnsActive() throws Exception {
+        // arrange
+        Person activePerson = TestEntityFactory.createPerson(true);
+        personRepository.save(activePerson);
+        personRepository.flush();
+
+        // act & assert
+        mockMvc.perform(get(BASE_URL + "/status/true")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+                        .string(org.hamcrest.Matchers.containsString(TestEntityFactory.DEFAULT_ID_NUMBER)));
+    }
+
+    @Test
+    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
+    void getPersonsByStatus_returnsInactive() throws Exception {
+        // arrange
+        Person inactivePerson = TestEntityFactory.createPerson(false);
+        personRepository.save(inactivePerson);
+        personRepository.flush();
+
+        // act & assert
+        mockMvc.perform(get(BASE_URL + "/status/false")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+                        .string(org.hamcrest.Matchers.containsString(TestEntityFactory.DEFAULT_ID_NUMBER)));
+    }
 }

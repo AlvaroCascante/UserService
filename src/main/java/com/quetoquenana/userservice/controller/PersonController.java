@@ -29,16 +29,28 @@ public class PersonController {
 
     @GetMapping
     @JsonView(Person.PersonList.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('AUDITOR')") // Only ADMIN and AUDITOR roles can access
+    @PreAuthorize("hasRole('ADMIN')") // Only ADMIN role can access
     public ResponseEntity<ApiResponse> getAllPersons() {
         log.info("GET /api/persons called");
         List<Person> entities = personService.findAll();
         return ResponseEntity.ok(new ApiResponse(entities));
     }
 
+
+    @GetMapping("/status/{status}")
+    @JsonView(Person.PersonList.class)
+    @PreAuthorize("hasRole('ADMIN')") // Only ADMIN role can access
+    public ResponseEntity<ApiResponse> getPersonsByStatus(
+            @PathVariable Boolean status
+    ) {
+        log.info("GET /api/persons/status{} called", status);
+        List<Person> entities = personService.findByIsActive(status);
+        return ResponseEntity.ok(new ApiResponse(entities));
+    }
+
     @GetMapping("/page")
     @JsonView(Person.PersonList.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('AUDITOR')") // Only ADMIN and AUDITOR roles can access
+    @PreAuthorize("hasRole('ADMIN')") // Only ADMIN role can access
     public ResponseEntity<ApiResponse> getPersonsPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -50,7 +62,7 @@ public class PersonController {
 
     @GetMapping("/{id}")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('AUDITOR') or hasRole('USER')") // ADMIN, AUDITOR and USER roles can access
+    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<ApiResponse> getPersonById(
             @PathVariable UUID id
     ) {
@@ -65,7 +77,7 @@ public class PersonController {
 
     @GetMapping("/idNumber/{idNumber}")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('AUDITOR') or hasRole('USER')") // ADMIN, AUDITOR and USER roles can access
+    @PreAuthorize("@securityService.canAccessIdNumber(authentication, #idNumber)")
     public ResponseEntity<ApiResponse> getPersonByIdNumber(
             @PathVariable String idNumber
     ) {
@@ -92,7 +104,7 @@ public class PersonController {
 
     @PutMapping("/{id}")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("hasRole('ADMIN')") // Only ADMIN role can access
+    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<ApiResponse> updatePerson(
             @PathVariable UUID id,
             @RequestBody PersonUpdateRequest request

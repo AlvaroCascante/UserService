@@ -30,7 +30,7 @@ public class UserController {
 
     @GetMapping
     @JsonView(User.UserList.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('AUDITOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> getAllUsers() {
         log.info("GET /api/users called");
         List<User> entities = userService.findAll(PageRequest.of(0, Integer.MAX_VALUE)).getContent();
@@ -39,7 +39,7 @@ public class UserController {
 
     @GetMapping("/page")
     @JsonView(User.UserList.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('AUDITOR')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> getUsersPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -51,7 +51,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @JsonView(User.UserDetail.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('AUDITOR') or hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<ApiResponse> getUserById(
             @PathVariable UUID id
     ) {
@@ -66,7 +66,7 @@ public class UserController {
 
     @GetMapping("/by-username/{username}")
     @JsonView(User.UserDetail.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('AUDITOR') or hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<ApiResponse> getByUsername(
             @PathVariable String username
     ) {

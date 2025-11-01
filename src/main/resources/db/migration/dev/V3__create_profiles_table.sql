@@ -1,7 +1,6 @@
 -- Migration to create profiles table
 CREATE TABLE profiles (
-    id UUID PRIMARY KEY,
-    id_person UUID UNIQUE REFERENCES persons(id) ON DELETE CASCADE,
+    id UUID PRIMARY KEY UNIQUE REFERENCES persons(id) ON DELETE CASCADE,
 
     birthday DATE,
     gender VARCHAR(50),

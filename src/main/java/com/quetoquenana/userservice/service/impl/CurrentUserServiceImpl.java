@@ -1,12 +1,11 @@
 package com.quetoquenana.userservice.service.impl;
 
-import com.quetoquenana.userservice.service.CurrentUserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SecurityCurrentUserService implements CurrentUserService {
+public class CurrentUserServiceImpl implements com.quetoquenana.userservice.service.CurrentUserService {
     @Override
     public String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

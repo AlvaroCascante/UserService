@@ -18,13 +18,13 @@ import java.util.UUID;
 @Setter
 public class Profile extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
     @JsonView(Person.PersonDetail.class)
     private UUID id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_person", unique = true)
+    @ManyToOne
+    @JoinColumn(name = "id", unique = true)
+    @MapsId
     private Person person;
 
     @Column(name = "birthday")

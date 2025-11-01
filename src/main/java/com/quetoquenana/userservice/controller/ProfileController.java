@@ -24,7 +24,7 @@ public class ProfileController {
 
     @PostMapping("/{idPerson}/profile")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')") // ADMIN, AUDITOR and USER roles can access
+    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<Profile> addProfile(
             @PathVariable UUID idPerson,
             @RequestBody ProfileCreateRequest request
@@ -36,7 +36,7 @@ public class ProfileController {
 
     @PutMapping("/profile/{idPersonProfile}")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')") // ADMIN, AUDITOR and USER roles can access
+    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<Profile> updateProfile(
             @PathVariable UUID idPersonProfile,
             @RequestBody ProfileUpdateRequest request) {

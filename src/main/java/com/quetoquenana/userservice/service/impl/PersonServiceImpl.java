@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,24 +27,34 @@ public class PersonServiceImpl implements PersonService {
     private final CurrentUserService currentUserService;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Person> findAll() {
         return personRepository.findAll();
     }
 
     @Override
+    public List<Person> findByIsActive(boolean isActive) {
+        return personRepository.findByIsActive(isActive);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Page<Person> findAll(Pageable pageable) {
         return personRepository.findAll(pageable);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Person> findById(UUID id) {
         return personRepository.findById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Person> findByIdNumber(String idNumber) { return personRepository.findByIdNumber(idNumber);}
 
     @Override
+    @Transactional
     public Person save(PersonCreateRequest request) {
         String username = currentUserService.getCurrentUsername();
         return personRepository.findByIdNumber(request.getIdNumber())
@@ -66,6 +77,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @Transactional
     public Person saveOrGet(PersonCreateRequest request) {
         Person person = personRepository.findByIdNumber(request.getIdNumber())
             .orElse(save(request));
@@ -80,6 +92,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @Transactional
     public Person update(UUID id, PersonUpdateRequest request) {
         Person existingPerson = personRepository.findById(id)
             .orElseThrow(RecordNotFoundException::new);
@@ -88,6 +101,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID id) {
         String username = currentUserService.getCurrentUsername();
         Person existingPerson = personRepository.findById(id)

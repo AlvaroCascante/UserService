@@ -24,7 +24,7 @@ public class PhoneController {
 
     @PostMapping("/{idPerson}/phone")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')") // ADMIN or USER roles can access
+    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<Phone> addPhone(
             @PathVariable UUID idPerson,
             @RequestBody PhoneCreateRequest request
@@ -36,7 +36,7 @@ public class PhoneController {
 
     @PutMapping("/phone/{idPhone}")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')") // ADMIN or USER roles can access
+    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<Phone> updatePhone(
             @PathVariable UUID idPhone,
             @RequestBody PhoneUpdateRequest request
@@ -47,7 +47,7 @@ public class PhoneController {
     }
 
     @DeleteMapping("/phone/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')") // ADMIN or USER roles can access
+    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<Void> deletePhone(@PathVariable UUID id) {
         log.info("DELETE /api/persons/phone/{} called", id);
         phoneService.deleteById(id);

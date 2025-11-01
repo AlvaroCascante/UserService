@@ -1,7 +1,6 @@
 package com.quetoquenana.userservice.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.quetoquenana.userservice.dto.UserCreateRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.model.User;
