@@ -221,7 +221,7 @@
 					"response": []
 				},
 				{
-					"name": "Get By IdNumber Copy",
+					"name": "Get By Status",
 					"id": "5067618-dd7d1c76-0d55-4718-9229-57363e81d4ac",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
