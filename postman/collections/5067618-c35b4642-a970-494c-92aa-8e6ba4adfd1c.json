@@ -904,6 +904,51 @@
 					"response": []
 				},
 				{
+					"name": "Get By Id Copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-f9a254d0-3c5d-46ce-a845-98228a5998e6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"id": "e169982a-250b-4ab4-984f-569d5f794ca7",
+									"key": "id",
+									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create User",
 					"event": [
 						{
