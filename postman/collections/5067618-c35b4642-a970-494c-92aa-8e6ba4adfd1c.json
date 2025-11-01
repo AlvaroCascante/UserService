@@ -787,7 +787,54 @@
 		},
 		{
 			"name": "Users",
-			"item": [],
+			"item": [
+				{
+					"name": "Create Person Copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-60ba27c5-73c4-4ec4-840f-e99728f8b53c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{$randomFirstName}}\",\n  \"lastname\": \"{{$randomLastName}}\",\n  \"idNumber\": \"{{$randomUUID}}\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons"
+							]
+						}
+					},
+					"response": []
+				}
+			],
 			"id": "5067618-d5288b57-f8cf-4f04-b072-f4cecc0b864d"
 		},
 		{
