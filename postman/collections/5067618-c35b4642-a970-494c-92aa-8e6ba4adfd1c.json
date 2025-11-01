@@ -812,7 +812,7 @@
 					"response": []
 				},
 				{
-					"name": "Get All Copy",
+					"name": "Get All Page",
 					"event": [
 						{
 							"listen": "prerequest",
