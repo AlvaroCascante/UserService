@@ -775,7 +775,7 @@
 			"name": "Users",
 			"item": [
 				{
-					"name": "Create User",
+					"name": "Get All",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -790,12 +790,12 @@
 							}
 						}
 					],
-					"id": "5067618-60ba27c5-73c4-4ec4-840f-e99728f8b53c",
+					"id": "5067618-e2c24e9c-502e-4572-a5b1-3b62f909caa8",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
@@ -821,7 +821,7 @@
 					"response": []
 				},
 				{
-					"name": "Create User Copy",
+					"name": "Create User",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -836,7 +836,7 @@
 							}
 						}
 					],
-					"id": "5067618-e2c24e9c-502e-4572-a5b1-3b62f909caa8",
+					"id": "5067618-60ba27c5-73c4-4ec4-840f-e99728f8b53c",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
