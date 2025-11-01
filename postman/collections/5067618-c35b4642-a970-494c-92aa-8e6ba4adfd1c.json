@@ -773,38 +773,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Delete Profile",
-					"id": "5067618-15a41000-5eff-4510-8880-a86117f85902",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/address/:id",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"persons",
-								"address",
-								":id"
-							],
-							"variable": [
-								{
-									"id": "79638953-b260-46e0-8eb2-42d1c0929580",
-									"key": "id",
-									"value": "58302ac7-04c7-4df9-8088-4b84f6b52014"
-								}
-							]
-						}
-					},
-					"response": []
 				}
 			],
 			"id": "5067618-65ea6334-d581-4fca-b318-d76299888653"
