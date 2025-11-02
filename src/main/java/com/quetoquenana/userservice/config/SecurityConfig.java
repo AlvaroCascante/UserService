@@ -52,11 +52,6 @@ public class SecurityConfig {
                         .username("admin")
                         .password(passwordEncoder.encode("password"))
                         .roles("ADMIN")
-                        .build(),
-                User.builder()
-                        .username("auditor")
-                        .password(passwordEncoder.encode("password"))
-                        .roles("AUDITOR")
                         .build()
         );
     }

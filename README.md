@@ -37,11 +37,17 @@ This template uses Spring Security with the following configuration:
 - **HTTP Basic Authentication** is enabled for all endpoints except `GET /api/executions`, which is public.
 - **User Details:**
   - Username: `user`
-  - Password: `password` (BCrypt encoded)
-  - Role: `SYSTEM`
+    - Password: `password`
+    - Role: `USER`
+  - Username: `system`
+      - Password: `password`
+      - Role: `SYSTEM
+  - Username: `admin`
+      - Password: `password`
+      - Role: `ADMIN`
 - **Access Rules:**
   - `GET /api/executions`: Public (no authentication required)
-  - All other endpoints: Require authentication and the `SYSTEM` role
+  - All other endpoints: Require authentication and some role
 - **Configuration Location:** See `src/main/java/com/quetoquenana/template/config/SecurityConfig.java` for details.
 
 ## Example Feature: Execution Tracking Table
@@ -140,6 +146,33 @@ This project uses Data Transfer Objects (DTOs) to handle incoming API requests. 
 **Example:**
 When creating or updating a person or profile, the API expects a DTO payload rather than the full entity object. This ensures only updatable fields are processed and sensitive/internal fields are not exposed.
 
+## Exception handling
+
+This project centralizes API error handling with a global Spring MVC exception handler (a class annotated with `@ControllerAdvice`) that converts exceptions into consistent JSON error responses.
+
+### Overview
+- A single `@ControllerAdvice` class handles uncaught exceptions, specific domain exceptions, and validation failures.
+- Handled exceptions are mapped to appropriate HTTP status codes (4xx for client errors, 5xx for server errors).
+- Validation errors from Jakarta Bean Validation (`@Valid`) are returned as structured field errors.
+
+### Error response format
+The API returns a standardized JSON error payload. Example:
+```json
+{
+  "timestamp": "2025-11-02T12:34:56.789Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Validation failed",
+  "path": "/api/persons",
+  "errors": [
+    {
+      "field": "email",
+      "rejectedValue": "bad-email",
+      "message": "must be a well-formed email address"
+    }
+  ]
+}
+```
 ## License
 
 This template is provided as-is for bootstrapping new Spring Boot projects.
