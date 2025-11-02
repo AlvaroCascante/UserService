@@ -582,7 +582,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"address\": \"{{$randomStreetAddress}}\",\n  \"country\": \"{{$randomCountry}}\",\n  \"city\": \"{{$randomCity}}\",\n  \"state\": \"{{$randomCity}}\",\n  \"zipCode\": \"28001\",\n  \"addressType\": \"WORK\"\n}\n",
+							"raw": "{\n  \"address\": \"{{$randomStreetAddress}}\",\n  \"country\": \"{{$randomCountry}}\",\n  \"city\": \"{{$randomCity}}\",\n  \"state\": \"{{$randomCity}}\",\n  \"zipCode\": \"28001\",\n  \"addressType\": \"HOME\"\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
