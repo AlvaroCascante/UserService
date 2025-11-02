@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class ResetPasswordRequest {
-    @NotBlank
+    @NotBlank(message = "{field.not.blank}")
     private String newPassword;
 }
 

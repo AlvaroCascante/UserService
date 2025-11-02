@@ -6,6 +6,7 @@ import com.quetoquenana.userservice.model.Phone;
 import com.quetoquenana.userservice.service.PhoneService;
 import com.quetoquenana.userservice.dto.PhoneCreateRequest;
 import com.quetoquenana.userservice.dto.PhoneUpdateRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class PhoneController {
     @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<Phone> addPhone(
             @PathVariable UUID idPerson,
-            @RequestBody PhoneCreateRequest request
+            @Valid @RequestBody PhoneCreateRequest request
     ) {
         log.info("POST /api/persons/{}/phone called with payload: {}", idPerson, request);
         Phone created = phoneService.addPhoneToPerson(idPerson, request);

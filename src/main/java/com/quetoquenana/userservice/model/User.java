@@ -34,7 +34,7 @@ public class User extends Auditable {
     @JsonView(ApiBaseResponseView.NoShow.class)
     private String passwordHash;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_id", nullable = false)
     @JsonView(UserDetail.class)
     private Person person;

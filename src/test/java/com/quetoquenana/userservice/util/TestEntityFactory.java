@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class TestEntityFactory {
 
     public static final String DEFAULT_ID_NUMBER = "ID123456";
+    public static final String DEFAULT_USERNAME = "user@email.com";
     public static final String DEFAULT_USER = "testUser";
     public static final String ROLE_ADMIN = "ADMIN";
 
@@ -45,7 +46,7 @@ public class TestEntityFactory {
             String createdBy
     ) {
         User user = User.builder()
-                .username("username")
+                .username(DEFAULT_USERNAME)
                 .passwordHash("passwordHash")
                 .nickname("nick")
                 .userStatus(UserStatus.ACTIVE)
@@ -83,7 +84,7 @@ public class TestEntityFactory {
 
     public static UserCreateRequest getUserCreateRequest() {
         UserCreateRequest req = new UserCreateRequest();
-        req.setUsername("username");
+        req.setUsername(DEFAULT_USERNAME);
         req.setPassword("pass");
         req.setNickname("nick");
         req.setPerson(getPersonCreateRequest(DEFAULT_ID_NUMBER, true));
@@ -109,15 +110,6 @@ public class TestEntityFactory {
         }
     }
 
-    public static String createPersonPayload(ObjectMapper objectMapper, boolean isActive) {
-        try {
-            PersonCreateRequest req = getPersonCreateRequest(DEFAULT_ID_NUMBER, isActive);
-            return objectMapper.writeValueAsString(req);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static PersonUpdateRequest getPersonUpdateRequest(Boolean isActive) {
         PersonUpdateRequest req = new PersonUpdateRequest();
         req.setName("John");
@@ -131,15 +123,6 @@ public class TestEntityFactory {
         req.setNickname("nickname");
         req.setUserStatus(UserStatus.ACTIVE.name());
         return req;
-    }
-
-    public static String createPersonUpdatePayload(ObjectMapper objectMapper, Boolean isActive) {
-        try {
-            PersonUpdateRequest req = getPersonUpdateRequest(isActive);
-            return objectMapper.writeValueAsString(req);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static Profile createProfile(Person person) {

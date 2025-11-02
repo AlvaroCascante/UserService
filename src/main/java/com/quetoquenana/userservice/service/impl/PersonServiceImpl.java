@@ -78,26 +78,19 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     @Transactional
-    public Person saveOrGet(PersonCreateRequest request) {
-        Person person = personRepository.findByIdNumber(request.getIdNumber())
-            .orElse(save(request));
-        if (!person.isActive()) {
-            person.setActive(true);
-            person.setUpdatedAt(LocalDateTime.now());
-            person.setUpdatedBy(currentUserService.getCurrentUsername());
-            return personRepository.save(person);
-        } else {
-            return person;
-        }
-    }
-
-    @Override
-    @Transactional
     public Person update(UUID id, PersonUpdateRequest request) {
         Person existingPerson = personRepository.findById(id)
             .orElseThrow(RecordNotFoundException::new);
         existingPerson.updateFromRequest(request, currentUserService.getCurrentUsername());
         return personRepository.save(existingPerson);
+    }
+
+    @Override
+    public void activateById(UUID id) {
+        Person existingPerson = personRepository.findById(id)
+                .orElseThrow(RecordNotFoundException::new);
+        existingPerson.activate(currentUserService.getCurrentUsername());
+        personRepository.save(existingPerson);
     }
 
     @Override

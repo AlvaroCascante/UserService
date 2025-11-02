@@ -21,9 +21,9 @@ public interface PersonService {
 
     Person save(PersonCreateRequest request);
 
-    Person saveOrGet(PersonCreateRequest request);
-
     Person update(UUID id, PersonUpdateRequest request);
+
+    void activateById(UUID id);
 
     void deleteById(UUID id);
 

@@ -60,7 +60,7 @@ public class Address {
                 .city(request.getCity())
                 .state(request.getState())
                 .zipCode(request.getZipCode())
-                .addressType(request.getAddressType())
+                .addressType(AddressType.valueOf(request.getAddressType()))
                 .build();
     }
 

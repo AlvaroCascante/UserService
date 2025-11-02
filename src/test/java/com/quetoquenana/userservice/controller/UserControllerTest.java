@@ -49,7 +49,7 @@ class UserControllerTest {
         userId = UUID.randomUUID();
         user = User.builder()
                 .id(userId)
-                .username("jdoe")
+                .username("Joe")
                 .nickname("Johnny")
                 .userStatus(UserStatus.ACTIVE)
                 .build();

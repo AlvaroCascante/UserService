@@ -35,7 +35,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public User save(UserCreateRequest request) {
         // Create or get person
-        Person person = personService.saveOrGet(request.getPerson());
+        Person person = personService.findByIdNumber(request.getPerson().getIdNumber())
+            .map(found -> {
+                // Ensure person is active
+                if (!found.isActive()) {
+                    found.setActive(true);
+                    personService.activateById(found.getId());
+                }
+                return found;
+            })
+            .orElseGet(() ->
+                personService.save(request.getPerson())
+            );
 
         // Check username uniqueness
         if (userRepository.existsByUsername(request.getUsername())) {

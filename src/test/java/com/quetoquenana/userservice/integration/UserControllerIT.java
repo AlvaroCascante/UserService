@@ -81,7 +81,7 @@ class UserControllerIT {
                 .content(json))
                 .andExpect(status().isCreated());
 
-        Optional<User> saved = userRepository.findByUsername("username");
+        Optional<User> saved = userRepository.findByUsername(DEFAULT_USERNAME);
         assertThat(saved).isPresent();
         assertThat(saved.get().getCreatedBy()).isEqualTo(DEFAULT_USER);
         assertThat(saved.get().getCreatedAt()).isNotNull();
@@ -118,7 +118,7 @@ class UserControllerIT {
         User user = TestEntityFactory.createUser(LocalDateTime.now().minusDays(1), "creator");
         userRepository.save(user);
         userRepository.flush();
-        user = userRepository.findByUsername("username").orElseThrow();
+        user = userRepository.findByUsername(DEFAULT_USERNAME).orElseThrow();
 
         mockMvc.perform(delete(BASE_URL + "/" + user.getId()))
                 .andExpect(status().isNoContent());
@@ -137,7 +137,7 @@ class UserControllerIT {
         User user = TestEntityFactory.createUser(LocalDateTime.now().minusDays(1), "creator");
         userRepository.save(user);
         userRepository.flush();
-        user = userRepository.findByUsername("username").orElseThrow();
+        user = userRepository.findByUsername(DEFAULT_USERNAME).orElseThrow();
 
         String json = "{\"newPassword\":\"newpass\"}";
 
@@ -182,7 +182,7 @@ class UserControllerIT {
                 .andExpect(status().isCreated());
 
         // Assert: user was created and linked to the existing person
-        Optional<User> saved = userRepository.findByUsername("username");
+        Optional<User> saved = userRepository.findByUsername(DEFAULT_USERNAME);
         assertThat(saved).isPresent();
         User created = saved.get();
         assertThat(created.getPerson()).isNotNull();

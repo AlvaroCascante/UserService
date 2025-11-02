@@ -1,15 +1,16 @@
 
 package com.quetoquenana.userservice.dto;
 
-import com.quetoquenana.userservice.model.PhoneCategory;
-import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
 @Data
 public class PhoneCreateRequest {
-    @NotBlank
+    @NotBlank(message = "{field.not.blank}")
     private String phoneNumber;
-    @NotBlank
-    private PhoneCategory category;
+
+    @NotBlank(message = "{field.not.blank}")
+    private String category;
+
     private Boolean isMain;
 }

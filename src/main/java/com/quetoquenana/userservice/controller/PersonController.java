@@ -8,6 +8,7 @@ import com.quetoquenana.userservice.model.ApiResponse;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.service.PersonService;
 import com.quetoquenana.userservice.util.JsonViewPageUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -94,7 +95,7 @@ public class PersonController {
     @JsonView(Person.PersonDetail.class)
     @PreAuthorize("hasRole('ADMIN')") // Only ADMIN role can access
     public ResponseEntity<ApiResponse> createPerson(
-            @RequestBody PersonCreateRequest request
+            @Valid @RequestBody PersonCreateRequest request
     ) {
         log.info("POST /api/persons called with payload: {}", request);
         Person entity = personService.save(request);

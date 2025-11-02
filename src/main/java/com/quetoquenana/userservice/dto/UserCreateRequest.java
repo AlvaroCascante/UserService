@@ -1,19 +1,20 @@
 package com.quetoquenana.userservice.dto;
 
 import com.quetoquenana.userservice.model.UserStatus;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class UserCreateRequest {
-    @NotBlank
+    @Email(message = "{user.email.invalid}")
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "{field.not.blank}")
     private String password;
 
-    @NotNull
+    @NotNull(message = "{field.not.null}")
     private PersonCreateRequest person;
 
     private String nickname;

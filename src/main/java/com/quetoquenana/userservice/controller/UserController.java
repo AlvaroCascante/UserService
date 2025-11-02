@@ -9,6 +9,7 @@ import com.quetoquenana.userservice.model.ApiResponse;
 import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.service.UserService;
 import com.quetoquenana.userservice.util.JsonViewPageUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -83,7 +84,7 @@ public class UserController {
     @JsonView(User.UserDetail.class)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> createUser(
-            @RequestBody UserCreateRequest request
+            @Valid @RequestBody UserCreateRequest request
     ) {
         log.info("POST /api/users called with payload: {}", request);
         User entity = userService.save(request);
@@ -117,7 +118,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> resetPassword(
             @PathVariable UUID id,
-            @RequestBody ResetPasswordRequest request
+            @Valid @RequestBody ResetPasswordRequest request
     ) {
         log.info("POST /api/users/{}/reset-password called", id);
         userService.resetPassword(id, request.getNewPassword());

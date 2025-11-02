@@ -6,6 +6,7 @@ import com.quetoquenana.userservice.dto.AddressUpdateRequest;
 import com.quetoquenana.userservice.model.Address;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.service.AddressService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class AddressController {
     @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<Address> createAddress(
             @PathVariable UUID idPerson,
-            @RequestBody AddressCreateRequest request
+            @Valid @RequestBody AddressCreateRequest request
     ) {
         log.info("POST /api/persons/{}/address called with payload: {}", idPerson, request);
         Address created = addressService.addAddressToPerson(idPerson, request);

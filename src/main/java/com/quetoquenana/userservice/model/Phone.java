@@ -46,7 +46,7 @@ public class Phone {
         return Phone.builder()
                 .isMain(request.getIsMain())
                 .phoneNumber(request.getPhoneNumber())
-                .category(request.getCategory())
+                .category(PhoneCategory.valueOf(request.getCategory()))
                 .build();
     }
 

@@ -5,13 +5,13 @@ import lombok.Data;
 
 @Data
 public class PersonCreateRequest {
-    @NotBlank
+    @NotBlank(message = "{field.not.blank}")
     private String idNumber;
 
-    @NotBlank
+    @NotBlank(message = "{field.not.blank}")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "{field.not.blank}")
     private String lastname;
 
     private Boolean isActive;

@@ -109,4 +109,10 @@ public class Person extends Auditable {
         this.setUpdatedAt(LocalDateTime.now());
         this.setUpdatedBy(username);
     }
+
+    public void activate(String username) {
+        this.setActive(true);
+        this.setUpdatedAt(LocalDateTime.now());
+        this.setUpdatedBy(username);
+    }
 }

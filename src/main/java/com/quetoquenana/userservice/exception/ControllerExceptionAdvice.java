@@ -4,8 +4,10 @@ import com.quetoquenana.userservice.model.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -14,8 +16,23 @@ import java.util.Locale;
 @Slf4j
 @ControllerAdvice
 public class ControllerExceptionAdvice {
+
     @Autowired
     private MessageSource messageSource;
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException ex) {
+        log.error("MethodArgumentNotValidException: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(new ApiResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex) {
+        log.error("DataIntegrityViolationException: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(new ApiResponse("DataIntegrityViolationException", HttpStatus.BAD_REQUEST.value()));
+    }
 
     @ExceptionHandler(ImmutableFieldModificationException.class)
     public ResponseEntity<ApiResponse> handleImmutableFieldModificationException(
