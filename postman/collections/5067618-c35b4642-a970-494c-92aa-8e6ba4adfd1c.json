@@ -213,7 +213,7 @@
 							"variable": [
 								{
 									"key": "idNumber",
-									"value": "d99fc53f-5b40-4712-8793-0316fcd82440"
+									"value": "5da8c7f6-b61d-42cf-901f-be95c0349a0d"
 								}
 							]
 						}
@@ -582,7 +582,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"address\": \"{{$randomStreetAddress}}\",\n  \"country\": \"{{$randomCountry}}\",\n  \"city\": \"{{$randomCity}}\",\n  \"state\": \"{{$randomCity}}\",\n  \"zipCode\": \"28001\",\n  \"addressType\": \"WORK\"\n}\n",
+							"raw": "{\n  \"address\": \"{{$randomStreetAddress}}\",\n  \"country\": \"{{$randomCountry}}\",\n  \"city\": \"{{$randomCity}}\",\n  \"state\": \"{{$randomCity}}\",\n  \"zipCode\": \"28001\",\n  \"addressType\": \"HOME\"\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -775,6 +775,180 @@
 			"name": "Users",
 			"item": [
 				{
+					"name": "Get All",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-e2c24e9c-502e-4572-a5b1-3b62f909caa8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Page",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-d61806a3-2221-41e0-8749-55fd4a1bd2d1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users/page?page=0&size=5",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users",
+								"page"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-286cb780-e352-4bf8-8310-8103d2c4c1b5",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Username",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-f9a254d0-3c5d-46ce-a845-98228a5998e6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users/by-username/:username",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users",
+								"by-username",
+								":username"
+							],
+							"variable": [
+								{
+									"key": "username",
+									"value": "Jasen.Stoltenberg@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create User",
 					"event": [
 						{
@@ -799,7 +973,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"{{$randomEmail}}\",\n  \"password\": \"P@ssw0rd!\",\n  \"person\": {\n    \"idNumber\": \"111080683\",\n    \"name\": \"John\",\n    \"lastname\": \"Doe\"\n  },\n  \"nickname\": \"Ksknt\"\n}",
+							"raw": "{\n  \"username\": \"{{$randomEmail}}\",\n  \"password\": \"P@ssw0rd!\",\n  \"person\": {\n    \"idNumber\": \"5da8c7f6-b61d-42cf-901f-be95c0349a0d\",\n    \"name\": \"John\",\n    \"lastname\": \"Doe\"\n  },\n  \"nickname\": \"Ksknt\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -815,6 +989,112 @@
 								"{{path}}",
 								"api",
 								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateUser",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-aee6d82f-f5e6-42c7-ad1d-614ea17923f2",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nickname\": \"New\",\n  \"userStatus\": \"ACTIVE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-d9154d6e-36b9-48fb-9eac-e1be19b9f6c9",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nickname\": \"New\",\n  \"userStatus\": \"INACTIVE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
+								}
 							]
 						}
 					},
