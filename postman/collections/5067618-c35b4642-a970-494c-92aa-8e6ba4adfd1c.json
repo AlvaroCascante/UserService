@@ -279,7 +279,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"lastname\": \"Keefe\",\n    \"unknown\": \"Yes\"\n}",
+							"raw": "{\n    \"name\": \"MyApp\",\n    \"description\": \"My application test\",\n    \"isActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
