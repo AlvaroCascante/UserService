@@ -127,7 +127,7 @@
 					"response": []
 				},
 				{
-					"name": "Get By Name Copy",
+					"name": "Search By Name",
 					"id": "5067618-c9b71776-e7a0-4555-b8d7-2a448b239487",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
