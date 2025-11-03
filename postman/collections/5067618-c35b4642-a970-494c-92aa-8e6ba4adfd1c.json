@@ -96,7 +96,7 @@
 					"response": []
 				},
 				{
-					"name": "Get By IdNumber",
+					"name": "Get By Name",
 					"id": "5067618-eab0edeb-e749-4bcb-b636-853cf6ed5228",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
