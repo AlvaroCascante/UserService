@@ -165,7 +165,7 @@
 					"response": []
 				},
 				{
-					"name": "Create Person",
+					"name": "Create Application",
 					"event": [
 						{
 							"listen": "prerequest",
