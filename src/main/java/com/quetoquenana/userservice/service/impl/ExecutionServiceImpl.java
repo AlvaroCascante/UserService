@@ -29,7 +29,7 @@ public class ExecutionServiceImpl implements ExecutionService {
     /**
      * Save a new execution record. Called by StartupExecutionRecorder.
      */
-    public void saveExecutionOnStartup() {
+    public void save() {
         Execution execution = new Execution();
         execution.setId(UUID.randomUUID());
         execution.setExecutedAt(LocalDateTime.now());

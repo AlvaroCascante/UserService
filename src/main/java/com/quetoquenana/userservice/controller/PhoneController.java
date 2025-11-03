@@ -31,7 +31,7 @@ public class PhoneController {
             @Valid @RequestBody PhoneCreateRequest request
     ) {
         log.info("POST /api/persons/{}/phone called with payload: {}", idPerson, request);
-        Phone created = phoneService.addPhoneToPerson(idPerson, request);
+        Phone created = phoneService.addPhone(idPerson, request);
         return ResponseEntity.ok(created);
     }
 

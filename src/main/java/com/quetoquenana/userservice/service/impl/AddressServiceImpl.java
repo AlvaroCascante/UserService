@@ -26,7 +26,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Transactional
     @Override
-    public Address addAddressToPerson(UUID personId, AddressCreateRequest request) {
+    public Address addAddress(UUID personId, AddressCreateRequest request) {
         Person person = personRepository.findById(personId)
                 .orElseThrow(RecordNotFoundException::new);
         if (!person.isActive()) {
@@ -57,7 +57,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Transactional
     @Override
-    public void deleteById(UUID addressId) {
+    public void delete(UUID addressId) {
         Address existingAddress = addressRepository.findById(addressId)
                 .orElseThrow(RecordNotFoundException::new);
         if (!existingAddress.getPerson().isActive()) {

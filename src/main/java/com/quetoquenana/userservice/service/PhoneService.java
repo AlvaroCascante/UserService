@@ -7,7 +7,9 @@ import com.quetoquenana.userservice.model.Phone;
 import java.util.UUID;
 
 public interface PhoneService {
-    Phone addPhoneToPerson(UUID idPerson, PhoneCreateRequest request);
+    Phone addPhone(UUID idPerson, PhoneCreateRequest request);
+
     Phone updatePhone(UUID idPhone, PhoneUpdateRequest request);
+
     void deleteById(UUID idPhone);
 }

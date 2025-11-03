@@ -10,6 +10,6 @@ import org.springframework.data.domain.Pageable;
 public interface ExecutionService {
     List<Execution> findAll();
     Optional<Execution> findById(UUID id);
-    void saveExecutionOnStartup();
+    void save();
     Page<Execution> findAll(Pageable pageable);
 }

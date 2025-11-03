@@ -7,7 +7,9 @@ import com.quetoquenana.userservice.model.Address;
 import java.util.UUID;
 
 public interface AddressService {
-    Address addAddressToPerson(UUID idPerson, AddressCreateRequest request);
+    Address addAddress(UUID idPerson, AddressCreateRequest request);
+
     Address updateAddress(UUID idPhone, AddressUpdateRequest request);
-    void deleteById(UUID idPhone);
+
+    void delete(UUID idPhone);
 }

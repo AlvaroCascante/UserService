@@ -25,7 +25,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final CurrentUserService currentUserService;
 
     @Override
-    public Profile addProfileToPerson(UUID idPerson, ProfileCreateRequest request) {
+    public Profile addProfile(UUID idPerson, ProfileCreateRequest request) {
         Person person = personRepository.findById(idPerson)
             .map(it -> {
                 if (!it.isActive()) {

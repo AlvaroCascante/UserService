@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -78,7 +79,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void deleteById(UUID id) {
+    public void delete(UUID id) {
         User existing = userRepository.findById(id)
                 .orElseThrow(RecordNotFoundException::new);
         existing.updateStatus(UserStatus.INACTIVE, currentUserService.getCurrentUsername());
@@ -98,6 +99,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findById(UUID id) {
         return userRepository.findById(id);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
     @Override

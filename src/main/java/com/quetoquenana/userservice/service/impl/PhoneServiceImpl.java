@@ -28,7 +28,7 @@ public class PhoneServiceImpl implements PhoneService {
 
     @Transactional
     @Override
-    public Phone addPhoneToPerson(UUID personId, PhoneCreateRequest request) {
+    public Phone addPhone(UUID personId, PhoneCreateRequest request) {
         Person person = personRepository.findById(personId)
                 .orElseThrow(RecordNotFoundException::new);
         if (!person.isActive()) {

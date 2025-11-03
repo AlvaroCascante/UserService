@@ -46,7 +46,7 @@ class PhoneControllerTest {
 
     @Test
     void addPhone_shouldReturnPhone() {
-        when(phoneService.addPhoneToPerson(eq(personId), any(PhoneCreateRequest.class))).thenReturn(phone);
+        when(phoneService.addPhone(eq(personId), any(PhoneCreateRequest.class))).thenReturn(phone);
         ResponseEntity<Phone> response = phoneController.addPhone(personId, new PhoneCreateRequest());
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(phone, response.getBody());
@@ -70,7 +70,7 @@ class PhoneControllerTest {
 
     @Test
     void addPhone_shouldThrowRecordNotFoundException() {
-        when(phoneService.addPhoneToPerson(eq(personId), any(PhoneCreateRequest.class)))
+        when(phoneService.addPhone(eq(personId), any(PhoneCreateRequest.class)))
                 .thenThrow(new RecordNotFoundException("Person not found"));
         assertThrows(RecordNotFoundException.class, () -> phoneController
                 .addPhone(personId, new PhoneCreateRequest()));
@@ -78,7 +78,7 @@ class PhoneControllerTest {
 
     @Test
     void addPhone_shouldThrowInactiveRecordException() {
-        when(phoneService.addPhoneToPerson(eq(personId), any(PhoneCreateRequest.class)))
+        when(phoneService.addPhone(eq(personId), any(PhoneCreateRequest.class)))
                 .thenThrow(new InactiveRecordException("Person is inactive"));
         assertThrows(InactiveRecordException.class, () -> phoneController
                 .addPhone(personId, new PhoneCreateRequest()));

@@ -60,25 +60,25 @@ class ProfileControllerTest {
 
     @Test
     void testAddProfile_PersonNotFound() {
-        when(profileService.addProfileToPerson(any(), any())).thenThrow(new RecordNotFoundException());
+        when(profileService.addProfile(any(), any())).thenThrow(new RecordNotFoundException());
         assertThrows(RecordNotFoundException.class, () -> profileController.addProfile(personId, profileCreateRequest));
     }
 
     @Test
     void testAddProfile_PersonInactive() {
-        when(profileService.addProfileToPerson(any(), any())).thenThrow(new InactiveRecordException());
+        when(profileService.addProfile(any(), any())).thenThrow(new InactiveRecordException());
         assertThrows(InactiveRecordException.class, () -> profileController.addProfile(personId, profileCreateRequest));
     }
 
     @Test
     void testAddProfile_ProfileAlreadyExists() {
-        when(profileService.addProfileToPerson(any(), any())).thenThrow(new DuplicateRecordException());
+        when(profileService.addProfile(any(), any())).thenThrow(new DuplicateRecordException());
         assertThrows(DuplicateRecordException.class, () -> profileController.addProfile(personId, profileCreateRequest));
     }
 
     @Test
     void testAddProfile_Success() {
-        when(profileService.addProfileToPerson(any(), any())).thenReturn(profile);
+        when(profileService.addProfile(any(), any())).thenReturn(profile);
         var response = profileController.addProfile(personId, profileCreateRequest);
         assertDoesNotThrow(() -> response);
         assertNotNull(response);

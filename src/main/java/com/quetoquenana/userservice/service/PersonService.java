@@ -13,11 +13,13 @@ import java.util.UUID;
 public interface PersonService {
     List<Person> findAll();
 
-    List<Person> findByIsActive(boolean isActive);
-
     Page<Person> findAll(Pageable pageable);
 
+    List<Person> findByIsActive(boolean isActive);
+
     Optional<Person> findById(UUID id);
+
+    Optional<Person> findByIdNumber(String idNumber);
 
     Person save(PersonCreateRequest request);
 
@@ -26,6 +28,4 @@ public interface PersonService {
     void activateById(UUID id);
 
     void deleteById(UUID id);
-
-    Optional<Person> findByIdNumber(String idNumber);
 }

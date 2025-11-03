@@ -79,10 +79,10 @@ public class PersonServiceImpl implements PersonService {
     @Override
     @Transactional
     public Person update(UUID id, PersonUpdateRequest request) {
-        Person existingPerson = personRepository.findById(id)
+        Person existing = personRepository.findById(id)
             .orElseThrow(RecordNotFoundException::new);
-        existingPerson.updateFromRequest(request, currentUserService.getCurrentUsername());
-        return personRepository.save(existingPerson);
+        existing.updateFromRequest(request, currentUserService.getCurrentUsername());
+        return personRepository.save(existing);
     }
 
     @Override
@@ -96,13 +96,12 @@ public class PersonServiceImpl implements PersonService {
     @Override
     @Transactional
     public void deleteById(UUID id) {
-        String username = currentUserService.getCurrentUsername();
         Person existingPerson = personRepository.findById(id)
                 .orElseThrow(RecordNotFoundException::new);
         if (existingPerson.isActive()) {
             existingPerson.setActive(false);
             existingPerson.setUpdatedAt(LocalDateTime.now());
-            existingPerson.setUpdatedBy(username);
+            existingPerson.setUpdatedBy(currentUserService.getCurrentUsername());
             personRepository.save(existingPerson);
         }
     }

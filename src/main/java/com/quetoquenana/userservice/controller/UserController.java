@@ -110,7 +110,7 @@ public class UserController {
             @PathVariable UUID id
     ) {
         log.info("DELETE /api/users/{} called", id);
-        userService.deleteById(id);
+        userService.delete(id);
         return ResponseEntity.noContent().build();
     }
 

@@ -49,7 +49,7 @@ class AddressControllerTest {
 
     @Test
     void createAddress_shouldReturnAddress() {
-        when(addressService.addAddressToPerson(eq(personId), any(AddressCreateRequest.class))).thenReturn(address);
+        when(addressService.addAddress(eq(personId), any(AddressCreateRequest.class))).thenReturn(address);
         ResponseEntity<Address> response = addressController.createAddress(personId, new AddressCreateRequest());
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(address, response.getBody());
@@ -65,7 +65,7 @@ class AddressControllerTest {
 
     @Test
     void deleteAddress_shouldReturnNoContent() {
-        doNothing().when(addressService).deleteById(addressId);
+        doNothing().when(addressService).delete(addressId);
         ResponseEntity<Void> response = addressController.deleteAddress(addressId);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertNull(response.getBody());
@@ -73,7 +73,7 @@ class AddressControllerTest {
 
     @Test
     void addPhone_shouldThrowRecordNotFoundException() {
-        when(addressService.addAddressToPerson(eq(personId), any(AddressCreateRequest.class)))
+        when(addressService.addAddress(eq(personId), any(AddressCreateRequest.class)))
                 .thenThrow(new RecordNotFoundException("Person not found"));
         assertThrows(RecordNotFoundException.class, () ->
                 addressController.createAddress(personId, new AddressCreateRequest()));
@@ -81,7 +81,7 @@ class AddressControllerTest {
 
     @Test
     void addPhone_shouldThrowInactiveRecordException() {
-        when(addressService.addAddressToPerson(eq(personId), any(AddressCreateRequest.class)))
+        when(addressService.addAddress(eq(personId), any(AddressCreateRequest.class)))
                 .thenThrow(new InactiveRecordException("Person is inactive"));
         assertThrows(InactiveRecordException.class, () ->
                 addressController.createAddress(personId, new AddressCreateRequest()));
@@ -105,14 +105,14 @@ class AddressControllerTest {
 
     @Test
     void deletePhone_shouldThrowRecordNotFoundException() {
-        doThrow(new RecordNotFoundException("Phone not found")).when(addressService).deleteById(addressId);
+        doThrow(new RecordNotFoundException("Phone not found")).when(addressService).delete(addressId);
         assertThrows(RecordNotFoundException.class, () ->
                 addressController.deleteAddress(addressId));
     }
 
     @Test
     void deletePhone_shouldThrowInactiveRecordException() {
-        doThrow(new InactiveRecordException("Phone is inactive")).when(addressService).deleteById(addressId);
+        doThrow(new InactiveRecordException("Phone is inactive")).when(addressService).delete(addressId);
         assertThrows(InactiveRecordException.class, () ->
                 addressController.deleteAddress(addressId));
     }

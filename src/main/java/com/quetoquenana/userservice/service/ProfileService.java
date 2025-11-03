@@ -7,6 +7,7 @@ import com.quetoquenana.userservice.model.Profile;
 import java.util.UUID;
 
 public interface ProfileService {
-    Profile addProfileToPerson(UUID idPerson, ProfileCreateRequest request);
+    Profile addProfile(UUID idPerson, ProfileCreateRequest request);
+
     Profile updateProfile(UUID idProfile, ProfileUpdateRequest request);
 }

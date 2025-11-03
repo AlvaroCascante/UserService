@@ -30,7 +30,7 @@ public class ProfileController {
             @RequestBody ProfileCreateRequest request
     ) {
         log.info("POST /api/persons/{}/profile called with payload: {}", idPerson, request);
-        Profile createdProfile = profileService.addProfileToPerson(idPerson, request);
+        Profile createdProfile = profileService.addProfile(idPerson, request);
         return ResponseEntity.ok(createdProfile);
     }
 

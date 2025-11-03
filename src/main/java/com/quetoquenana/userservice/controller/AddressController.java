@@ -31,7 +31,7 @@ public class AddressController {
             @Valid @RequestBody AddressCreateRequest request
     ) {
         log.info("POST /api/persons/{}/address called with payload: {}", idPerson, request);
-        Address created = addressService.addAddressToPerson(idPerson, request);
+        Address created = addressService.addAddress(idPerson, request);
         return ResponseEntity.ok(created);
     }
 
@@ -51,7 +51,7 @@ public class AddressController {
     @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
     public ResponseEntity<Void> deleteAddress(@PathVariable UUID id) {
         log.info("DELETE /api/persons/address/{} called", id);
-        addressService.deleteById(id);
+        addressService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
