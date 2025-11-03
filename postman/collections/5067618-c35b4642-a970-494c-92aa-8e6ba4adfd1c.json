@@ -75,19 +75,18 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/:id",
+							"raw": "{{HOST}}/{{path}}/api/applications/:id",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"persons",
+								"applications",
 								":id"
 							],
 							"variable": [
 								{
-									"id": "160b3fc7-895c-432e-aab4-15ca8a56aa79",
 									"key": "id",
 									"value": "d2b70130-aea5-4257-bf2d-a43deeaed265"
 								}
