@@ -127,6 +127,38 @@
 					"response": []
 				},
 				{
+					"name": "Get By Name Copy",
+					"id": "5067618-c9b71776-e7a0-4555-b8d7-2a448b239487",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/applications/name/:name",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"applications",
+								"name",
+								":name"
+							],
+							"variable": [
+								{
+									"id": "e5db33d3-14a0-4078-9d47-91a94ca9b976",
+									"key": "name",
+									"value": "MyApp"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get By Status",
 					"id": "5067618-72660a9f-f447-4bc8-ad76-9e54edc85171",
 					"protocolProfileBehavior": {
