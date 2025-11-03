@@ -136,7 +136,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/applications/search/?name=MyA&page=0&size=5",
+							"raw": "{{HOST}}/{{path}}/api/applications/search?name=MyA&page=0&size=5",
 							"host": [
 								"{{HOST}}"
 							],
@@ -144,8 +144,7 @@
 								"{{path}}",
 								"api",
 								"applications",
-								"search",
-								""
+								"search"
 							],
 							"query": [
 								{
@@ -159,38 +158,6 @@
 								{
 									"key": "size",
 									"value": "5"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get By Status",
-					"id": "5067618-72660a9f-f447-4bc8-ad76-9e54edc85171",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/status/:status",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"persons",
-								"status",
-								":status"
-							],
-							"variable": [
-								{
-									"id": "32f4f193-a012-488e-8f83-8474412d7272",
-									"key": "status",
-									"value": "true"
 								}
 							]
 						}
