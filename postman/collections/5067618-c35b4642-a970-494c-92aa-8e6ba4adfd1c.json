@@ -279,7 +279,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"MyApp\",\n    \"description\": \"My application test\",\n    \"isActive\": true\n}",
+							"raw": "{\n    \"name\": \"MyAppU\",\n    \"description\": \"My application test U\",\n    \"isActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -300,7 +300,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "852d8640-26f5-44a1-b5b7-555c06bb4968"
+									"value": "246b499c-f613-4ae1-9812-104f1c8f7c54"
 								}
 							]
 						}
