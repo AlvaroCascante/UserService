@@ -189,7 +189,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"MyApp\",\n    \"description\": \"My application test\",\n    \"isActive\": true\n}",
+							"raw": "{\n    \"name\": \"{{$randomCatchPhraseAdjective}}\",\n    \"description\": \"{{$randomCatchPhraseDescriptor}}\",\n    \"isActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
