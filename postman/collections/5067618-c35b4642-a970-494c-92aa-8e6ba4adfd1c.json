@@ -9,7 +9,7 @@
 			"name": "Applications",
 			"item": [
 				{
-					"name": "Fetch All Persons",
+					"name": "Fetch All Applications",
 					"id": "5067618-ac8f49a3-8922-486c-adf5-d6f2f170d318",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -18,14 +18,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons",
+							"raw": "{{HOST}}/{{path}}/api/applications",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"persons"
+								"applications"
 							]
 						}
 					},
