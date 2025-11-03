@@ -32,7 +32,7 @@
 					"response": []
 				},
 				{
-					"name": "Fetch All Persons Page",
+					"name": "Fetch All Applications Page",
 					"id": "5067618-011331af-7c68-47f0-bec1-4b83660dc013",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
