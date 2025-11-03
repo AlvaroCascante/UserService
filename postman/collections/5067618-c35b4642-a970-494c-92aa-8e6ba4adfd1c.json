@@ -136,7 +136,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/applications/name/:name",
+							"raw": "{{HOST}}/{{path}}/api/applications/search/?name=MyA&page=0&size=5",
 							"host": [
 								"{{HOST}}"
 							],
@@ -144,14 +144,21 @@
 								"{{path}}",
 								"api",
 								"applications",
-								"name",
-								":name"
+								"search",
+								""
 							],
-							"variable": [
+							"query": [
 								{
-									"id": "e5db33d3-14a0-4078-9d47-91a94ca9b976",
 									"key": "name",
-									"value": "MyApp"
+									"value": "MyA"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "5"
 								}
 							]
 						}
