@@ -6,6 +6,123 @@
 	},
 	"item": [
 		{
+			"name": "Addresses",
+			"item": [
+				{
+					"name": "Add Address",
+					"id": "5067618-585993a2-987b-4006-ac10-e975241b4e45",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"address\": \"{{$randomStreetAddress}}\",\n  \"country\": \"{{$randomCountry}}\",\n  \"city\": \"{{$randomCity}}\",\n  \"state\": \"{{$randomCity}}\",\n  \"zipCode\": \"28001\",\n  \"addressType\": \"HOME\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons/:id/address",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons",
+								":id",
+								"address"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "d2b70130-aea5-4257-bf2d-a43deeaed265"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Address",
+					"id": "5067618-410a26ec-70ab-4b31-8841-320309261a58",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"address\": \"123 Main St, Apt 4B\",\n  \"country\": \"Spain\",\n  \"city\": \"Barcelona\",\n  \"state\": \"Community of Barcelona\",\n  \"zipCode\": \"28001\",\n  \"addressType\": \"HOME\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons/address/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons",
+								"address",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "ba318d9e-4e01-41cc-908c-f7b286fe1cd2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Phone",
+					"id": "5067618-4e20aca2-04b9-4add-b864-1775af0ba7ce",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons/address/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons",
+								"address",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "e88f2a2b-49d2-40f2-bb69-0bb253255a1d"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "5067618-0d3923bf-1beb-418c-b80e-025e7b22ce67"
+		},
+		{
 			"name": "Executions",
 			"item": [
 				{
@@ -567,123 +684,6 @@
 				}
 			],
 			"id": "5067618-b668ce12-6e06-4572-9f99-e1c59974ccaa"
-		},
-		{
-			"name": "Addresses",
-			"item": [
-				{
-					"name": "Add Address",
-					"id": "5067618-585993a2-987b-4006-ac10-e975241b4e45",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"address\": \"{{$randomStreetAddress}}\",\n  \"country\": \"{{$randomCountry}}\",\n  \"city\": \"{{$randomCity}}\",\n  \"state\": \"{{$randomCity}}\",\n  \"zipCode\": \"28001\",\n  \"addressType\": \"HOME\"\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/:id/address",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"persons",
-								":id",
-								"address"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "d2b70130-aea5-4257-bf2d-a43deeaed265"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Address",
-					"id": "5067618-410a26ec-70ab-4b31-8841-320309261a58",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"address\": \"123 Main St, Apt 4B\",\n  \"country\": \"Spain\",\n  \"city\": \"Barcelona\",\n  \"state\": \"Community of Barcelona\",\n  \"zipCode\": \"28001\",\n  \"addressType\": \"HOME\"\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/address/:id",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"persons",
-								"address",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "ba318d9e-4e01-41cc-908c-f7b286fe1cd2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Phone",
-					"id": "5067618-4e20aca2-04b9-4add-b864-1775af0ba7ce",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/address/:id",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"persons",
-								"address",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "e88f2a2b-49d2-40f2-bb69-0bb253255a1d"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			],
-			"id": "5067618-0d3923bf-1beb-418c-b80e-025e7b22ce67"
 		},
 		{
 			"name": "Profiles",
