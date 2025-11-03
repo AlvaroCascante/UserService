@@ -211,7 +211,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete Person",
+					"name": "Delete Application",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -248,61 +248,6 @@
 								{
 									"id": "dd8e232f-4275-4e02-926b-c35267f54b86",
 									"key": "id",
-									"value": "852d8640-26f5-44a1-b5b7-555c06bb4968"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Add Person Profile",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"id": "5067618-a713913b-080d-4930-b5cf-4e8cb0a7689d",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"birthday\": \"1990-05-15\",\n    \"gender\": \"M\",\n    \"nationality\": \"Spanish\",\n    \"maritalStatus\": \"Single\",\n    \"occupation\": \"Engineer\",\n    \"profilePictureUrl\": \"https://example.com/profile.jpg\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/:idPerson/profile",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"persons",
-								":idPerson",
-								"profile"
-							],
-							"variable": [
-								{
-									"id": "25cbf817-f9c4-4d44-b566-a2c2bff243f4",
-									"key": "idPerson",
 									"value": "852d8640-26f5-44a1-b5b7-555c06bb4968"
 								}
 							]
