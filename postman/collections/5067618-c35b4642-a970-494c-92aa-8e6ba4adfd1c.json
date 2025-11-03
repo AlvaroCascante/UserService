@@ -6,6 +6,364 @@
 	},
 	"item": [
 		{
+			"name": "Persons Copy",
+			"item": [
+				{
+					"name": "Fetch All Persons",
+					"id": "5067618-ac8f49a3-8922-486c-adf5-d6f2f170d318",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch All Persons Page",
+					"id": "5067618-011331af-7c68-47f0-bec1-4b83660dc013",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons/page?page=0&size=5",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons",
+								"page"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By ID",
+					"id": "5067618-b071c401-f8d3-4262-a5a6-c3dbe29cf638",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons",
+								":id"
+							],
+							"variable": [
+								{
+									"id": "160b3fc7-895c-432e-aab4-15ca8a56aa79",
+									"key": "id",
+									"value": "d2b70130-aea5-4257-bf2d-a43deeaed265"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By IdNumber",
+					"id": "5067618-eab0edeb-e749-4bcb-b636-853cf6ed5228",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons/idNumber/:idNumber",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons",
+								"idNumber",
+								":idNumber"
+							],
+							"variable": [
+								{
+									"id": "2d781634-e9f4-4ad4-aa15-0e502c594fc1",
+									"key": "idNumber",
+									"value": "5da8c7f6-b61d-42cf-901f-be95c0349a0d"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Status",
+					"id": "5067618-72660a9f-f447-4bc8-ad76-9e54edc85171",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons/status/:status",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons",
+								"status",
+								":status"
+							],
+							"variable": [
+								{
+									"id": "32f4f193-a012-488e-8f83-8474412d7272",
+									"key": "status",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Person",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-1979d5d7-a0c9-41a9-9e66-66b542dca957",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{$randomFirstName}}\",\n  \"lastname\": \"{{$randomLastName}}\",\n  \"idNumber\": \"{{$randomUUID}}\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Person",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-e65fa63a-ccea-4d7e-b97f-e4cf74e222a5",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons",
+								":id"
+							],
+							"variable": [
+								{
+									"id": "dd8e232f-4275-4e02-926b-c35267f54b86",
+									"key": "id",
+									"value": "852d8640-26f5-44a1-b5b7-555c06bb4968"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Person Profile",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-a713913b-080d-4930-b5cf-4e8cb0a7689d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"birthday\": \"1990-05-15\",\n    \"gender\": \"M\",\n    \"nationality\": \"Spanish\",\n    \"maritalStatus\": \"Single\",\n    \"occupation\": \"Engineer\",\n    \"profilePictureUrl\": \"https://example.com/profile.jpg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons/:idPerson/profile",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons",
+								":idPerson",
+								"profile"
+							],
+							"variable": [
+								{
+									"id": "25cbf817-f9c4-4d44-b566-a2c2bff243f4",
+									"key": "idPerson",
+									"value": "852d8640-26f5-44a1-b5b7-555c06bb4968"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Person",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-c78b3db5-d6ea-4071-b8bd-9e9d26569757",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"lastname\": \"Keefe\",\n    \"unknown\": \"Yes\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/persons/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"persons",
+								":id"
+							],
+							"variable": [
+								{
+									"id": "53cd9861-afd3-4428-8b46-5b220e4aacb3",
+									"key": "id",
+									"value": "852d8640-26f5-44a1-b5b7-555c06bb4968"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "5067618-a8c84f9a-2b24-482b-94b6-801bbec5064c"
+		},
+		{
 			"name": "Addresses",
 			"item": [
 				{
