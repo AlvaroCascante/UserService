@@ -189,7 +189,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"{{$randomFirstName}}\",\n  \"lastname\": \"{{$randomLastName}}\",\n  \"idNumber\": \"{{$randomUUID}}\"\n}\n",
+							"raw": "{\n    \"name\": \"MyApp\",\n    \"description\": \"My application test\",\n    \"isActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
