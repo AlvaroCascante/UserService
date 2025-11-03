@@ -105,14 +105,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons/name/:name",
+							"raw": "{{HOST}}/{{path}}/api/applications/name/:name",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"persons",
+								"applications",
 								"name",
 								":name"
 							],
