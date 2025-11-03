@@ -197,14 +197,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons",
+							"raw": "{{HOST}}/{{path}}/api/applications",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"persons"
+								"applications"
 							]
 						}
 					},
@@ -256,7 +256,7 @@
 					"response": []
 				},
 				{
-					"name": "Update Person",
+					"name": "Update Application",
 					"event": [
 						{
 							"listen": "prerequest",
