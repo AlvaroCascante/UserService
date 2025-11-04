@@ -21,7 +21,7 @@ public abstract class Auditable {
     @JsonView(ApiBaseResponseView.Admin.class)
     private LocalDateTime createdAt;
 
-    @Column(name = "created_by", nullable = false)
+    @Column(name = "created_by", nullable = false, length = 100)
     @JsonView(ApiBaseResponseView.Admin.class)
     private String createdBy;
 
@@ -29,7 +29,7 @@ public abstract class Auditable {
     @JsonView(ApiBaseResponseView.Admin.class)
     private LocalDateTime updatedAt;
 
-    @Column(name = "updated_by")
+    @Column(name = "updated_by", length = 100)
     @JsonView(ApiBaseResponseView.Admin.class)
     private String updatedBy;
 }

@@ -1,8 +1,8 @@
 -- Migration for creating the applications table
 CREATE TABLE applications (
     id UUID PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE,
-    description TEXT,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description VARCHAR(100),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
 
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),

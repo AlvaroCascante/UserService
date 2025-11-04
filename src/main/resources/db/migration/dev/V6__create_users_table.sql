@@ -9,10 +9,10 @@ CREATE TABLE users (
     id UUID PRIMARY KEY,
     person_id UUID UNIQUE REFERENCES persons(id) ON DELETE CASCADE,
 
-    username VARCHAR(255) NOT NULL UNIQUE,
+    username VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
 
-    nickname VARCHAR(100),
+    nickname VARCHAR(50),
     user_status user_status_t NOT NULL DEFAULT 'ACTIVE',
 
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),

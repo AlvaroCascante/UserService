@@ -31,19 +31,19 @@ public class Profile extends Auditable {
     @JsonView(Person.PersonDetail.class)
     private LocalDate birthday;
 
-    @Column(name = "gender")
+    @Column(name = "gender", length = 50)
     @JsonView(Person.PersonDetail.class)
     private String gender;
 
-    @Column(name = "nationality")
+    @Column(name = "nationality", length = 100)
     @JsonView(Person.PersonDetail.class)
     private String nationality;
 
-    @Column(name = "marital_status")
+    @Column(name = "marital_status", length = 50)
     @JsonView(Person.PersonDetail.class)
     private String maritalStatus;
 
-    @Column(name = "occupation")
+    @Column(name = "occupation", length = 100)
     @JsonView(Person.PersonDetail.class)
     private String occupation;
 

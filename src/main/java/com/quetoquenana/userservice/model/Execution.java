@@ -34,11 +34,11 @@ public class Execution {
     @JsonView({Execution.ExecutionDetail.class})
     private String ipAddress;
 
-    @Column(name = "app_version")
+    @Column(name = "app_version", length = 50)
     @JsonView({Execution.ExecutionList.class})
     private String appVersion;
 
-    @Column(name = "environment")
+    @Column(name = "environment", length = 50)
     @JsonView({Execution.ExecutionList.class})
     private String environment;
 

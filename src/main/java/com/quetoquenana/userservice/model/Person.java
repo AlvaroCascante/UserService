@@ -26,17 +26,17 @@ public class Person extends Auditable {
     @JsonView(PersonList.class)
     private UUID id;
 
-    @Column(name = "id_number", nullable = false, unique = true)
+    @Column(name = "id_number", nullable = false, unique = true, length = 50)
     @JsonView({PersonList.class,
             User.UserDetail.class})
     private String idNumber;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 50)
     @JsonView({PersonList.class,
             User.UserDetail.class})
     private String name;
 
-    @Column(name = "lastname", nullable = false)
+    @Column(name = "lastname", nullable = false, length = 50)
     @JsonView({PersonList.class,
             User.UserDetail.class})
     private String lastname;

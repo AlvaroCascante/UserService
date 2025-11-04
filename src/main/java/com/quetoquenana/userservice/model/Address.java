@@ -27,23 +27,23 @@ public class Address {
     @JoinColumn(name = "person_id", nullable = false)
     private Person person;
 
-    @Column(name = "address", nullable = false)
+    @Column(name = "address", nullable = false, length = 100)
     @JsonView(Person.PersonDetail.class)
     private String address;
 
-    @Column(name = "country", nullable = false)
+    @Column(name = "country", nullable = false, length = 100)
     @JsonView(Person.PersonDetail.class)
     private String country;
 
-    @Column(name = "city", nullable = false)
+    @Column(name = "city", nullable = false, length = 100)
     @JsonView(Person.PersonDetail.class)
     private String city;
 
-    @Column(name = "state", nullable = false)
+    @Column(name = "state", nullable = false, length = 100)
     @JsonView(Person.PersonDetail.class)
     private String state;
 
-    @Column(name = "zip_code", nullable = false)
+    @Column(name = "zip_code", nullable = false, length = 20)
     @JsonView(Person.PersonDetail.class)
     private String zipCode;
 

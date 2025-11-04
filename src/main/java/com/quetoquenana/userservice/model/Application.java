@@ -3,19 +3,8 @@ package com.quetoquenana.userservice.model;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.quetoquenana.userservice.dto.ApplicationCreateRequest;
 import com.quetoquenana.userservice.dto.ApplicationUpdateRequest;
-import com.quetoquenana.userservice.dto.PersonCreateRequest;
-import com.quetoquenana.userservice.dto.PersonUpdateRequest;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -35,11 +24,11 @@ public class Application extends Auditable {
     @JsonView(ApplicationList.class)
     private UUID id;
 
-    @Column(name = "name", nullable = false, unique = true, length = 255)
+    @Column(name = "name", nullable = false, unique = true, length = 100)
     @JsonView(ApplicationList.class)
     private String name;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(name = "description", length = 100)
     @JsonView(ApplicationDetail.class)
     private String description;
 

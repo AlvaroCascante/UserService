@@ -24,7 +24,7 @@ public class Phone {
     @JsonView(Person.PersonDetail.class)
     private UUID id;
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number", nullable = false, length = 50)
     @JsonView(Person.PersonDetail.class)
     private String phoneNumber;
 
