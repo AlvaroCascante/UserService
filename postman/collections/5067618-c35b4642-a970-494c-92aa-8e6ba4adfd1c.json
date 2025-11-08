@@ -1438,13 +1438,25 @@
 			],
 			"id": "5067618-9f7a01ce-6942-4f0c-b7ea-32cbf99d1d2a",
 			"auth": {
-				"type": "basic"
+				"type": "basic",
+				"basic": [
+					{
+						"key": "password",
+						"value": "P@ass",
+						"type": "string"
+					},
+					{
+						"key": "username",
+						"value": "SYSTEM",
+						"type": "string"
+					}
+				]
 			},
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "31ea5c44-eb5c-4048-9c84-1b7b0d5af847",
+						"id": "d7217d74-d64c-4592-93cc-36809f8c6a9a",
 						"type": "text/javascript",
 						"packages": {},
 						"requests": {},
@@ -1456,7 +1468,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "5d8fc9e7-e46a-4a4f-bb29-79e9e7b30760",
+						"id": "fbc6f89b-7ca3-4436-a841-52123c4c332b",
 						"type": "text/javascript",
 						"packages": {},
 						"requests": {},
