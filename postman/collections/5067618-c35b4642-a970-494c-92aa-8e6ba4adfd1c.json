@@ -1418,8 +1418,20 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/auth/login",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"auth",
+								"login"
+							]
+						}
 					},
 					"response": []
 				}
