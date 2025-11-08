@@ -1412,7 +1412,7 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "New Request",
+					"name": "Login",
 					"id": "5067618-ef1fdae4-2e36-4b4d-a5dc-8bcfa32c6337",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
