@@ -1440,6 +1440,36 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Reset",
+					"id": "5067618-aed80b3b-8121-46c8-b755-775df7555813",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Application-Name",
+								"value": "UserServiceApp",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/auth/login",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "5067618-9f7a01ce-6942-4f0c-b7ea-32cbf99d1d2a",
