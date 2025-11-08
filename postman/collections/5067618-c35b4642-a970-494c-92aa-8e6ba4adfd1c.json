@@ -1436,7 +1436,36 @@
 					"response": []
 				}
 			],
-			"id": "5067618-9f7a01ce-6942-4f0c-b7ea-32cbf99d1d2a"
+			"id": "5067618-9f7a01ce-6942-4f0c-b7ea-32cbf99d1d2a",
+			"auth": {
+				"type": "basic"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "31ea5c44-eb5c-4048-9c84-1b7b0d5af847",
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "5d8fc9e7-e46a-4a4f-bb29-79e9e7b30760",
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
 		},
 		{
 			"name": "Health Check",
