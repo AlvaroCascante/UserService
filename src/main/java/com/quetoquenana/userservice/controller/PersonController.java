@@ -26,6 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class PersonController {
+
     private final PersonService personService;
 
     @GetMapping

@@ -6,6 +6,7 @@ import com.quetoquenana.userservice.model.ApiResponse;
 import com.quetoquenana.userservice.model.Execution;
 import com.quetoquenana.userservice.service.ExecutionService;
 import com.quetoquenana.userservice.util.JsonViewPageUtil;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

@@ -14,4 +14,7 @@ CREATE TABLE persons (
 );
 
 -- Indexes
-CREATE INDEX IF NOT EXISTS idx_persons_id_number ON persons(id_number);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_persons_id_number ON persons(id_number);
+
+INSERT INTO persons (id, id_number, name, lastname, is_active, created_at, created_by, version)
+VALUES (gen_random_uuid(), 'System', 'System', 'System', true, now(), 'system', 1);

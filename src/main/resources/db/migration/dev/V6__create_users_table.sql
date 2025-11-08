@@ -23,6 +23,17 @@ CREATE TABLE users (
 );
 
 -- Indexes
-CREATE INDEX IF NOT EXISTS idx_users_person_id ON users(person_id);
-CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_person_id ON users(person_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(LOWER(username));
 
+INSERT INTO users (id, person_id, username, password_hash, nickname, user_status, created_at, created_by, version)
+VALUES (
+    gen_random_uuid(),
+    (SELECT id FROM persons WHERE id_number = 'System'),
+    'system',
+    '$2a$10$kPSZciJ4XMVo1PjtKbmtA.3XeglUyfB.KhCMuXwqgCX17qluEhfEa',
+    'System',
+    'ACTIVE',
+    now(),
+    'system',
+    1);

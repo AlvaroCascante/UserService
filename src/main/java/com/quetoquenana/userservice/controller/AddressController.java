@@ -7,8 +7,11 @@ import com.quetoquenana.userservice.model.Address;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.service.AddressService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +20,8 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/persons")
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class AddressController {
 
     private final AddressService addressService;

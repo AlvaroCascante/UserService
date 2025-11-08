@@ -13,5 +13,15 @@ CREATE TABLE applications (
 );
 
 -- Indexes
-CREATE INDEX IF NOT EXISTS idx_applications_name ON applications(name);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_applications_name ON applications(name);
+
+INSERT INTO applications (id, name, description, is_active, created_at, created_by, version)
+VALUES (
+    gen_random_uuid(),
+    'UserServiceApp',
+    'User Service Application',
+    TRUE,
+    now(),
+    'system',
+    1);
 

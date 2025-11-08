@@ -1,4 +1,3 @@
-// ...existing code...
 package com.quetoquenana.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -9,7 +8,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "app_roles_users", uniqueConstraints = {
-        @UniqueConstraint(name = "ux_uar_user_app", columnNames = {"user_id", "application_id"})
+        @UniqueConstraint(name = "ux_aru_user_app", columnNames = {"user_id", "app_role_id"})
 })
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,11 +27,11 @@ public class AppRoleUser extends Auditable {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", nullable = false)
+    @JoinColumn(name = "app_role_id", nullable = false)
     @JsonView(AppRole.class)
     private AppRole role;
 
-    public static AppRoleUser of(User user, Application application, AppRole role) {
+    public static AppRoleUser of(User user, AppRole role) {
         return AppRoleUser.builder()
                 .id(UUID.randomUUID())
                 .user(user)

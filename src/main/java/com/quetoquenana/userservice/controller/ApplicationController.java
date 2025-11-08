@@ -7,6 +7,7 @@ import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.ApiResponse;
 import com.quetoquenana.userservice.model.Application;
 import com.quetoquenana.userservice.service.ApplicationService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,8 +23,8 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/applications")
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class ApplicationController {
 
     private final ApplicationService applicationService;

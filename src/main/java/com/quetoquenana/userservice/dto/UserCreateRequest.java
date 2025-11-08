@@ -20,4 +20,14 @@ public class UserCreateRequest {
     private String nickname;
 
     private UserStatus userStatus;
+
+    @Override
+    public String toString() {
+        return "UserCreateRequest(username=" + username
+                + ", password=<hidden>"
+                + ", person=" + person
+                + ", nickname=" + nickname
+                + ", userStatus=" + userStatus
+                + ")";
+    }
 }

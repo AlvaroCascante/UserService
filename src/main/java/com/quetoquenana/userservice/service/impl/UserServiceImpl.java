@@ -49,8 +49,8 @@ public class UserServiceImpl implements UserService {
                 personService.save(request.getPerson())
             );
 
-        // Check username uniqueness
-        if (userRepository.existsByUsername(request.getUsername())) {
+        // Check username uniqueness (case-insensitive)
+        if (userRepository.existsByUsernameIgnoreCase(request.getUsername())) {
             throw new DuplicateRecordException("user.username.duplicate");
         }
 
@@ -113,6 +113,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsernameIgnoreCase(username);
     }
 }

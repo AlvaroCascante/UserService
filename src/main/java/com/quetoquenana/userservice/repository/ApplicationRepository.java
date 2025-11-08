@@ -12,8 +12,8 @@ import java.util.UUID;
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, UUID> {
     Optional<Application> findByName(String name);
+
     boolean existsByName(String name);
 
-    // Pageable variant
     Page<Application> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }

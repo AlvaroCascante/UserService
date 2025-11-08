@@ -173,6 +173,35 @@ The API returns a standardized JSON error payload. Example:
   ]
 }
 ```
+
+### Generate RSA keys for JWT Signing
+To generate RSA keys for JWT signing, you can use the following OpenSSL commands:
+```
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out user_service_private_key.pem
+openssl genpkey -algorithm RSA -aes256 -pkeyopt rsa_keygen_bits:4096 -out user_service_private_key_enc.pem
+user_service
+openssl rsa -pubout -in user_service_private_key.pem -out user_service_public_key.pem
+
+# Verify headers
+head -n 1 user_service_private_key.pem
+head -n 1 user_service_public_key.pem
+
+# Set secure filesystem permissions (owner read/write only)
+chmod 600 user_service_private_key.pem
+chown $(whoami) user_service_private_key.pem
+
+# produce single-line base64 values and export for the local process
+export SECURITY_RSA_PRIVATE_KEY_B64=$(base64 -i user_service_private_key.pem | tr -d '\n')
+export SECURITY_RSA_PUBLIC_KEY_B64=$(base64 -i user_service_public_key.pem | tr -d '\n')
+
+# start only postgres container
+docker compose -f compose.yaml up -d postgres
+
+# run the app locally
+mvn spring-boot:run
+
+```
+
 ## License
 
 This template is provided as-is for bootstrapping new Spring Boot projects.
