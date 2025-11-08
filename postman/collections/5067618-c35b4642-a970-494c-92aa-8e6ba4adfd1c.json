@@ -1419,7 +1419,13 @@
 					},
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "X-Application-Name",
+								"value": "UserServiceApp",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{HOST}}/{{path}}/api/auth/login",
 							"host": [
