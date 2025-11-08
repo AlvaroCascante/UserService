@@ -1409,6 +1409,24 @@
 			"id": "5067618-d5288b57-f8cf-4f04-b072-f4cecc0b864d"
 		},
 		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "New Request",
+					"id": "5067618-ef1fdae4-2e36-4b4d-a5dc-8bcfa32c6337",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			],
+			"id": "5067618-9f7a01ce-6942-4f0c-b7ea-32cbf99d1d2a"
+		},
+		{
 			"name": "Health Check",
 			"id": "5067618-beded8d5-7600-469a-a549-0042901040b1",
 			"protocolProfileBehavior": {
