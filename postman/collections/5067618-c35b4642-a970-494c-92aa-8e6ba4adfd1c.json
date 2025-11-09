@@ -1418,6 +1418,21 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "MynewPass",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "System",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [
 							{
