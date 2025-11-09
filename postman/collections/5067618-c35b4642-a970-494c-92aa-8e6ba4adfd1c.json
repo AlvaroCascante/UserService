@@ -1567,16 +1567,11 @@
 		}
 	],
 	"auth": {
-		"type": "basic",
-		"basic": [
+		"type": "bearer",
+		"bearer": [
 			{
-				"key": "username",
-				"value": "admin",
-				"type": "string"
-			},
-			{
-				"key": "password",
-				"value": "password",
+				"key": "token",
+				"value": "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ1c2VyLXNlcnZpY2UiLCJzdWIiOiJzeXN0ZW0iLCJleHAiOjE3NjI2NTk2NDMsImlhdCI6MTc2MjY1NjA0Mywicm9sZXMiOlsiQVBQX0FETUlOIl19.LH5klCP42jkzWfkU3g80djkM-RP9wJeNpLYi5gIEoBpZighJrfgOlOl-0cNRFpEeRd5DniD20QGxwHG-d7xVuD8-0WpoKs8DMueFEhjm-j1YZFLQcDL--9nv2sSAk3qtl6TduBkcqdsSKelZ7EWuh0OKYvIMEO13FIuosk1ZBYBewus3wL1hSjlWHzlgMte3iseQNyYx90_ELkQGYIe_oHv1-VEYQL4B1Gfffr0KkAY9Awi4MLkX27qVvinE_w4IqogVYyS-tMFjna1G87aEqZnKGPs8okceDK2n3vHD8Nx-cnBcbjxLJEBP5uCYbHO4mYmAmQTFwzuA2vdSK77HrSUhW9nCGbZ9GrG5SSxnaqp3Er6GUhEFbl1_s6oxsNPSzevOvRaOsiuKTKII9NpIVz13YqK5VKuxNKvxHkHRgRfrXZTNEOjmpEkbFjiSzQW2Xjz2kY61db6YaV0P0e5KYgDuAwVJfiNMG5jA1L3VpuqH1210p3ZNAXQ_C1IUjp0aL5upWJ2l1lhl1UDjHV_Pumutx6J4Tvi0kMcTk9VqeXqRA0TsPbQ_QzevZ9EAvlm-iF8TypMLO6PPiuNogliH74Sb-I093_3Gaj0Bq37e4dB__KnxwflBuVzObYXbcUc_ETP_P_QDCpa_f5V5wPieyqHMPFp8DtC-9Qe4MVWBj1I",
 				"type": "string"
 			}
 		]
@@ -1585,7 +1580,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "1f2c8a2b-33a8-4895-8bca-01b5bf38e0d8",
+				"id": "e65d9f49-745b-4f30-a83b-1f62002c5083",
 				"type": "text/javascript",
 				"packages": {},
 				"requests": {},
@@ -1597,7 +1592,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "1ff485dc-b5ce-42b5-9263-dc6bd1f9d974",
+				"id": "73959fe6-7d75-4feb-b8d0-82fc7112b385",
 				"type": "text/javascript",
 				"packages": {},
 				"requests": {},
