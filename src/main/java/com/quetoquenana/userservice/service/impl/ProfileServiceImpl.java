@@ -28,7 +28,7 @@ public class ProfileServiceImpl implements ProfileService {
     public Profile addProfile(UUID idPerson, ProfileCreateRequest request) {
         Person person = personRepository.findById(idPerson)
             .map(it -> {
-                if (!it.isActive()) {
+                if (!it.getIsActive()) {
                     throw new InactiveRecordException("person.inactive");
                 }
                 if (it.getProfile() != null) {

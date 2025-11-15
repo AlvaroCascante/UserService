@@ -5,11 +5,7 @@ import com.quetoquenana.userservice.service.TokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -24,27 +20,32 @@ public class TokenServiceImpl implements TokenService {
     private final JwtDecoder jwtDecoder;
     private final long accessTokenSeconds;
     private final long refreshTokenSeconds;
+    private final String issuer;
 
     public TokenServiceImpl(JwtEncoder jwtEncoder,
                             JwtDecoder jwtDecoder,
                             @Value("${security.jwt.access-token-seconds:3600}") long accessTokenSeconds,
-                            @Value("${security.jwt.refresh-token-seconds:604800}") long refreshTokenSeconds) {
+                            @Value("${security.jwt.refresh-token-seconds:604800}") long refreshTokenSeconds,
+                            @Value("${security.jwt.issuer}") String issuer) {
         this.jwtEncoder = jwtEncoder;
         this.jwtDecoder = jwtDecoder;
         this.accessTokenSeconds = accessTokenSeconds;
         this.refreshTokenSeconds = refreshTokenSeconds;
+        this.issuer = issuer;
     }
 
     @Override
     public TokenResponse createTokens(Authentication authentication) {
         String username = authentication.getName();
+        Instant now = Instant.now();
         List<String> roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
+                // normalize stored authorities: if they are "ROLE_X" strip prefix, otherwise keep
+                .map(a -> a.startsWith("ROLE_") ? a.substring(5) : a)
                 .collect(Collectors.toList());
 
-        Instant now = Instant.now();
-
         JwtClaimsSet accessClaims = JwtClaimsSet.builder()
+                .issuer(issuer)
                 .subject(username)
                 .issuedAt(now)
                 .expiresAt(now.plus(accessTokenSeconds, ChronoUnit.SECONDS))
@@ -54,6 +55,7 @@ public class TokenServiceImpl implements TokenService {
         String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(accessClaims)).getTokenValue();
 
         JwtClaimsSet refreshClaims = JwtClaimsSet.builder()
+                .issuer(issuer)
                 .subject(username)
                 .issuedAt(now)
                 .expiresAt(now.plus(refreshTokenSeconds, ChronoUnit.SECONDS))

@@ -3,6 +3,11 @@ package com.quetoquenana.userservice.config;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.quetoquenana.userservice.exception.AuthenticationException;
+import com.quetoquenana.userservice.model.Application;
+import com.quetoquenana.userservice.repository.AppRoleUserRepository;
+import com.quetoquenana.userservice.repository.ApplicationRepository;
+import com.quetoquenana.userservice.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -11,30 +16,44 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.quetoquenana.userservice.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Arrays;
 
+import static com.quetoquenana.userservice.util.Constants.*;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @EnableMethodSecurity
 @Configuration
-@EnableConfigurationProperties(RsaKeyProperties.class)
+@EnableConfigurationProperties({RsaKeyProperties.class, CorsConfigProperties.class})
 @AllArgsConstructor
 public class SecurityConfig {
 
+    private final CorsConfigProperties corsConfigProperties;
     private final RsaKeyProperties rsaKeys;
     private final UserRepository userRepository;
+    private final ApplicationRepository applicationRepository;
+    private final AppRoleUserRepository appRoleUserRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -46,8 +65,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         // public endpoints
                         .requestMatchers("/api/executions").permitAll()
-                        // everything else requires JWT bearer token
-                        .anyRequest().authenticated()
+
+                        // everything else: allow if user has ROLE_SYSTEM, otherwise require authentication
+                        .anyRequest().access((authentication, object) -> {
+                            var authObj = authentication.get();
+                            boolean isSystem = authObj != null && authObj.getAuthorities().stream()
+                                    .anyMatch(a -> ROLE_SYSTEM.equals(a.getAuthority()));
+                            if (isSystem) return new AuthorizationDecision(true);
+                            return new AuthorizationDecision(authObj != null && authObj.isAuthenticated());
+                        })
                 )
                 // enable basic auth so Spring decodes credentials automatically
                 .httpBasic(withDefaults())
@@ -77,26 +103,106 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsernameIgnoreCase(username)
-                .map(u -> org.springframework.security.core.userdetails.User
-                        .withUsername(u.getUsername())
-                        .password(u.getPasswordHash())
-                        .authorities(new String[0])
-                        .accountLocked(!u.getUserStatus().name().equals("ACTIVE"))
-                        .build())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        // The application name should be supplied by the client in a header (e.g. X-Application-Name).
+        // We read it from the current request using RequestContextHolder so we can determine the
+        // user's roles for that specific application during username/password authentication.
+        return username ->
+                userRepository.findByUsernameIgnoreCase(username)
+                        .map(user -> {
+                            // try to read application name from current request
+                            String appName = getAppName();
+
+                            Application application = applicationRepository.findByName(appName)
+                                    .orElseThrow(() -> new AuthenticationException("error.authentication.application"));
+
+                            List<GrantedAuthority> authorities = appRoleUserRepository
+                                    .findByUserIdAndRoleApplicationId(user.getId(), application.getId()).stream()
+                                    .map(mapping -> new SimpleGrantedAuthority(mapping.getRole().getRoleName()))
+                                    .collect(Collectors.toList());
+
+                            return org.springframework.security.core.userdetails.User
+                                    .withUsername(user.getUsername())
+                                    .password(user.getPasswordHash())
+                                    .authorities(authorities)
+                                    .accountLocked(user.accountLocked())
+                                    .build();
+                        })
+                        .orElseThrow(() -> new AuthenticationException("error.authentication"));
+    }
+
+    private static String getAppName() {
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        String appName = null;
+        if (attrs != null) {
+            HttpServletRequest req = attrs.getRequest();
+            appName = req.getHeader(HEADER_APP_NAME);
+        }
+
+        // if application not provided, fail early (caller can change to allow default behavior)
+        if (appName == null || appName.isBlank()) {
+            throw new AuthenticationException("error.authentication.application.header");
+        }
+        return appName;
     }
 
     private JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        authoritiesConverter.setAuthoritiesClaimName("roles");
+        authoritiesConverter.setAuthoritiesClaimName(TOKEN_CLAIM_ROLES);
         // we will prefix authorities with ROLE_ so that hasRole('X') checks work
-        authoritiesConverter.setAuthorityPrefix("ROLE_");
+        authoritiesConverter.setAuthorityPrefix(ROLE_PREFIX);
 
         JwtAuthenticationConverter jwtAuthConverter = new JwtAuthenticationConverter();
         jwtAuthConverter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
 
-        jwtAuthConverter.setPrincipalClaimName("sub");
+        jwtAuthConverter.setPrincipalClaimName(TOKEN_CLAIM_SUB);
         return jwtAuthConverter;
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // Safely read CSV config values and provide sensible defaults when missing
+        String hostsCsv = corsConfigProperties == null ? null : corsConfigProperties.getHosts();
+        String methodsCsv = corsConfigProperties == null ? null : corsConfigProperties.getMethods();
+        String headersCsv = corsConfigProperties == null ? null : corsConfigProperties.getHeaders();
+
+        List<String> allowedOrigins;
+        if (hostsCsv == null || hostsCsv.isBlank()) {
+            // default to allowing any origin if not configured
+            allowedOrigins = List.of("*");
+        } else {
+            allowedOrigins = Arrays.stream(hostsCsv.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+        }
+
+        List<String> allowedMethods;
+        if (methodsCsv == null || methodsCsv.isBlank()) {
+            allowedMethods = List.of("GET", "POST", "PUT", "DELETE", "OPTIONS");
+        } else {
+            allowedMethods = Arrays.stream(methodsCsv.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+        }
+
+        List<String> allowedHeaders;
+        if (headersCsv == null || headersCsv.isBlank()) {
+            allowedHeaders = List.of("Content-Type", "Authorization");
+        } else {
+            allowedHeaders = Arrays.stream(headersCsv.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+        }
+
+        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedMethods(allowedMethods);
+        configuration.setAllowedHeaders(allowedHeaders);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

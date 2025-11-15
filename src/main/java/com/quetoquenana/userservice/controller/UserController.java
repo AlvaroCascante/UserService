@@ -2,7 +2,6 @@ package com.quetoquenana.userservice.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.quetoquenana.userservice.dto.ResetPasswordRequest;
-import com.quetoquenana.userservice.dto.UserCreateRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.ApiResponse;
@@ -14,12 +13,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,16 +24,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
-    private final UserService userService;
 
-    @GetMapping
-    @JsonView(User.UserList.class)
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse> getAllUsers() {
-        log.info("GET /api/users called");
-        List<User> entities = userService.findAll(PageRequest.of(0, Integer.MAX_VALUE)).getContent();
-        return ResponseEntity.ok(new ApiResponse(entities));
-    }
+    private final UserService userService;
 
     @GetMapping("/page")
     @JsonView(User.UserList.class)
@@ -52,7 +41,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @JsonView(User.UserDetail.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("@securityService.canAccessIdUser(authentication, #id)")
     public ResponseEntity<ApiResponse> getUserById(
             @PathVariable UUID id
     ) {
@@ -65,9 +54,9 @@ public class UserController {
                 });
     }
 
-    @GetMapping("/by-username/{username}")
+    @GetMapping("/username/{username}")
     @JsonView(User.UserDetail.class)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> getByUsername(
             @PathVariable String username
     ) {
@@ -78,18 +67,6 @@ public class UserController {
                     log.error("User with username {} not found", username);
                     throw new RecordNotFoundException();
                 });
-    }
-
-    @PostMapping
-    @JsonView(User.UserDetail.class)
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse> createUser(
-            @Valid @RequestBody UserCreateRequest request
-    ) {
-        log.info("POST /api/users called with payload: {}", request);
-        User entity = userService.save(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse(entity));
     }
 
     @PutMapping("/{id}")
@@ -116,6 +93,7 @@ public class UserController {
 
     @PostMapping("/{id}/reset-password")
     @PreAuthorize("hasRole('ADMIN')")
+    // TODO check if canAccessIdUser is needed here
     public ResponseEntity<Void> resetPassword(
             @PathVariable UUID id,
             @Valid @RequestBody ResetPasswordRequest request

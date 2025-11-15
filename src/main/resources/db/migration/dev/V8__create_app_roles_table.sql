@@ -23,13 +23,3 @@ ALTER TABLE app_roles
 
 CREATE INDEX IF NOT EXISTS idx_app_roles_application_id ON app_roles (application_id);
 CREATE INDEX IF NOT EXISTS idx_app_roles_name_lower ON app_roles (lower(role_name));
-
-INSERT INTO app_roles (id, application_id, role_name, description, created_at, created_by, version)
-VALUES (
-    gen_random_uuid(),
-    (SELECT id FROM applications WHERE name = 'UserServiceApp'),
-    'USER_SERVICE_ADMIN',
-    'Administrator role with full permissions',
-    now(),
-    'system',
-    1);

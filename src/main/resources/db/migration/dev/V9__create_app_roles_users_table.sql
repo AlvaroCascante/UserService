@@ -17,12 +17,3 @@ CREATE TABLE app_roles_users (
 CREATE UNIQUE INDEX IF NOT EXISTS ux_aru_user_app ON app_roles_users(user_id, app_role_id);
 
 CREATE INDEX IF NOT EXISTS idx_aru_user_id ON app_roles_users(user_id);
-
-INSERT INTO app_roles_users (id, user_id, app_role_id, created_at, created_by, version)
-VALUES (
-    gen_random_uuid(),
-    (SELECT id FROM users WHERE username = 'System'),
-    (SELECT id FROM app_roles WHERE role_name = 'USER_SERVICE_ADMIN'),
-    now(),
-    'system',
-    1);

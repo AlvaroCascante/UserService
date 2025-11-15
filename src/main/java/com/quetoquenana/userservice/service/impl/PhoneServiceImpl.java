@@ -31,7 +31,7 @@ public class PhoneServiceImpl implements PhoneService {
     public Phone addPhone(UUID personId, PhoneCreateRequest request) {
         Person person = personRepository.findById(personId)
                 .orElseThrow(RecordNotFoundException::new);
-        if (!person.isActive()) {
+        if (!person.getIsActive()) {
             throw new InactiveRecordException("person.inactive");
         }
         Phone phone = Phone.fromCreateRequest(request);
@@ -41,7 +41,7 @@ public class PhoneServiceImpl implements PhoneService {
         person.setUpdatedAt(LocalDateTime.now());
         person.setUpdatedBy(currentUserService.getCurrentUsername());
         phoneRepository.save(phone);
-        if(phone.isMain()) {
+        if(phone.getIsMain()) {
             phoneRepository.clearMainForPerson(personId, phone.getId());
         }
         return phone;
@@ -53,7 +53,7 @@ public class PhoneServiceImpl implements PhoneService {
         Phone existingPhone = phoneRepository.findById(phoneId)
                 .orElseThrow(RecordNotFoundException::new);
         Person person = existingPhone.getPerson();
-        if (!person.isActive()) {
+        if (!person.getIsActive()) {
             throw new InactiveRecordException("person.inactive");
         }
         existingPhone.updateFromRequest(request);
@@ -68,10 +68,10 @@ public class PhoneServiceImpl implements PhoneService {
     public void deleteById(UUID phoneId) {
         Phone existingPhone = phoneRepository.findById(phoneId)
                 .orElseThrow(RecordNotFoundException::new);
-        if (!existingPhone.getPerson().isActive()) {
+        if (!existingPhone.getPerson().getIsActive()) {
             throw new InactiveRecordException();
         }
-        if (existingPhone.isMain()) {
+        if (existingPhone.getIsMain()) {
             throw new RecordNotDeletableException();
         }
         phoneRepository.delete(existingPhone);

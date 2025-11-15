@@ -106,7 +106,7 @@ class PhoneControllerIT {
     void deleteMainPhone_andAssertNotRemoved() throws Exception {
         // Add main phone
         Phone mainPhone = TestEntityFactory.createPhone(person, "123456789");
-        mainPhone.setMain(true);
+        mainPhone.setIsMain(true);
         person.addPhone(mainPhone);
         person = personRepository.save(person);
         Phone savedMainPhone = phoneRepository.findByPersonId(person.getId()).getFirst();
@@ -124,19 +124,19 @@ class PhoneControllerIT {
     void deleteNonMainPhone_andAssertRemoved() throws Exception {
         // Add main phone
         Phone mainPhone = TestEntityFactory.createPhone(person, "123456789");
-        mainPhone.setMain(true);
+        mainPhone.setIsMain(true);
         person.addPhone(mainPhone);
 
         // Add secondary phone
         Phone secondaryPhone = TestEntityFactory.createPhone(person, "987654321");
-        secondaryPhone.setMain(false);
+        secondaryPhone.setIsMain(false);
         person.addPhone(secondaryPhone);
 
         person = personRepository.save(person);
 
         // Find secondary phone
         Phone savedSecondaryPhone = phoneRepository.findByPersonId(person.getId())
-                .stream().filter(p -> !p.isMain()).findFirst().orElseThrow();
+                .stream().filter(p -> !p.getIsMain()).findFirst().orElseThrow();
 
         // Delete secondary phone
         mockMvc.perform(delete("/api/persons/phone/" + savedSecondaryPhone.getId()))
@@ -144,6 +144,6 @@ class PhoneControllerIT {
 
         List<Phone> phones = phoneRepository.findByPersonId(person.getId());
         assertThat(phones).hasSize(1);
-        assertThat(phones.getFirst().isMain()).isTrue();
+        assertThat(phones.getFirst().getIsMain()).isTrue();
     }
 }

@@ -77,24 +77,6 @@ class PersonControllerTest {
     }
 
     @Test
-    void testGetAllPersons_ReturnsList() throws Exception {
-        List<Person> persons = Collections.singletonList(person);
-        when(personService.findAll()).thenReturn(persons);
-        ResponseEntity<ApiResponse> response = personController.getAllPersons();
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        ApiResponse apiResponse = response.getBody();
-        assertNotNull(apiResponse);
-        List<?> data = (List<?>) apiResponse.getData();
-        assertEquals(1, data.size());
-        String json = objectMapper.writerWithView(Person.PersonList.class).writeValueAsString(data);
-        assertTrue(json.contains("id"));
-        assertTrue(json.contains("name"));
-        assertTrue(json.contains("lastname"));
-        assertTrue(json.contains("idNumber"));
-        assertTrue(json.contains("isActive"));
-    }
-
-    @Test
     void testGetPersonById_Found() throws Exception {
         when(personService.findById(personId)).thenReturn(Optional.of(person));
         ResponseEntity<ApiResponse> response = personController.getPersonById(personId);
@@ -180,7 +162,7 @@ class PersonControllerTest {
         ApiResponse apiResponse = response.getBody();
         assertNotNull(apiResponse);
         Person data = (Person) apiResponse.getData();
-        assertTrue(data.isActive());
+        assertTrue(data.getIsActive());
         assertEquals("John", data.getName());
         assertEquals("Doe", data.getLastname());
         assertEquals("ID123456", data.getIdNumber());
@@ -224,7 +206,7 @@ class PersonControllerTest {
         // In a real integration test, you would fetch the person again and assert isActive is false
         // Here, you can verify the service was called, or use ArgumentCaptor if you want to check the value passed to the repository
         // For demonstration, we assert the mock setup
-        assertFalse(inactivePerson.isActive());
+        assertFalse(inactivePerson.getIsActive());
     }
 
     // java

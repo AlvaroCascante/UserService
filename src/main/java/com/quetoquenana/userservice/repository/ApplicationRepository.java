@@ -11,9 +11,10 @@ import java.util.UUID;
 
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, UUID> {
+    //TODO manage status methods
     Optional<Application> findByName(String name);
 
-    boolean existsByName(String name);
+    boolean existsByNameIgnoreCase(String name);
 
     Page<Application> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }

@@ -13,7 +13,7 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
 
     nickname VARCHAR(50),
-    user_status user_status_t NOT NULL DEFAULT 'ACTIVE',
+    user_status user_status_t NOT NULL,
 
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     created_by VARCHAR(100) NOT NULL,
@@ -25,15 +25,3 @@ CREATE TABLE users (
 -- Indexes
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_person_id ON users(person_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(LOWER(username));
-
-INSERT INTO users (id, person_id, username, password_hash, nickname, user_status, created_at, created_by, version)
-VALUES (
-    gen_random_uuid(),
-    (SELECT id FROM persons WHERE id_number = 'System'),
-    'system',
-    '$2a$10$kPSZciJ4XMVo1PjtKbmtA.3XeglUyfB.KhCMuXwqgCX17qluEhfEa',
-    'System',
-    'ACTIVE',
-    now(),
-    'system',
-    1);

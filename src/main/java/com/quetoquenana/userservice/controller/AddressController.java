@@ -7,11 +7,8 @@ import com.quetoquenana.userservice.model.Address;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.service.AddressService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,15 +17,15 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/persons")
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class AddressController {
 
     private final AddressService addressService;
 
     @PostMapping("/{idPerson}/address")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
+    @PreAuthorize("@securityService.canAccessIdPerson(authentication, #idPerson)")
     public ResponseEntity<Address> createAddress(
             @PathVariable UUID idPerson,
             @Valid @RequestBody AddressCreateRequest request
@@ -40,7 +37,7 @@ public class AddressController {
 
     @PutMapping("/address/{idAddress}")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
+    @PreAuthorize("@securityService.canAccessIdAddress(authentication, #idAddress)")
     public ResponseEntity<Address> updateAddress(
             @PathVariable UUID idAddress,
             @RequestBody AddressUpdateRequest request
@@ -50,11 +47,11 @@ public class AddressController {
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/address/{id}")
-    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
-    public ResponseEntity<Void> deleteAddress(@PathVariable UUID id) {
-        log.info("DELETE /api/persons/address/{} called", id);
-        addressService.delete(id);
+    @DeleteMapping("/address/{idAddress}")
+    @PreAuthorize("@securityService.canAccessIdAddress(authentication, #idAddress)")
+    public ResponseEntity<Void> deleteAddress(@PathVariable UUID idAddress) {
+        log.info("DELETE /api/persons/address/{} called", idAddress);
+        addressService.delete(idAddress);
         return ResponseEntity.noContent().build();
     }
 }

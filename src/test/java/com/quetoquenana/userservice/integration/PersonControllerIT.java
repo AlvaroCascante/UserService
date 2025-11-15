@@ -75,7 +75,7 @@ class PersonControllerIT {
         assertThat(savedPerson).isNotNull();
         assertThat(savedPerson.getCreatedBy()).isEqualTo(DEFAULT_USER);
         assertThat(savedPerson.getCreatedAt()).isNotNull();
-        assertThat(savedPerson.isActive()).isTrue();
+        assertThat(savedPerson.getIsActive()).isTrue();
     }
 
     @Test
@@ -96,7 +96,7 @@ class PersonControllerIT {
 
         Person reactivatedPerson = personRepository.findByIdNumber(TestEntityFactory.DEFAULT_ID_NUMBER).orElse(null);
         assertThat(reactivatedPerson).isNotNull();
-        assertThat(reactivatedPerson.isActive()).isTrue();
+        assertThat(reactivatedPerson.getIsActive()).isTrue();
         assertThat(reactivatedPerson.getUpdatedBy()).isEqualTo(DEFAULT_USER);
         assertThat(reactivatedPerson.getUpdatedAt()).isNotNull();
     }
@@ -118,7 +118,7 @@ class PersonControllerIT {
 
         Person updatedPerson = personRepository.findById(person.getId()).orElse(null);
         assertThat(updatedPerson).isNotNull();
-        assertThat(updatedPerson.isActive()).isTrue();
+        assertThat(updatedPerson.getIsActive()).isTrue();
     }
 
     @Test
@@ -134,7 +134,7 @@ class PersonControllerIT {
 
         Person deletedPerson = personRepository.findById(person.getId()).orElse(null);
         assertThat(deletedPerson).isNotNull();
-        assertThat(deletedPerson.isActive()).isFalse();
+        assertThat(deletedPerson.getIsActive()).isFalse();
         assertThat(deletedPerson.getUpdatedBy()).isEqualTo(DEFAULT_USER);
         assertThat(deletedPerson.getUpdatedAt()).isNotNull();
         assertThat(deletedPerson.getCreatedBy()).isEqualTo("creator");

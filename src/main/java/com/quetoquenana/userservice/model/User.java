@@ -53,6 +53,14 @@ public class User extends Auditable {
     public static class UserList extends ApiBaseResponseView.Always {}
     public static class UserDetail extends User.UserList {}
 
+
+    public boolean accountLocked() {
+        return switch (this.userStatus) {
+            case ACTIVE, RESET -> false;
+            case BLOCKED, INACTIVE -> true;
+        };
+    }
+
     public static User fromCreateRequest(
             UserCreateRequest request,
             String passwordHash,

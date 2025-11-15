@@ -54,25 +54,6 @@ class ApplicationControllerTest {
     }
 
     @Test
-    void testGetAllApplications_ReturnsList() throws Exception {
-        List<Application> apps = Collections.singletonList(application);
-        when(applicationService.findAll()).thenReturn(apps);
-
-        ResponseEntity<ApiResponse> response = applicationController.getAllApplications();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        ApiResponse apiResponse = response.getBody();
-        assertNotNull(apiResponse);
-        List<?> data = (List<?>) apiResponse.getData();
-        assertEquals(1, data.size());
-
-        String json = objectMapper.writerWithView(Application.ApplicationList.class).writeValueAsString(data);
-        assertTrue(json.contains("name"));
-        assertFalse(json.contains("description"));
-        assertTrue(json.contains("isActive"));
-    }
-
-    @Test
     void testGetApplicationById_NotFound() {
         when(applicationService.findById(appId)).thenReturn(Optional.empty());
         assertThrows(RecordNotFoundException.class, () -> applicationController.getApplicationById(appId));

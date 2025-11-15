@@ -39,8 +39,8 @@ public class UserServiceImpl implements UserService {
         Person person = personService.findByIdNumber(request.getPerson().getIdNumber())
             .map(found -> {
                 // Ensure person is active
-                if (!found.isActive()) {
-                    found.setActive(true);
+                if (!found.getIsActive()) {
+                    found.setIsActive(true);
                     personService.activateById(found.getId());
                 }
                 return found;

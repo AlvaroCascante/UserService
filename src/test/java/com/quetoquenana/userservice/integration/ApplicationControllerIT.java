@@ -81,7 +81,7 @@ class ApplicationControllerIT {
         assertThat(saved).isNotNull();
         assertThat(saved.getCreatedBy()).isEqualTo(DEFAULT_USER);
         assertThat(saved.getCreatedAt()).isNotNull();
-        assertThat(saved.isActive()).isTrue();
+        assertThat(saved.getIsActive()).isTrue();
     }
 
     @Test

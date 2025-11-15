@@ -11,6 +11,7 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
 
+    //TODO manage status methods
     Optional<User> findByUsernameIgnoreCase(String username);
 
     boolean existsByUsernameIgnoreCase(String username);

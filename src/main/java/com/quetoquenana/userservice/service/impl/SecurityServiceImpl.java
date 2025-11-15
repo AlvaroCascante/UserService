@@ -1,14 +1,10 @@
 package com.quetoquenana.userservice.service.impl;
 
-import com.quetoquenana.userservice.model.AppRoleUser;
-import com.quetoquenana.userservice.model.Application;
-import com.quetoquenana.userservice.model.User;
-import com.quetoquenana.userservice.repository.AppRoleUserRepository;
-import com.quetoquenana.userservice.repository.ApplicationRepository;
-import com.quetoquenana.userservice.repository.UserRepository;
+import com.quetoquenana.userservice.exception.AuthenticationException;
+import com.quetoquenana.userservice.model.*;
+import com.quetoquenana.userservice.repository.*;
 import com.quetoquenana.userservice.service.SecurityService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -26,28 +24,31 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SecurityServiceImpl implements SecurityService {
 
+    private final AddressRepository addressRepository;
+    private final PhoneRepository phoneRepository;
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
     private final AppRoleUserRepository appRoleUserRepository;
+    private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public Authentication authenticate(String username, String password, String applicationName) {
         User user = userRepository.findByUsernameIgnoreCase(username)
-                .orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
+                .orElseThrow(AuthenticationException::new);
 
         if (user.getPasswordHash() == null || !passwordEncoder.matches(password, user.getPasswordHash())) {
-            throw new BadCredentialsException("Invalid username or password");
+            throw new AuthenticationException();
         }
 
         // find application
         Application application = applicationRepository.findByName(applicationName)
-                .orElseThrow(() -> new BadCredentialsException("Unknown application: " + applicationName));
+                .orElseThrow(() -> new AuthenticationException("error.authentication.application"));
 
         // get roles for user in the application
-        List<AppRoleUser> roleMappings = appRoleUserRepository.findByUser_IdAndRole_Application_Id(user.getId(), application.getId());
+        List<AppRoleUser> roleMappings = appRoleUserRepository.findByUserIdAndRoleApplicationId(user.getId(), application.getId());
         List<GrantedAuthority> authorities = roleMappings.stream()
-                .map(mapping -> new SimpleGrantedAuthority(mapping.getRole().getRolName()))
+                .map(mapping -> new SimpleGrantedAuthority(mapping.getRole().getRoleName()))
                 .collect(Collectors.toList());
 
         // create an authenticated token with authorities
@@ -58,17 +59,31 @@ public class SecurityServiceImpl implements SecurityService {
     public Authentication getAuthenticationForApplication(String username, String applicationName) {
         // find user existence
         User user = userRepository.findByUsernameIgnoreCase(username)
-                .orElseThrow(() -> new BadCredentialsException("Invalid username"));
+                .orElseThrow(AuthenticationException::new);
+
+        if (user.getUserStatus().equals(UserStatus.RESET)) {
+            throw new AuthenticationException("error.authentication.reset");
+        }
 
         Application application = applicationRepository.findByName(applicationName)
-                .orElseThrow(() -> new BadCredentialsException("Unknown application: " + applicationName));
+                .orElseThrow(() -> new AuthenticationException("error.authentication.application"));
 
-        List<AppRoleUser> roleMappings = appRoleUserRepository.findByUser_IdAndRole_Application_Id(user.getId(), application.getId());
+        List<AppRoleUser> roleMappings = appRoleUserRepository.findByUserIdAndRoleApplicationId(user.getId(), application.getId());
         List<GrantedAuthority> authorities = roleMappings.stream()
-                .map(mapping -> new SimpleGrantedAuthority(mapping.getRole().getRolName()))
+                .map(mapping -> new SimpleGrantedAuthority(mapping.getRole().getRoleName()))
                 .collect(Collectors.toList());
 
         return new UsernamePasswordAuthenticationToken(username, null, authorities);
+    }
+
+    @Override
+    public void resetPassword(String username, String newPassword) {
+        User user = userRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow(AuthenticationException::new);
+
+        String passwordHash = passwordEncoder.encode(newPassword);
+        user.updateStatus(UserStatus.ACTIVE, passwordHash, username);
+        userRepository.save(user);
     }
 
     @Override
@@ -80,10 +95,60 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
-    public boolean canAccessId(Authentication authentication, String id) {
-        if (authentication == null || authentication.getName() == null) return false;
+    public boolean canAccessIdProfile(Authentication authentication, UUID idProfile) {
+        if (authentication == null || authentication.getName() == null || idProfile == null) return false;
+
         return userRepository.findByUsernameIgnoreCase(authentication.getName())
-                .map(u -> u.getPerson() != null && id != null && id.equals(u.getPerson().getId().toString()))
+                .map(User::getPerson)
+                .filter(person -> person.getId() != null)
+                .flatMap(person -> profileRepository.findByPersonId(person.getId()))
+                .map(Profile::getId)
+                .map(id -> id.equals(idProfile))
                 .orElse(false);
+    }
+
+    @Override
+    public boolean canAccessIdPerson(Authentication authentication, UUID idPerson) {
+        if (authentication == null || authentication.getName() == null || idPerson == null) return false;
+
+        return userRepository.findByUsernameIgnoreCase(authentication.getName())
+                .map(User::getPerson)
+                .map(Person::getId)
+                .map(idPerson::equals)
+                .orElse(false);
+    }
+
+    @Override
+    public boolean canAccessIdAddress(Authentication authentication, UUID idAddress) {
+        if (authentication == null || authentication.getName() == null || idAddress == null) return false;
+
+        return userRepository.findByUsernameIgnoreCase(authentication.getName())
+                .map(User::getPerson)
+                .filter(person -> person.getId() != null)
+                .map(person -> addressRepository.findByPersonId(person.getId())
+                        .stream()
+                        .anyMatch(address -> address.getId().equals(idAddress)))
+                .orElse(false);
+    }
+
+    @Override
+    public boolean canAccessIdPhone(Authentication authentication, UUID idPhone) {
+        if (authentication == null || authentication.getName() == null || idPhone == null) return false;
+
+        return userRepository.findByUsernameIgnoreCase(authentication.getName())
+                .map(User::getPerson)
+                .filter(person -> person.getId() != null)
+                .map(person -> phoneRepository.findByPersonId(person.getId())
+                        .stream()
+                        .anyMatch(phone -> phone.getId().equals(idPhone)))
+                .orElse(false);
+    }
+
+    @Override
+    public boolean canAccessIdUser(Authentication authentication, UUID idUser) {
+        if (authentication == null || authentication.getName() == null || idUser == null) return false;
+
+        Optional<User> userOpt = userRepository.findByUsernameIgnoreCase(authentication.getName());
+        return userOpt.map(user -> user.getId().equals(idUser)).orElse(false);
     }
 }

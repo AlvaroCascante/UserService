@@ -1,13 +1,18 @@
 package com.quetoquenana.userservice.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.quetoquenana.userservice.dto.AppRoleCreateRequest;
+import com.quetoquenana.userservice.dto.AppRoleUserCreateRequest;
 import com.quetoquenana.userservice.dto.ApplicationCreateRequest;
 import com.quetoquenana.userservice.dto.ApplicationUpdateRequest;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.ApiResponse;
+import com.quetoquenana.userservice.model.AppRole;
+import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.Application;
+import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.service.ApplicationService;
-import lombok.AllArgsConstructor;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,29 +22,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/applications")
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class ApplicationController {
 
     private final ApplicationService applicationService;
 
-    @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(Application.ApplicationList.class)
-    public ResponseEntity<ApiResponse> getAllApplications() {
-        log.info("GET /api/applications called");
-        List<Application> entities = applicationService.findAll();
-        return ResponseEntity.ok(new ApiResponse(entities));
-    }
-
     @GetMapping("/page")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SYSTEM')")
     @JsonView(Application.ApplicationList.class)
     public ResponseEntity<ApiResponse> getAllApplicationsPage(
             @RequestParam(defaultValue = "0") int page,
@@ -51,7 +45,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SYSTEM')")
     @JsonView(Application.ApplicationDetail.class)
     public ResponseEntity<ApiResponse> getApplicationById(@PathVariable UUID id) {
         log.info("GET /api/applications/{} called", id);
@@ -64,7 +58,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/name/{name}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SYSTEM')")
     @JsonView(Application.ApplicationDetail.class)
     public ResponseEntity<ApiResponse> getApplicationByName(@PathVariable String name) {
         log.info("GET /api/applications/name/{} called", name);
@@ -77,7 +71,7 @@ public class ApplicationController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SYSTEM')")
     @JsonView(Application.ApplicationList.class)
     public ResponseEntity<ApiResponse> searchApplications(
             @RequestParam String name,
@@ -90,28 +84,83 @@ public class ApplicationController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SYSTEM')")
     @JsonView(Application.ApplicationDetail.class)
-    public ResponseEntity<ApiResponse> createApplication(@Valid @RequestBody ApplicationCreateRequest request) {
+    public ResponseEntity<ApiResponse> createApplication(
+            @Valid @RequestBody ApplicationCreateRequest request
+    ) {
         log.info("POST /api/applications called with payload: {}", request);
         Application entity = applicationService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(entity));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SYSTEM')")
     @JsonView(Application.ApplicationDetail.class)
-    public ResponseEntity<ApiResponse> updateApplication(@PathVariable UUID id, @Valid @RequestBody ApplicationUpdateRequest request) {
+    public ResponseEntity<ApiResponse> updateApplication(
+            @PathVariable UUID id,
+            @Valid @RequestBody ApplicationUpdateRequest request
+    ) {
         log.info("PUT /api/applications/{} called with payload: {}", id, request);
         Application entity = applicationService.update(id, request);
         return ResponseEntity.ok(new ApiResponse(entity));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteApplication(@PathVariable UUID id) {
+    @PreAuthorize("hasRole('SYSTEM')")
+    public ResponseEntity<Void> deleteApplication(
+            @PathVariable UUID id
+    ) {
         log.info("DELETE /api/applications/{} called", id);
         applicationService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/role")
+    @JsonView(User.UserDetail.class)
+    @PreAuthorize("hasRole('SYSTEM')")
+    public ResponseEntity<ApiResponse> addRole(
+            @PathVariable UUID id,
+            @Valid @RequestBody AppRoleCreateRequest request
+    ) {
+        log.info("POST /api/applications/{}/user called with payload: {}", id, request);
+        AppRole entity = applicationService.addRole(id, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse(entity));
+    }
+
+    @PostMapping("/{id}/user")
+    @JsonView(User.UserDetail.class)
+    @PreAuthorize("hasRole('SYSTEM')")
+    public ResponseEntity<ApiResponse> addUser(
+            @PathVariable UUID id,
+            @Valid @RequestBody AppRoleUserCreateRequest request
+    ) {
+        log.info("POST /api/applications/{}/user called with payload: {}", id, request);
+        AppRoleUser entity = applicationService.addUser(id, request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse(entity));
+    }
+
+    @DeleteMapping("/{id}/user/{username}")
+    @PreAuthorize("hasRole('SYSTEM')")
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable UUID id,
+            @PathVariable String username
+    ) {
+        log.info("DELETE /api/applications/{}/user/{} called", id, username);
+        applicationService.removeUser(id, username);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}/role/{roleId}")
+    @PreAuthorize("hasRole('SYSTEM')")
+    public ResponseEntity<Void> deleteRole(
+            @PathVariable UUID id,
+            @PathVariable UUID roleId
+    ) {
+        log.info("DELETE /api/applications/{}/role/{} called", id, roleId);
+        applicationService.deleteRole(id, roleId);
         return ResponseEntity.noContent().build();
     }
 }

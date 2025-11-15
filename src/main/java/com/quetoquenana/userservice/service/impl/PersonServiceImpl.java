@@ -59,10 +59,10 @@ public class PersonServiceImpl implements PersonService {
         String username = currentUserService.getCurrentUsername();
         return personRepository.findByIdNumber(request.getIdNumber())
             .map(found -> {
-                if (found.isActive()) {
+                if (found.getIsActive()) {
                     throw new DuplicateRecordException("person.id.number.duplicate.active");
                 } else {
-                    found.setActive(true);
+                    found.setIsActive(true);
                     found.setUpdatedAt(LocalDateTime.now());
                     found.setUpdatedBy(username);
                     return personRepository.save(found);
@@ -98,8 +98,8 @@ public class PersonServiceImpl implements PersonService {
     public void deleteById(UUID id) {
         Person existingPerson = personRepository.findById(id)
                 .orElseThrow(RecordNotFoundException::new);
-        if (existingPerson.isActive()) {
-            existingPerson.setActive(false);
+        if (existingPerson.getIsActive()) {
+            existingPerson.setIsActive(false);
             existingPerson.setUpdatedAt(LocalDateTime.now());
             existingPerson.setUpdatedBy(currentUserService.getCurrentUsername());
             personRepository.save(existingPerson);

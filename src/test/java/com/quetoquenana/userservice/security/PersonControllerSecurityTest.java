@@ -1,18 +1,40 @@
 package com.quetoquenana.userservice.security;
 
+import com.quetoquenana.userservice.config.CorsConfigProperties;
+import com.quetoquenana.userservice.config.RsaKeyProperties;
 import com.quetoquenana.userservice.config.SecurityConfig;
 import com.quetoquenana.userservice.controller.PersonController;
+import com.quetoquenana.userservice.dto.PersonCreateRequest;
+import com.quetoquenana.userservice.model.Person;
+import com.quetoquenana.userservice.repository.AppRoleUserRepository;
+import com.quetoquenana.userservice.repository.ApplicationRepository;
+import com.quetoquenana.userservice.repository.UserRepository;
+import com.quetoquenana.userservice.service.PersonService;
+import com.quetoquenana.userservice.service.SecurityService;
+import com.quetoquenana.userservice.util.JsonPayloadToObjectBuilder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import com.quetoquenana.userservice.service.PersonService;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -25,13 +47,54 @@ class PersonControllerSecurityTest {
     @MockBean
     private PersonService personService;
 
-    @Test
-    @DisplayName("GET /api/persons returns 401 when unauthenticated")
-    void getAllPersons_Unauthenticated_Returns401() throws Exception {
-        mockMvc.perform(get("/api/persons"))
-                .andExpect(status().isUnauthorized());
+    // Mock beans required by SecurityConfig
+    @MockBean
+    private CorsConfigProperties corsConfigProperties;
+
+    @MockBean
+    private RsaKeyProperties rsaKeyProperties;
+
+    @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
+    private ApplicationRepository applicationRepository;
+
+    @MockBean
+    private AppRoleUserRepository appRoleUserRepository;
+
+    // Provide JwtDecoder/JwtEncoder mocks to avoid SecurityConfig creating real encoders/decoders
+    @MockBean
+    private JwtDecoder jwtDecoder;
+
+    @MockBean
+    private JwtEncoder jwtEncoder;
+
+    // Mock SecurityService bean name for method-security SpEL if needed
+    @MockBean(name = "securityService")
+    private SecurityService securityService;
+
+    private String payload;
+
+    @BeforeEach
+    void setup() throws IOException, URISyntaxException {
+        JsonPayloadToObjectBuilder<PersonCreateRequest> mapper = new JsonPayloadToObjectBuilder<>(PersonCreateRequest.class);
+        payload = mapper.loadJsonData("payloads/person-create-request.json");
+
+        when(corsConfigProperties.getHosts()).thenReturn("http://localhost");
+        when(corsConfigProperties.getMethods()).thenReturn("GET,POST,PUT,DELETE");
+        when(corsConfigProperties.getHeaders()).thenReturn("Content-Type,Authorization");
+
+        when(securityService.canAccessIdPerson(any(), any())).thenReturn(true);
+        when(securityService.canAccessIdNumber(any(), any())).thenReturn(true);
     }
 
+    @Test
+    @DisplayName("GET /api/persons/status/{status} returns 401 when unauthenticated")
+    void getPersonsByStatus_Unauthenticated_Returns401() throws Exception {
+        mockMvc.perform(get("/api/persons/status/{status}", true))
+                .andExpect(status().isUnauthorized());
+    }
     @Test
     @DisplayName("GET /api/persons/page returns 401 when unauthenticated")
     void getPersonsPage_Unauthenticated_Returns401() throws Exception {
@@ -42,7 +105,16 @@ class PersonControllerSecurityTest {
     @Test
     @DisplayName("GET /api/persons/{id} returns 401 when unauthenticated")
     void getPersonById_Unauthenticated_Returns401() throws Exception {
+        when(securityService.canAccessIdPerson(any(), any())).thenReturn(false);
         mockMvc.perform(get("/api/persons/{id}", "00000000-0000-0000-0000-000000000000"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("GET /api/persons/idNumber/{idNumber} returns 401 when unauthenticated")
+    void getPersonByIdNumber_Unauthenticated_Returns401() throws Exception {
+        when(securityService.canAccessIdNumber(any(), any())).thenReturn(false);
+        mockMvc.perform(get("/api/persons/idNumber/{idNumber}", "00000000-0000-0000-0000-000000000000"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -51,16 +123,8 @@ class PersonControllerSecurityTest {
     void createPerson_Unauthenticated_Returns401() throws Exception {
         mockMvc.perform(post("/api/persons")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{}"))
+                .content(payload))
                 .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @DisplayName("GET /api/persons returns 403 for USER role")
-    @WithMockUser(username = "user")
-    void getAllPersons_UserRole_Returns403() throws Exception {
-        mockMvc.perform(get("/api/persons"))
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -69,8 +133,18 @@ class PersonControllerSecurityTest {
     void createPerson_AuditorRole_Returns403() throws Exception {
         mockMvc.perform(post("/api/persons")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{}"))
+                .content(payload))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("PUT /api/persons/{id} returns 401 when unauthenticated")
+    void updatePerson_AuditorRole_Returns403() throws Exception {
+        when(securityService.canAccessIdPerson(any(), any())).thenReturn(false);
+        mockMvc.perform(put("/api/persons/{id}", "00000000-0000-0000-0000-000000000000")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

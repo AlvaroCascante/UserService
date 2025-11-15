@@ -24,7 +24,7 @@ public class ProfileController {
 
     @PostMapping("/{idPerson}/profile")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
+    @PreAuthorize("@securityService.canAccessIdPerson(authentication, #idPerson)")
     public ResponseEntity<Profile> addProfile(
             @PathVariable UUID idPerson,
             @RequestBody ProfileCreateRequest request
@@ -34,14 +34,14 @@ public class ProfileController {
         return ResponseEntity.ok(createdProfile);
     }
 
-    @PutMapping("/profile/{idPersonProfile}")
+    @PutMapping("/profile/{idProfile}")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
+    @PreAuthorize("@securityService.canAccessIdProfile(authentication, #idProfile)")
     public ResponseEntity<Profile> updateProfile(
-            @PathVariable UUID idPersonProfile,
+            @PathVariable UUID idProfile,
             @RequestBody ProfileUpdateRequest request) {
-        log.info("PUT /api/persons/profile/{} called with payload: {}", idPersonProfile, request);
-        Profile updatedProfile = profileService.updateProfile(idPersonProfile, request);
+        log.info("PUT /api/persons/profile/{} called with payload: {}", idProfile, request);
+        Profile updatedProfile = profileService.updateProfile(idProfile, request);
         return ResponseEntity.ok(updatedProfile);
     }
 }

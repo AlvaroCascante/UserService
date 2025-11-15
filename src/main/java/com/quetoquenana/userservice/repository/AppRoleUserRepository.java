@@ -7,5 +7,17 @@ import java.util.List;
 import java.util.UUID;
 
 public interface AppRoleUserRepository extends JpaRepository<AppRoleUser, UUID> {
-    List<AppRoleUser> findByUser_IdAndRole_Application_Id(UUID userId, UUID applicationId);
+    List<AppRoleUser> findByUserIdAndRoleApplicationId(UUID userId, UUID applicationId);
+
+    // Delete all AppRoleUser mappings for a given username (case-insensitive)
+    void deleteByUserUsernameIgnoreCase(String username);
+
+    // Delete mappings for a given application (role.application.id) and username (case-insensitive)
+    void deleteByRoleApplicationIdAndUserUsernameIgnoreCase(UUID applicationId, String username);
+
+    // Delete mappings for a given application, username and role name (all case-insensitive for textual values)
+    void deleteByRoleApplicationIdAndUserUsernameIgnoreCaseAndRoleRoleNameIgnoreCase(UUID applicationId, String username, String rolName);
+
+    // Delete mappings for a given role id (used before deleting the AppRole)
+    void deleteByRoleId(UUID roleId);
 }

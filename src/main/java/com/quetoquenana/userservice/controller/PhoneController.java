@@ -25,7 +25,7 @@ public class PhoneController {
 
     @PostMapping("/{idPerson}/phone")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
+    @PreAuthorize("@securityService.canAccessIdPerson(authentication, #idPerson)")
     public ResponseEntity<Phone> addPhone(
             @PathVariable UUID idPerson,
             @Valid @RequestBody PhoneCreateRequest request
@@ -37,7 +37,7 @@ public class PhoneController {
 
     @PutMapping("/phone/{idPhone}")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
+    @PreAuthorize("@securityService.canAccessIdPhone(authentication, #idPhone)")
     public ResponseEntity<Phone> updatePhone(
             @PathVariable UUID idPhone,
             @RequestBody PhoneUpdateRequest request
@@ -47,11 +47,11 @@ public class PhoneController {
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/phone/{id}")
-    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
-    public ResponseEntity<Void> deletePhone(@PathVariable UUID id) {
-        log.info("DELETE /api/persons/phone/{} called", id);
-        phoneService.deleteById(id);
+    @DeleteMapping("/phone/{idPhone}")
+    @PreAuthorize("@securityService.canAccessIdPhone(authentication, #idPhone)")
+    public ResponseEntity<Void> deletePhone(@PathVariable UUID idPhone) {
+        log.info("DELETE /api/persons/phone/{} called", idPhone);
+        phoneService.deleteById(idPhone);
         return ResponseEntity.noContent().build();
     }
 }

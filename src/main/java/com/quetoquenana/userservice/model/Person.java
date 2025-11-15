@@ -43,7 +43,7 @@ public class Person extends Auditable {
 
     @Column(name = "is_active", nullable = false)
     @JsonView(PersonList.class)
-    private boolean isActive;
+    private Boolean isActive;
 
     @OneToMany(mappedBy = "person", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonView(PersonDetail.class)
@@ -104,14 +104,14 @@ public class Person extends Auditable {
     public void updateFromRequest(PersonUpdateRequest request, String username) {
         if (request.getName() != null) this.setName(request.getName());
         if (request.getLastname() != null) this.setLastname(request.getLastname());
-        if (request.getIsActive() != null) this.setActive(request.getIsActive());
+        if (request.getIsActive() != null) this.setIsActive(request.getIsActive());
 
         this.setUpdatedAt(LocalDateTime.now());
         this.setUpdatedBy(username);
     }
 
     public void activate(String username) {
-        this.setActive(true);
+        this.setIsActive(true);
         this.setUpdatedAt(LocalDateTime.now());
         this.setUpdatedBy(username);
     }

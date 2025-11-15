@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.quetoquenana.userservice.dto.ResetPasswordRequest;
-import com.quetoquenana.userservice.dto.UserCreateRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
-import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.ApiResponse;
 import com.quetoquenana.userservice.model.User;
@@ -25,7 +23,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -79,23 +79,6 @@ class UserControllerTest {
     }
 
     @Test
-    void testGetAllUsers_ReturnsList() throws Exception {
-        List<User> users = Collections.singletonList(user);
-        when(userService.findAll(any())).thenReturn(new PageImpl<>(users));
-        ResponseEntity<ApiResponse> response = userController.getAllUsers();
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        ApiResponse apiResponse = response.getBody();
-        assertNotNull(apiResponse);
-        List<?> data = (List<?>) apiResponse.getData();
-        assertEquals(1, data.size());
-        String json = objectMapper.writerWithView(User.UserList.class).writeValueAsString(data);
-        assertTrue(json.contains("id"));
-        assertTrue(json.contains("username"));
-        assertTrue(json.contains("nickname"));
-        assertTrue(json.contains("userStatus"));
-    }
-
-    @Test
     void testGetUserById_Found() throws Exception {
         when(userService.findById(userId)).thenReturn(Optional.of(user));
         ResponseEntity<ApiResponse> response = userController.getUserById(userId);
@@ -125,29 +108,6 @@ class UserControllerTest {
         assertTrue(json.contains("id"));
         assertTrue(json.contains("username"));
         assertTrue(json.contains("nickname"));
-    }
-
-    @Test
-    void testCreateUser_ReturnsCreated() {
-        UserCreateRequest createRequest = TestEntityFactory.getUserCreateRequest();
-        when(userService.save(any(UserCreateRequest.class))).thenReturn(user);
-        ResponseEntity<ApiResponse> response = userController.createUser(createRequest);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        ApiResponse apiResponse = response.getBody();
-        assertNotNull(apiResponse);
-        User data = (User) apiResponse.getData();
-        assertEquals(user, data);
-    }
-
-    @Test
-    void testCreateUser_DuplicateUsername() {
-        UserCreateRequest createRequest = TestEntityFactory.getUserCreateRequest();
-        when(userService.save(any(UserCreateRequest.class)))
-                .thenThrow(new DuplicateRecordException("user.username.duplicate"));
-        Exception exception = assertThrows(DuplicateRecordException.class, () ->
-                userController.createUser(createRequest)
-        );
-        assertEquals("user.username.duplicate", exception.getMessage());
     }
 
     @Test

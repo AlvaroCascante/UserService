@@ -7,7 +7,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "applications")
@@ -34,19 +39,41 @@ public class Application extends Auditable {
 
     @Column(name = "is_active", nullable = false)
     @JsonView(ApplicationList.class)
-    private boolean isActive = true;
+    private Boolean isActive = true;
 
-    public static Application fromCreateRequest(ApplicationCreateRequest request) {
+    @OneToMany(mappedBy = "application", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonView(ApplicationDetail.class)
+    private Set<AppRole> roles = new HashSet<>();
+
+    public void addRole(AppRole role) {
+        if (roles == null) {
+            roles = new HashSet<>();
+        }
+        role.setApplication(this);
+        roles.add(role);
+    }
+
+    public static Application fromCreateRequest(ApplicationCreateRequest request, List<DefaultData> defaultData) {
+        Set<AppRole> roles = Optional.ofNullable(defaultData)
+                .orElse(List.of())
+                .stream()
+                .map(dr -> AppRole.builder()
+                        .roleName(dr.getDataName())
+                        .description(dr.getDescription())
+                        .build())
+                .collect(Collectors.toCollection(HashSet::new));
+
         return Application.builder()
                 .name(request.getName())
                 .description(request.getDescription())
-                .isActive(request.getIsActive() != null ? request.getIsActive() : true)
+                .isActive(Optional.ofNullable(request.getIsActive()).orElse(true))
+                .roles(roles)
                 .build();
     }
 
     public void updateFromRequest(ApplicationUpdateRequest request, String username) {
         if (request.getDescription() != null) this.setDescription(request.getDescription());
-        if (request.getIsActive() != null) this.setActive(request.getIsActive());
+        if (request.getIsActive() != null) this.setIsActive(request.getIsActive());
 
         this.setUpdatedAt(LocalDateTime.now());
         this.setUpdatedBy(username);
@@ -56,4 +83,3 @@ public class Application extends Auditable {
     public static class ApplicationList extends ApiBaseResponseView.Always {}
     public static class ApplicationDetail extends Application.ApplicationList {}
 }
-

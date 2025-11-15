@@ -189,7 +189,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{$randomCatchPhraseAdjective}}\",\n    \"description\": \"{{$randomCatchPhraseDescriptor}}\",\n    \"isActive\": true\n}",
+							"raw": "{\n    \"name\": \"{{$randomCatchPhraseAdjective}}\",\n    \"description\": \"{{$randomCatchPhraseDescriptor}}\",\n    \"getIsActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -279,7 +279,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"MyAppU\",\n    \"description\": \"My application test U\",\n    \"isActive\": true\n}",
+							"raw": "{\n    \"name\": \"MyAppU\",\n    \"description\": \"My application test U\",\n    \"getIsActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"

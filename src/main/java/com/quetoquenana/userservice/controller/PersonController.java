@@ -29,16 +29,6 @@ public class PersonController {
 
     private final PersonService personService;
 
-    @GetMapping
-    @JsonView(Person.PersonList.class)
-    @PreAuthorize("hasRole('ADMIN')") // Only ADMIN role can access
-    public ResponseEntity<ApiResponse> getAllPersons() {
-        log.info("GET /api/persons called");
-        List<Person> entities = personService.findAll();
-        return ResponseEntity.ok(new ApiResponse(entities));
-    }
-
-
     @GetMapping("/status/{status}")
     @JsonView(Person.PersonList.class)
     @PreAuthorize("hasRole('ADMIN')") // Only ADMIN role can access
@@ -64,7 +54,7 @@ public class PersonController {
 
     @GetMapping("/{id}")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
+    @PreAuthorize("@securityService.canAccessIdPerson(authentication, #idNumber)")
     public ResponseEntity<ApiResponse> getPersonById(
             @PathVariable UUID id
     ) {
@@ -106,7 +96,7 @@ public class PersonController {
 
     @PutMapping("/{id}")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("@securityService.canAccessId(authentication, #idNumber)")
+    @PreAuthorize("@securityService.canAccessIdPerson(authentication, #id)")
     public ResponseEntity<ApiResponse> updatePerson(
             @PathVariable UUID id,
             @RequestBody PersonUpdateRequest request

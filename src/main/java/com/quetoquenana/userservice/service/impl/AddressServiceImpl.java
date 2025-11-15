@@ -29,7 +29,7 @@ public class AddressServiceImpl implements AddressService {
     public Address addAddress(UUID personId, AddressCreateRequest request) {
         Person person = personRepository.findById(personId)
                 .orElseThrow(RecordNotFoundException::new);
-        if (!person.isActive()) {
+        if (!person.getIsActive()) {
             throw new InactiveRecordException("person.inactive");
         }
         Address address = Address.fromCreateRequest(request);
@@ -48,7 +48,7 @@ public class AddressServiceImpl implements AddressService {
         Address existingAddress = addressRepository.findById(addressId)
                 .orElseThrow(RecordNotFoundException::new);
         Person person = existingAddress.getPerson();
-        if (!person.isActive()) {
+        if (!person.getIsActive()) {
             throw new InactiveRecordException("person.inactive");
         }
         existingAddress.updateFromRequest(request);
@@ -60,7 +60,7 @@ public class AddressServiceImpl implements AddressService {
     public void delete(UUID addressId) {
         Address existingAddress = addressRepository.findById(addressId)
                 .orElseThrow(RecordNotFoundException::new);
-        if (!existingAddress.getPerson().isActive()) {
+        if (!existingAddress.getPerson().getIsActive()) {
             throw new InactiveRecordException();
         }
         addressRepository.delete(existingAddress);

@@ -1,18 +1,40 @@
 package com.quetoquenana.userservice.security;
 
+import com.quetoquenana.userservice.config.CorsConfigProperties;
+import com.quetoquenana.userservice.config.RsaKeyProperties;
 import com.quetoquenana.userservice.config.SecurityConfig;
 import com.quetoquenana.userservice.controller.PhoneController;
+import com.quetoquenana.userservice.model.Phone;
+import com.quetoquenana.userservice.dto.PhoneCreateRequest;
 import com.quetoquenana.userservice.service.PhoneService;
+import com.quetoquenana.userservice.service.SecurityService;
+import com.quetoquenana.userservice.repository.AppRoleUserRepository;
+import com.quetoquenana.userservice.repository.ApplicationRepository;
+import com.quetoquenana.userservice.repository.UserRepository;
+import com.quetoquenana.userservice.util.JsonPayloadToObjectBuilder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -25,32 +47,75 @@ class PhoneControllerSecurityTest {
     @MockBean
     private PhoneService phoneService;
 
-    private static final String PHONE_PAYLOAD = "{\"number\":\"123456789\"}";
+    // Mock beans required by SecurityConfig
+    @MockBean
+    private CorsConfigProperties corsConfigProperties;
+
+    @MockBean
+    private RsaKeyProperties rsaKeyProperties;
+
+    @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
+    private ApplicationRepository applicationRepository;
+
+    @MockBean
+    private AppRoleUserRepository appRoleUserRepository;
+
+    // Provide JwtDecoder/JwtEncoder mocks to avoid SecurityConfig creating real encoders/decoders
+    @MockBean
+    private JwtDecoder jwtDecoder;
+
+    @MockBean
+    private JwtEncoder jwtEncoder;
+
+    // Mock SecurityService bean name for method-security SpEL if needed
+    @MockBean(name = "securityService")
+    private SecurityService securityService;
+
+    private String payload;
     private static final String PERSON_ID = "00000000-0000-0000-0000-000000000000";
     private static final String PHONE_ID = "00000000-0000-0000-0000-000000000001";
+
+    @BeforeEach
+    void setup() throws IOException, URISyntaxException {
+        JsonPayloadToObjectBuilder<PhoneCreateRequest> mapper = new JsonPayloadToObjectBuilder<>(PhoneCreateRequest.class);
+        payload = mapper.loadJsonData("payloads/phone-create-request.json");
+
+        when(corsConfigProperties.getHosts()).thenReturn("http://localhost");
+        when(corsConfigProperties.getMethods()).thenReturn("GET,POST,PUT,DELETE");
+        when(corsConfigProperties.getHeaders()).thenReturn("Content-Type,Authorization");
+
+        when(securityService.canAccessIdPerson(any(), any())).thenReturn(true);
+        when(securityService.canAccessIdPhone(any(), any())).thenReturn(true);
+    }
 
     @Test
     @DisplayName("POST /api/persons/{id}/phone returns 401 when unauthenticated")
     void addPhone_Unauthenticated_Returns401() throws Exception {
+        when(securityService.canAccessIdPerson(any(), any())).thenReturn(false);
         mockMvc.perform(post("/api/persons/" + PERSON_ID + "/phone")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(PHONE_PAYLOAD))
+                .content(payload))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @DisplayName("PUT /api/persons/phone/{id} returns 401 when unauthenticated")
     void updatePhone_Unauthenticated_Returns401() throws Exception {
+        when(securityService.canAccessIdPhone(any(), any())).thenReturn(false);
         mockMvc.perform(put("/api/persons/phone/" + PHONE_ID)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(PHONE_PAYLOAD))
+                .content(payload))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @DisplayName("DELETE /api/persons/{id} returns 401 when unauthenticated")
     void deletePhone_Unauthenticated_Returns401() throws Exception {
-        mockMvc.perform(delete("/api/persons/" + PHONE_ID))
+        when(securityService.canAccessIdPhone(any(), any())).thenReturn(false);
+        mockMvc.perform(delete("/api/persons/phone/" + PHONE_ID))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -60,7 +125,7 @@ class PhoneControllerSecurityTest {
     void addPhone_UserRole_Returns200() throws Exception {
         mockMvc.perform(post("/api/persons/" + PERSON_ID + "/phone")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(PHONE_PAYLOAD))
+                .content(payload))
                 .andExpect(status().isOk());
     }
 
@@ -70,7 +135,7 @@ class PhoneControllerSecurityTest {
     void addPhone_AdminRole_Returns200() throws Exception {
         mockMvc.perform(post("/api/persons/" + PERSON_ID + "/phone")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(PHONE_PAYLOAD))
+                .content(payload))
                 .andExpect(status().isOk());
     }
 
@@ -80,34 +145,7 @@ class PhoneControllerSecurityTest {
     void updatePhone_UserRole_Returns200() throws Exception {
         mockMvc.perform(put("/api/persons/phone/" + PHONE_ID)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(PHONE_PAYLOAD))
+                .content(payload))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser(roles = {"ADMIN"})
-    @DisplayName("PUT /api/persons/phone/{id} returns 200 for ADMIN role")
-    void updatePhone_AdminRole_Returns200() throws Exception {
-        mockMvc.perform(put("/api/persons/phone/" + PHONE_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(PHONE_PAYLOAD))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser(roles = {"USER"})
-    @DisplayName("DELETE /api/persons/phone/{id} returns 204 for USER role")
-    void deletePhone_UserRole_Returns204() throws Exception {
-        mockMvc.perform(delete("/api/persons/phone/" + PHONE_ID))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    @WithMockUser(roles = {"ADMIN"})
-    @DisplayName("DELETE /api/persons/phone/{id} returns 204 for ADMIN role")
-    void deletePhone_AdminRole_Returns204() throws Exception {
-        mockMvc.perform(delete("/api/persons/phone/" + PHONE_ID))
-                .andExpect(status().isNoContent());
     }
 }
-

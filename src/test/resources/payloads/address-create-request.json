@@ -1,0 +1,8 @@
+{
+  "address": "randomStreetAddress",
+  "country": "randomCountry",
+  "city": "randomCity",
+  "state": "randomCity",
+  "zipCode": "28001",
+  "addressType": "HOME"
+}

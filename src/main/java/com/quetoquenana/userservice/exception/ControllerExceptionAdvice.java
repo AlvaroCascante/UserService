@@ -22,21 +22,34 @@ public class ControllerExceptionAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse> handleMethodArgumentNotValidException(
-            MethodArgumentNotValidException ex) {
+            MethodArgumentNotValidException ex
+    ) {
         log.error("MethodArgumentNotValidException: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(new ApiResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value()));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse> handleDataIntegrityViolationException(
-            DataIntegrityViolationException ex) {
+            DataIntegrityViolationException ex
+    ) {
         log.error("DataIntegrityViolationException: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(new ApiResponse("DataIntegrityViolationException", HttpStatus.BAD_REQUEST.value()));
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse> handleAuthenticationException(
+            AuthenticationException ex,
+            Locale locale
+    ) {
+        log.error("AuthenticationException: {}", ex.getMessage());
+        String message = messageSource.getMessage(ex.getMessageKey(), ex.getMessageArgs(), locale);
+        return ResponseEntity.badRequest().body(new ApiResponse(message, HttpStatus.BAD_REQUEST.value()));
+    }
+
     @ExceptionHandler(ImmutableFieldModificationException.class)
     public ResponseEntity<ApiResponse> handleImmutableFieldModificationException(
-            ImmutableFieldModificationException ex, Locale locale) {
+            ImmutableFieldModificationException ex,
+            Locale locale) {
         log.error("Attempted to modify immutable field: {}", ex.getMessage());
         String message = messageSource.getMessage(ex.getMessageKey(), ex.getMessageArgs(), locale);
         return ResponseEntity.badRequest().body(new ApiResponse(message, HttpStatus.BAD_REQUEST.value()));
@@ -44,7 +57,9 @@ public class ControllerExceptionAdvice {
 
     @ExceptionHandler(RecordNotFoundException.class)
     public ResponseEntity<ApiResponse> handleRecordNotFoundException(
-            RecordNotFoundException ex, Locale locale) {
+            RecordNotFoundException ex,
+            Locale locale
+    ) {
         log.error("RecordNotFoundException: {}", ex.getMessage());
         String message = messageSource.getMessage(ex.getMessageKey(), ex.getMessageArgs(), locale);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -53,7 +68,9 @@ public class ControllerExceptionAdvice {
 
     @ExceptionHandler(DuplicateRecordException.class)
     public ResponseEntity<ApiResponse> handleDuplicateRecordException(
-            DuplicateRecordException ex, Locale locale) {
+            DuplicateRecordException ex,
+            Locale locale
+    ) {
         log.error("Duplicate record: {}", ex.getMessage());
         String message = messageSource.getMessage(ex.getMessageKey(), ex.getMessageArgs(), locale);
         return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -62,7 +79,9 @@ public class ControllerExceptionAdvice {
 
     @ExceptionHandler(InactiveRecordException.class)
     public ResponseEntity<ApiResponse> handleInactiveRecordException(
-            InactiveRecordException ex, Locale locale) {
+            InactiveRecordException ex,
+            Locale locale
+    ) {
         log.error("Inactive record: {}", ex.getMessage());
         String message = messageSource.getMessage(ex.getMessageKey(), ex.getMessageArgs(), locale);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -71,7 +90,9 @@ public class ControllerExceptionAdvice {
 
     @ExceptionHandler(RecordNotDeletableException.class)
     public ResponseEntity<ApiResponse> handleRecordNotDeletableException(
-            RecordNotDeletableException ex, Locale locale) {
+            RecordNotDeletableException ex,
+            Locale locale
+    ) {
         log.error("Record not deletable: {}", ex.getMessage());
         String message = messageSource.getMessage(ex.getMessageKey(), ex.getMessageArgs(), locale);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

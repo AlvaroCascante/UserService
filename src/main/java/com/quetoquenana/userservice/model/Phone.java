@@ -36,7 +36,7 @@ public class Phone {
 
     @Column(name = "is_main", nullable = false)
     @JsonView(Person.PersonDetail.class)
-    private boolean isMain = false;
+    private Boolean isMain = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_id", nullable = false)
@@ -58,7 +58,7 @@ public class Phone {
             this.setCategory(PhoneCategory.valueOf(request.getCategory()));
         }
         if (request.getIsMain() != null) {
-            this.setMain(request.getIsMain());
+            this.setIsMain(request.getIsMain());
         }
     }
 }

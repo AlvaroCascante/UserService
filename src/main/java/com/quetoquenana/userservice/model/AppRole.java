@@ -2,6 +2,7 @@
 package com.quetoquenana.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.quetoquenana.userservice.dto.AppRoleCreateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,18 +30,18 @@ public class AppRole extends Auditable {
 
     @Column(name = "role_name", nullable = false, length = 50)
     @JsonView(Application.ApplicationList.class)
-    private String rolName;
+    private String roleName;
 
     @Column(name = "description", length = 100)
     @JsonView(Application.ApplicationDetail.class)
     private String description;
 
-    public static AppRole fromCreateRequest(Application application, String name, String description) {
+    public static AppRole fromCreateRequest(Application application, AppRoleCreateRequest request) {
         return AppRole.builder()
                 .id(UUID.randomUUID())
                 .application(application)
-                .rolName(name)
-                .description(description)
+                .roleName(request.getRoleName())
+                .description(request.getDescription())
                 .build();
     }
 
