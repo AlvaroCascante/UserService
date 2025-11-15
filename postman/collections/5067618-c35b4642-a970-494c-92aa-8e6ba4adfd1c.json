@@ -126,29 +126,6 @@
 			"name": "Applications",
 			"item": [
 				{
-					"name": "Fetch All Applications",
-					"id": "5067618-ac8f49a3-8922-486c-adf5-d6f2f170d318",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/applications",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"applications"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Fetch All Applications Page",
 					"id": "5067618-011331af-7c68-47f0-bec1-4b83660dc013",
 					"protocolProfileBehavior": {
