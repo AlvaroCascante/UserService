@@ -576,14 +576,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/page?page=0&size=5",
+							"raw": "{{HOST}}/{{path}}/api/default-data/page?page=0&size=5",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"users",
+								"default-data",
 								"page"
 							],
 							"query": [
@@ -716,7 +716,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"{{$randomEmail}}\",\n  \"password\": \"P@ssw0rd!\",\n  \"person\": {\n    \"idNumber\": \"{{$randomUUID}}\",\n    \"name\": \"John\",\n    \"lastname\": \"Doe\"\n  },\n  \"nickname\": \"Ksknt\"\n}",
+							"raw": "{\n  \"name\": \"DATA\",\n  \"description\": \"Role data\",\n  \"dataCategory\": \"ROLE\",\n  \"isActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
