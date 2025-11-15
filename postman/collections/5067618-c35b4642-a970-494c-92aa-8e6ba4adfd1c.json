@@ -441,13 +441,13 @@
 							"type": "basic",
 							"basic": [
 								{
-									"key": "password",
-									"value": "MynewPass",
+									"key": "username",
+									"value": "system",
 									"type": "string"
 								},
 								{
-									"key": "username",
-									"value": "System",
+									"key": "password",
+									"value": "SYSP@ssw0rd!TEM",
 									"type": "string"
 								}
 							]
@@ -490,8 +490,17 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"newPassword\": \"MynewPass\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/auth/login",
+							"raw": "{{HOST}}/{{path}}/api/auth/reset",
 							"host": [
 								"{{HOST}}"
 							],
@@ -499,7 +508,7 @@
 								"{{path}}",
 								"api",
 								"auth",
-								"login"
+								"reset"
 							]
 						}
 					},
