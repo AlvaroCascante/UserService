@@ -1079,43 +1079,6 @@
 			"name": "Users",
 			"item": [
 				{
-					"name": "Get All",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"id": "5067618-e2c24e9c-502e-4572-a5b1-3b62f909caa8",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get All Page",
 					"event": [
 						{
@@ -1410,43 +1373,6 @@
 		{
 			"name": "Default Data",
 			"item": [
-				{
-					"name": "Get All",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"id": "5067618-3a804f08-7ff1-4319-8c8d-c9e1bb754a01",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"users"
-							]
-						}
-					},
-					"response": []
-				},
 				{
 					"name": "Get All Page",
 					"event": [
