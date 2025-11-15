@@ -126,7 +126,7 @@
 			"name": "Applications",
 			"item": [
 				{
-					"name": "Fetch All Applications Page",
+					"name": "Get All Applications Page",
 					"id": "5067618-011331af-7c68-47f0-bec1-4b83660dc013",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
