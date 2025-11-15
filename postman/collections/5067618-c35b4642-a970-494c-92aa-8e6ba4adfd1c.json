@@ -456,7 +456,7 @@
 						"header": [
 							{
 								"key": "X-Application-Name",
-								"value": "UserServiceApp",
+								"value": "UserService",
 								"type": "text"
 							}
 						],
