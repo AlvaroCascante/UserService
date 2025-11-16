@@ -45,6 +45,11 @@ class AddressControllerIT {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
+
+        // Ensure RSA keys are available for SecurityConfig during tests
+        // Keys are in src/main/resources/keys/
+        registry.add("security.rsa.public-key", () -> "classpath:keys/user_service_public_key.pem");
+        registry.add("security.rsa.private-key", () -> "classpath:keys/user_service_private_key.pem");
     }
 
     @Autowired
@@ -131,4 +136,3 @@ class AddressControllerIT {
                 .andExpect(status().isBadRequest());
     }
 }
-

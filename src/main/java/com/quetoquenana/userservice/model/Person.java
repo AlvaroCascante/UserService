@@ -32,13 +32,11 @@ public class Person extends Auditable {
     private String idNumber;
 
     @Column(name = "name", nullable = false, length = 50)
-    @JsonView({PersonList.class,
-            User.UserDetail.class})
+    @JsonView({PersonList.class, User.UserDetail.class, Application.ApplicationDetail.class})
     private String name;
 
     @Column(name = "lastname", nullable = false, length = 50)
-    @JsonView({PersonList.class,
-            User.UserDetail.class})
+    @JsonView({PersonList.class, User.UserDetail.class, Application.ApplicationDetail.class})
     private String lastname;
 
     @Column(name = "is_active", nullable = false)

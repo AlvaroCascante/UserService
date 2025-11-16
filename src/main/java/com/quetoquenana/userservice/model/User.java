@@ -27,7 +27,7 @@ public class User extends Auditable {
     private UUID id;
 
     @Column(name = "username", nullable = false, unique = true, length = 100)
-    @JsonView(UserList.class)
+    @JsonView({UserList.class, Application.ApplicationDetail.class})
     private String username;
 
     @Column(name = "password_hash", nullable = false)
@@ -36,11 +36,11 @@ public class User extends Auditable {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_id", nullable = false)
-    @JsonView(UserDetail.class)
+    @JsonView({UserDetail.class, Application.ApplicationDetail.class})
     private Person person;
 
     @Column(name = "nickname", length = 50)
-    @JsonView(UserList.class)
+    @JsonView({UserList.class, Application.ApplicationDetail.class})
     private String nickname;
 
     @Enumerated(EnumType.STRING)

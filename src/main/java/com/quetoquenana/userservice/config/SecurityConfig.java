@@ -4,6 +4,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.quetoquenana.userservice.exception.AuthenticationException;
+import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.Application;
 import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.ApplicationRepository;
@@ -115,8 +116,8 @@ public class SecurityConfig {
                             Application application = applicationRepository.findByName(appName)
                                     .orElseThrow(() -> new AuthenticationException("error.authentication.application"));
 
-                            List<GrantedAuthority> authorities = appRoleUserRepository
-                                    .findByUserIdAndRoleApplicationId(user.getId(), application.getId()).stream()
+                            List<AppRoleUser> appRoleUsers = appRoleUserRepository.findByUserIdAndRoleApplicationId(user.getId(), application.getId());
+                            List<GrantedAuthority> authorities =  appRoleUsers.stream()
                                     .map(mapping -> new SimpleGrantedAuthority(mapping.getRole().getRoleName()))
                                     .collect(Collectors.toList());
 

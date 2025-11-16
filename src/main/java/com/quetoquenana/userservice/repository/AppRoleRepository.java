@@ -9,5 +9,5 @@ import java.util.UUID;
 
 public interface AppRoleRepository extends JpaRepository<AppRole, UUID> {
     List<AppRole> findByApplicationId(UUID applicationId);
+    Optional<AppRole> findByApplicationIdAndRoleName(UUID applicationId, String roleName);
 }
-

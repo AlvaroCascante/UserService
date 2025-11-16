@@ -6,6 +6,7 @@ import com.quetoquenana.userservice.model.DefaultData;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public interface DefaultDataService {
 
     Optional<DefaultData> findById(UUID id);
 
-    Optional<DefaultData> findByName(String name);
+    Page<DefaultData> findByDataCategory(String category, Pageable pageable);
 
     DefaultData create(DefaultDataCreateRequest request);
 

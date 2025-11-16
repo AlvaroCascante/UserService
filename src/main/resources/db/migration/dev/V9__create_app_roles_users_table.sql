@@ -3,8 +3,8 @@
 
 CREATE TABLE app_roles_users (
     id UUID PRIMARY KEY,
-    user_id UUID UNIQUE REFERENCES users(id),
-    app_role_id UUID UNIQUE REFERENCES app_roles(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id),
+    app_role_id UUID REFERENCES app_roles(id) ON DELETE CASCADE,
 
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     created_by VARCHAR(100) NOT NULL,

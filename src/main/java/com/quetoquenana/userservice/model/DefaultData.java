@@ -19,22 +19,23 @@ public class DefaultData extends Auditable {
 
     @Id
     @Column(name = "id", updatable = false, nullable = false)
+    @JsonView(DefaultDataList.class)
     private UUID id;
 
     @Column(name = "name", nullable = false, length = 50)
-    @JsonView(Application.ApplicationList.class)
+    @JsonView(DefaultDataList.class)
     private String dataName;
 
     @Column(name = "description", length = 100)
-    @JsonView(Application.ApplicationDetail.class)
+    @JsonView(DefaultDataDetail.class)
     private String description;
 
     @Column(name = "is_active", nullable = false)
-    @JsonView(Person.PersonList.class)
+    @JsonView(DefaultDataDetail.class)
     private Boolean isActive;
 
     @Column(name = "data_category", nullable = false, length = 50)
-    @JsonView(Application.ApplicationList.class)
+    @JsonView(DefaultDataList.class)
     @Enumerated(EnumType.STRING)
     private DataCategory dataCategory;
 
@@ -55,4 +56,8 @@ public class DefaultData extends Auditable {
         if (request.getIsActive() != null) this.setIsActive(request.getIsActive());
         if (request.getDataCategory() != null) this.setDataCategory(DataCategory.valueOf(request.getDataCategory()));
     }
+
+    // JSON Views
+    public static class DefaultDataList extends ApiBaseResponseView.Always {}
+    public static class DefaultDataDetail extends DefaultDataList {}
 }

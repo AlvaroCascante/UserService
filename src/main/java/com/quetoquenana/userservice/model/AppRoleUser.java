@@ -18,22 +18,23 @@ import java.util.UUID;
 public class AppRoleUser extends Auditable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
+    @JsonView(Application.ApplicationDetail.class)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonView(User.UserList.class)
+    @JsonView({User.UserList.class, Application.ApplicationDetail.class})
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "app_role_id", nullable = false)
-    @JsonView(AppRole.class)
+    @JsonView({AppRole.class, Application.ApplicationDetail.class})
     private AppRole role;
 
     public static AppRoleUser of(User user, AppRole role) {
         return AppRoleUser.builder()
-                .id(UUID.randomUUID())
                 .user(user)
                 .role(role)
                 .build();

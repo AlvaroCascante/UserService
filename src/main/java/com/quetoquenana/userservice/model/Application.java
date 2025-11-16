@@ -42,7 +42,7 @@ public class Application extends Auditable {
     private Boolean isActive = true;
 
     @OneToMany(mappedBy = "application", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonView(ApplicationDetail.class)
+    @JsonView(value = ApplicationDetail.class)
     private Set<AppRole> roles = new HashSet<>();
 
     public void addRole(AppRole role) {
@@ -53,21 +53,11 @@ public class Application extends Auditable {
         roles.add(role);
     }
 
-    public static Application fromCreateRequest(ApplicationCreateRequest request, List<DefaultData> defaultData) {
-        Set<AppRole> roles = Optional.ofNullable(defaultData)
-                .orElse(List.of())
-                .stream()
-                .map(dr -> AppRole.builder()
-                        .roleName(dr.getDataName())
-                        .description(dr.getDescription())
-                        .build())
-                .collect(Collectors.toCollection(HashSet::new));
-
+    public static Application fromCreateRequest(ApplicationCreateRequest request) {
         return Application.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .isActive(Optional.ofNullable(request.getIsActive()).orElse(true))
-                .roles(roles)
                 .build();
     }
 

@@ -30,8 +30,8 @@ public class DefaultDataController {
     private final DefaultDataService defaultDataService;
 
     @GetMapping("/page")
-    @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(Application.ApplicationList.class)
+    @PreAuthorize("hasRole('SYSTEM')")
+    @JsonView(DefaultData.DefaultDataList.class)
     public ResponseEntity<ApiResponse> getDefaultDataPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -42,8 +42,8 @@ public class DefaultDataController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(Application.ApplicationDetail.class)
+    @PreAuthorize("hasRole('SYSTEM')")
+    @JsonView(DefaultData.DefaultDataDetail.class)
     public ResponseEntity<ApiResponse> getDefaultDataById(
             @PathVariable UUID id
     ) {
@@ -56,24 +56,22 @@ public class DefaultDataController {
                 });
     }
 
-    @GetMapping("/name/{name}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(Application.ApplicationDetail.class)
-    public ResponseEntity<ApiResponse> getDefaultDataByName(
-            @PathVariable String name
+    @GetMapping("/page/category/{category}")
+    @PreAuthorize("hasRole('SYSTEM')")
+    @JsonView(DefaultData.DefaultDataDetail.class)
+    public ResponseEntity<ApiResponse> getDefaultDataByCategory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @PathVariable String category
     ) {
-        log.info("GET /api/default-data/name/{} called", name);
-        return defaultDataService.findByName(name)
-                .map(entity -> ResponseEntity.ok(new ApiResponse(entity)))
-                .orElseGet(() -> {
-                    log.error("DefaultData with name {} not found", name);
-                    throw new RecordNotFoundException();
-                });
+        log.info("GET /api/default-data/page/category/{} called", category);
+        Page<DefaultData> entities = defaultDataService.findByDataCategory(category, PageRequest.of(page, size));
+        return ResponseEntity.ok(new ApiResponse(new JsonViewPageUtil<>(entities, entities.getPageable())));
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(Application.ApplicationDetail.class)
+    @PreAuthorize("hasRole('SYSTEM')")
+    @JsonView(DefaultData.DefaultDataDetail.class)
     public ResponseEntity<ApiResponse> createDefaultData(
             @Valid @RequestBody DefaultDataCreateRequest request
     ) {
@@ -83,8 +81,8 @@ public class DefaultDataController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(Application.ApplicationDetail.class)
+    @PreAuthorize("hasRole('SYSTEM')")
+    @JsonView(DefaultData.DefaultDataDetail.class)
     public ResponseEntity<ApiResponse> updateDefaultData(@PathVariable UUID id, @RequestBody DefaultDataUpdateRequest request) {
         log.info("PUT /api/default-data/{} called with payload: {}", id, request);
         DefaultData saved = defaultDataService.update(id, request);
@@ -92,7 +90,7 @@ public class DefaultDataController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SYSTEM')")
     public ResponseEntity<Void> deleteDefaultData(@PathVariable UUID id) {
         log.info("DELETE /api/default-data/{} called", id);
         defaultDataService.deleteById(id);

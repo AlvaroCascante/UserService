@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @RestController
@@ -50,7 +51,7 @@ public class ApplicationController {
     public ResponseEntity<ApiResponse> getApplicationById(@PathVariable UUID id) {
         log.info("GET /api/applications/{} called", id);
         return applicationService.findById(id)
-                .map(entity -> ResponseEntity.ok(new ApiResponse(entity)))
+                .map(entity -> ResponseEntity.ok(new ApiResponse(Collections.singletonMap("application", entity))))
                 .orElseGet(() -> {
                     log.error("Application with id {} not found", id);
                     throw new RecordNotFoundException();
@@ -63,7 +64,7 @@ public class ApplicationController {
     public ResponseEntity<ApiResponse> getApplicationByName(@PathVariable String name) {
         log.info("GET /api/applications/name/{} called", name);
         return applicationService.findByName(name)
-                .map(entity -> ResponseEntity.ok(new ApiResponse(entity)))
+                .map(entity -> ResponseEntity.ok(new ApiResponse(Collections.singletonMap("application", entity))))
                 .orElseGet(() -> {
                     log.error("Application with name {} not found", name);
                     throw new RecordNotFoundException();
@@ -91,7 +92,7 @@ public class ApplicationController {
     ) {
         log.info("POST /api/applications called with payload: {}", request);
         Application entity = applicationService.save(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(entity));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(Collections.singletonMap("application", entity)));
     }
 
     @PutMapping("/{id}")
@@ -103,7 +104,7 @@ public class ApplicationController {
     ) {
         log.info("PUT /api/applications/{} called with payload: {}", id, request);
         Application entity = applicationService.update(id, request);
-        return ResponseEntity.ok(new ApiResponse(entity));
+        return ResponseEntity.ok(new ApiResponse(Collections.singletonMap("application", entity)));
     }
 
     @DeleteMapping("/{id}")
@@ -117,20 +118,20 @@ public class ApplicationController {
     }
 
     @PostMapping("/{id}/role")
-    @JsonView(User.UserDetail.class)
+    @JsonView(Application.ApplicationDetail.class)
     @PreAuthorize("hasRole('SYSTEM')")
     public ResponseEntity<ApiResponse> addRole(
             @PathVariable UUID id,
             @Valid @RequestBody AppRoleCreateRequest request
     ) {
-        log.info("POST /api/applications/{}/user called with payload: {}", id, request);
+        log.info("POST /api/applications/{}/role called with payload: {}", id, request);
         AppRole entity = applicationService.addRole(id, request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse(entity));
+                .body(new ApiResponse(Collections.singletonMap("appRole", entity)));
     }
 
     @PostMapping("/{id}/user")
-    @JsonView(User.UserDetail.class)
+    @JsonView(Application.ApplicationDetail.class)
     @PreAuthorize("hasRole('SYSTEM')")
     public ResponseEntity<ApiResponse> addUser(
             @PathVariable UUID id,
@@ -139,7 +140,7 @@ public class ApplicationController {
         log.info("POST /api/applications/{}/user called with payload: {}", id, request);
         AppRoleUser entity = applicationService.addUser(id, request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse(entity));
+                .body(new ApiResponse(Collections.singletonMap("appRoleUser", entity)));
     }
 
     @DeleteMapping("/{id}/user/{username}")

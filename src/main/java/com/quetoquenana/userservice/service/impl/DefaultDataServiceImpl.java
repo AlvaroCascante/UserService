@@ -4,6 +4,7 @@ import com.quetoquenana.userservice.dto.DefaultDataCreateRequest;
 import com.quetoquenana.userservice.dto.DefaultDataUpdateRequest;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
+import com.quetoquenana.userservice.model.DataCategory;
 import com.quetoquenana.userservice.model.DefaultData;
 import com.quetoquenana.userservice.repository.DefaultDataRepository;
 import com.quetoquenana.userservice.service.CurrentUserService;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,8 +38,8 @@ public class DefaultDataServiceImpl implements DefaultDataService {
     }
 
     @Override
-    public Optional<DefaultData> findByName(String name) {
-        return defaultDataRepository.findByDataNameIgnoreCase(name);
+    public Page<DefaultData> findByDataCategory(String category, Pageable pageable) {
+        return defaultDataRepository.findByDataCategory(DataCategory.valueOf(category), pageable);
     }
 
     @Override

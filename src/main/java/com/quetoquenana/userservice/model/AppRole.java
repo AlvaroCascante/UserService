@@ -1,4 +1,3 @@
-// ...existing code...
 package com.quetoquenana.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -20,25 +19,32 @@ import java.util.UUID;
 public class AppRole extends Auditable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
+    @JsonView(Application.ApplicationDetail.class)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "application_id", nullable = false)
-    @JsonView(Application.ApplicationList.class)
     private Application application;
 
     @Column(name = "role_name", nullable = false, length = 50)
-    @JsonView(Application.ApplicationList.class)
+    @JsonView(Application.ApplicationDetail.class)
     private String roleName;
 
     @Column(name = "description", length = 100)
     @JsonView(Application.ApplicationDetail.class)
     private String description;
 
+    public static AppRole fromData(String roleName, String description) {
+        return AppRole.builder()
+                .roleName(roleName)
+                .description(description)
+                .build();
+    }
+
     public static AppRole fromCreateRequest(Application application, AppRoleCreateRequest request) {
         return AppRole.builder()
-                .id(UUID.randomUUID())
                 .application(application)
                 .roleName(request.getRoleName())
                 .description(request.getDescription())
@@ -49,4 +55,3 @@ public class AppRole extends Auditable {
         if (description != null) this.setDescription(description);
     }
 }
-

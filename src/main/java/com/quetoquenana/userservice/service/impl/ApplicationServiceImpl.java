@@ -58,11 +58,20 @@ public class ApplicationServiceImpl implements ApplicationService {
         if (applicationRepository.existsByNameIgnoreCase(request.getName())) {
             throw new DuplicateRecordException("application.name.duplicate");
         }
+        Application application = Application.fromCreateRequest(request);
+        LocalDateTime now = LocalDateTime.now();
+        User currentUser = userRepository.findByUsernameIgnoreCase(currentUserService.getCurrentUsername())
+                .orElseThrow(RecordNotFoundException::new);
+        application.setCreatedAt(now);
+        application.setCreatedBy(currentUser.getUsername());
 
-        List<DefaultData> defaultRoles = defaultDataRepository.findByDataCategoryAndIsActive(DataCategory.ROLE.name(), true);
-        Application application = Application.fromCreateRequest(request, defaultRoles);
-        application.setCreatedAt(LocalDateTime.now());
-        application.setCreatedBy(currentUserService.getCurrentUsername());
+        // sets role.application and adds to set
+        for (DefaultData data : defaultDataRepository.findByDataCategoryAndIsActive(DataCategory.ROLE, true)) {
+            AppRole role = AppRole.fromData(data.getDataName(), data.getDescription());
+            role.setCreatedAt(now);
+            role.setCreatedBy(currentUser.getUsername());
+            application.addRole(role);
+        }
         return applicationRepository.save(application);
     }
 
@@ -77,15 +86,38 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    @Transactional
     public AppRole addRole(UUID applicationId, AppRoleCreateRequest request) {
         Application existing = applicationRepository.findById(applicationId)
                 .orElseThrow(RecordNotFoundException::new);
         AppRole appRole = AppRole.fromCreateRequest(existing, request);
-        appRole.setCreatedAt(LocalDateTime.now());
-        appRole.setCreatedBy(currentUserService.getCurrentUsername());
-        return appRoleRepository.save(appRole);
+        return saveAppRole(appRole);
     }
 
+    private AppRole saveAppRole(AppRole role) {
+        Application application = role.getApplication();
+
+        // If role already exists for the application, return it (avoid merging detached instances)
+        Optional<AppRole> existing = appRoleRepository.findByApplicationIdAndRoleName(application.getId(), role.getRoleName());
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        // set auditing for new role
+        role.setCreatedAt(LocalDateTime.now());
+        role.setCreatedBy(currentUserService.getCurrentUsername());
+
+        // Ensure the application reference is set and application already exists
+        if (application.getId() == null) {
+            // persist application first if not yet persisted
+            application = applicationRepository.saveAndFlush(application);
+            role.setApplication(application);
+        }
+
+        // Persist role directly to ensure id/version are initialized
+        AppRole saved = appRoleRepository.saveAndFlush(role);
+        return saved;
+    }
     @Override
     @Transactional
     public AppRoleUser addUser(UUID applicationId, AppRoleUserCreateRequest request) {
@@ -93,12 +125,12 @@ public class ApplicationServiceImpl implements ApplicationService {
         applicationRepository.findById(applicationId)
                 .orElseThrow(RecordNotFoundException::new);
 
-        // find matching app role for the application
-        List<AppRole> roles = appRoleRepository.findByApplicationId(applicationId);
-        Optional<AppRole> optRole = roles.stream()
-                .filter(r -> r.getRoleName().equalsIgnoreCase(request.getRoleName()))
-                .findFirst();
-        AppRole role = optRole.orElseThrow(RecordNotFoundException::new);
+        // find matching app role for the application (use repo to get managed entity)
+        AppRole role = appRoleRepository.findByApplicationIdAndRoleName(applicationId, request.getRoleName())
+                .orElseThrow(RecordNotFoundException::new);
+
+        // reload role by id to ensure it's managed and version is initialized
+        role = appRoleRepository.findById(role.getId()).orElseThrow(RecordNotFoundException::new);
 
         // find user by username
         User user = userRepository.findByUsernameIgnoreCase(request.getUsername())
