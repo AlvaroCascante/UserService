@@ -918,7 +918,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"nickname\": \"New\",\n  \"userStatus\": \"ACTIVE\"\n}",
+							"raw": "{\n  \"name\": \"TEST1\",\n  \"description\": \"Test data1\",\n  \"isActive\": false\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -926,21 +926,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/:id",
+							"raw": "{{HOST}}/{{path}}/api/default-data/:id",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"users",
+								"default-data",
 								":id"
 							],
 							"variable": [
 								{
-									"id": "ff112d17-99c5-4012-b6ea-91ed07895305",
 									"key": "id",
-									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
+									"value": "df19f30a-5583-45d4-8514-0da4e8481a18"
 								}
 							]
 						}
