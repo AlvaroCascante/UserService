@@ -845,7 +845,7 @@
 					"response": []
 				},
 				{
-					"name": "Create User",
+					"name": "Create DefaultData",
 					"event": [
 						{
 							"listen": "prerequest",
