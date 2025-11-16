@@ -918,7 +918,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"TEST1\",\n  \"description\": \"Test data1\",\n  \"isActive\": false\n}",
+							"raw": "{\n  \"name\": \"TEST1\",\n  \"description\": \"Test data1\",\n  \"isActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
