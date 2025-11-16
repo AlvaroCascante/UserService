@@ -894,7 +894,7 @@
 					"response": []
 				},
 				{
-					"name": "UpdateUser",
+					"name": "Update Default Data",
 					"event": [
 						{
 							"listen": "prerequest",
