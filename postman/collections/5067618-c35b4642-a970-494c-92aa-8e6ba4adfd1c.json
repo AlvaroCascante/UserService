@@ -500,6 +500,61 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "AddRole Copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-48b88b8e-7d4f-4d06-b8b2-1c7564922b4b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roleName\": \"ADMIN\",\n  \"description\": \"Admin Role\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/applications/:id/role",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"applications",
+								":id",
+								"role"
+							],
+							"variable": [
+								{
+									"id": "b600622b-dfb6-4b0a-b03d-6b6ef7e2eb17",
+									"key": "id",
+									"value": "28ca18b9-0883-49f6-9b5d-3714460d70f4"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "5067618-a8c84f9a-2b24-482b-94b6-801bbec5064c"
