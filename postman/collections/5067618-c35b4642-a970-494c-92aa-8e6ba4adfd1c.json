@@ -480,14 +480,22 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users",
+							"raw": "{{HOST}}/{{path}}/api/applications/:id/role",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"users"
+								"applications",
+								":id",
+								"role"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "28ca18b9-0883-49f6-9b5d-3714460d70f4"
+								}
 							]
 						}
 					},
