@@ -979,19 +979,18 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/:id",
+							"raw": "{{HOST}}/{{path}}/api/default-data/:id",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"users",
+								"default-data",
 								":id"
 							],
 							"variable": [
 								{
-									"id": "3efc8f96-1603-4111-83aa-d7fe2ad87738",
 									"key": "id",
 									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
 								}
