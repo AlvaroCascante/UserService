@@ -502,6 +502,61 @@
 					"response": []
 				},
 				{
+					"name": "AddUser",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-765deac9-6949-474d-ba75-dc9ad4bdf56d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roleName\": \"ADMIN\",\n  \"description\": \"Admin Role\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/applications/:id/role",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"applications",
+								":id",
+								"role"
+							],
+							"variable": [
+								{
+									"id": "144c837f-53f5-48b8-b008-b6212bf67685",
+									"key": "id",
+									"value": "28ca18b9-0883-49f6-9b5d-3714460d70f4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "DeleteRole",
 					"event": [
 						{
