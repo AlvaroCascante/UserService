@@ -1844,6 +1844,60 @@
 					"response": []
 				},
 				{
+					"name": "Create User",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-d65ee820-c363-4b11-b9ed-ba91b46e33b4",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nickname\": \"New\",\n  \"userStatus\": \"ACTIVE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"id": "669afce0-432b-4189-840a-7c3536448866",
+									"key": "id",
+									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Delete User",
 					"event": [
 						{
