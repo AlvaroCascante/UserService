@@ -1864,11 +1864,11 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "PUT",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"nickname\": \"New\",\n  \"userStatus\": \"ACTIVE\"\n}",
+							"raw": "{\n    \"username\": \"{{$randomEmail}}\",\n    \"password\": \"P@ssw0rd!\",\n    \"person\": {\n        \"idNumber\": \"{{$randomUUID}}\",\n        \"name\": \"John\",\n        \"lastname\": \"Doe\"\n    },\n  \"nickname\": \"New\",\n  \"userStatus\": \"ACTIVE\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1876,22 +1876,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/:id",
+							"raw": "{{HOST}}/{{path}}/api/users",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"users",
-								":id"
-							],
-							"variable": [
-								{
-									"id": "669afce0-432b-4189-840a-7c3536448866",
-									"key": "id",
-									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
-								}
+								"users"
 							]
 						}
 					},
