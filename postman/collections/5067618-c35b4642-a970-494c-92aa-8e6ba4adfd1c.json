@@ -754,50 +754,6 @@
 					"response": []
 				},
 				{
-					"name": "Get By Id",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"id": "5067618-a3a9e692-e7a9-4c71-be59-a902687cc039",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/default-data/:id",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"default-data",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "4c1300c9-ab2d-43f8-ac1a-80271fbe4784"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get By Category",
 					"event": [
 						{
@@ -841,6 +797,50 @@
 								{
 									"key": "size",
 									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-a3a9e692-e7a9-4c71-be59-a902687cc039",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/default-data/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"default-data",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "4c1300c9-ab2d-43f8-ac1a-80271fbe4784"
 								}
 							]
 						}
