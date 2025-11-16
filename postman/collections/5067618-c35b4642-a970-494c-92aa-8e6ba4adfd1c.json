@@ -358,6 +358,50 @@
 					"response": []
 				},
 				{
+					"name": "Delete Application",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-e65fa63a-ccea-4d7e-b97f-e4cf74e222a5",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/applications/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"applications",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "d874ce22-457b-46d8-a686-43157537c4e5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create User",
 					"event": [
 						{
@@ -398,50 +442,6 @@
 								"{{path}}",
 								"api",
 								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Application",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"id": "5067618-e65fa63a-ccea-4d7e-b97f-e4cf74e222a5",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/applications/:id",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"applications",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "d874ce22-457b-46d8-a686-43157537c4e5"
-								}
 							]
 						}
 					},
