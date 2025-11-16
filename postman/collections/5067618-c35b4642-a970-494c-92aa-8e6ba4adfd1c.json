@@ -522,7 +522,7 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "POST",
+						"method": "DELETE",
 						"header": [],
 						"body": {
 							"mode": "raw",
@@ -547,7 +547,6 @@
 							],
 							"variable": [
 								{
-									"id": "b600622b-dfb6-4b0a-b03d-6b6ef7e2eb17",
 									"key": "id",
 									"value": "28ca18b9-0883-49f6-9b5d-3714460d70f4"
 								}
