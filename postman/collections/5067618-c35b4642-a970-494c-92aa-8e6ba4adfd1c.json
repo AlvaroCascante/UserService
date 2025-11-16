@@ -869,7 +869,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"DATA\",\n  \"description\": \"Role data\",\n  \"dataCategory\": \"ROLE\",\n  \"isActive\": true\n}",
+							"raw": "{\n  \"name\": \"TEST\",\n  \"description\": \"Test data\",\n  \"dataCategory\": \"ROLE\",\n  \"isActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -877,14 +877,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users",
+							"raw": "{{HOST}}/{{path}}/api/default-data",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"users"
+								"default-data"
 							]
 						}
 					},
