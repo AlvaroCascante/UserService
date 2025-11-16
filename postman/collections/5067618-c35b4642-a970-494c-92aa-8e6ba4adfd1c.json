@@ -305,6 +305,59 @@
 					"response": []
 				},
 				{
+					"name": "Update Application",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-c78b3db5-d6ea-4071-b8bd-9e9d26569757",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"User Service Application Update\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/applications/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"applications",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "28ca18b9-0883-49f6-9b5d-3714460d70f4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create User",
 					"event": [
 						{
@@ -387,60 +440,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "246b499c-f613-4ae1-9812-104f1c8f7c54"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Application",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"id": "5067618-c78b3db5-d6ea-4071-b8bd-9e9d26569757",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"description\": \"User Service Application Update\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/applications/:id",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"applications",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "28ca18b9-0883-49f6-9b5d-3714460d70f4"
+									"value": "d874ce22-457b-46d8-a686-43157537c4e5"
 								}
 							]
 						}
