@@ -534,7 +534,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/applications/:id/role",
+							"raw": "{{HOST}}/{{path}}/api/applications/:id/role/:roleId",
 							"host": [
 								"{{HOST}}"
 							],
@@ -543,12 +543,17 @@
 								"api",
 								"applications",
 								":id",
-								"role"
+								"role",
+								":roleId"
 							],
 							"variable": [
 								{
 									"key": "id",
 									"value": "28ca18b9-0883-49f6-9b5d-3714460d70f4"
+								},
+								{
+									"key": "roleId",
+									"value": "470e5a8b-52c8-4f9a-a82a-fa535e655ce1"
 								}
 							]
 						}
