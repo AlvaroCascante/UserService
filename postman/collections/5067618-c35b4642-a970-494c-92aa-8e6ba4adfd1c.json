@@ -777,21 +777,20 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/:id",
+							"raw": "{{HOST}}/{{path}}/api/default-data/:id",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"users",
+								"default-data",
 								":id"
 							],
 							"variable": [
 								{
-									"id": "9ae4a8a1-6a3c-4430-99ba-97032c096e3d",
 									"key": "id",
-									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
+									"value": "4c1300c9-ab2d-43f8-ac1a-80271fbe4784"
 								}
 							]
 						}
