@@ -502,7 +502,7 @@
 					"response": []
 				},
 				{
-					"name": "AddRole Copy",
+					"name": "DeleteRole",
 					"event": [
 						{
 							"listen": "prerequest",
