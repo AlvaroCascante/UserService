@@ -419,7 +419,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"MyAppU\",\n    \"description\": \"My application test U\",\n    \"getIsActive\": true\n}",
+							"raw": "{\n    \"description\": \"User Service Application Update\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -440,7 +440,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "246b499c-f613-4ae1-9812-104f1c8f7c54"
+									"value": "28ca18b9-0883-49f6-9b5d-3714460d70f4"
 								}
 							]
 						}
