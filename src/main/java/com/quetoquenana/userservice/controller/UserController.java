@@ -71,18 +71,6 @@ public class UserController {
                 });
     }
 
-    @PostMapping
-    @JsonView(User.UserDetail.class)
-    @PreAuthorize("hasRole('SYSTEM')")
-    public ResponseEntity<ApiResponse> createUser(
-            @Valid @RequestBody UserCreateRequest request
-    ) {
-        log.info("POST /api/users called with payload: {}", request);
-        User entity = userService.save(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse(entity));
-    }
-
     @PutMapping("/{id}")
     @JsonView(User.UserDetail.class)
     @PreAuthorize("hasRole('ADMIN')")

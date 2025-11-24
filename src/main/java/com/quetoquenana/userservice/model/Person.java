@@ -95,7 +95,7 @@ public class Person extends Auditable {
             .idNumber(request.getIdNumber())
             .name(request.getName())
             .lastname(request.getLastname())
-            .isActive(request.getIsActive() != null ? request.getIsActive() : true)
+            .isActive(true)
             .build();
     }
 

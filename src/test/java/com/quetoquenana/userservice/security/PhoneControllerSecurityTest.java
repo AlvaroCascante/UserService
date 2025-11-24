@@ -4,7 +4,6 @@ import com.quetoquenana.userservice.config.CorsConfigProperties;
 import com.quetoquenana.userservice.config.RsaKeyProperties;
 import com.quetoquenana.userservice.config.SecurityConfig;
 import com.quetoquenana.userservice.controller.PhoneController;
-import com.quetoquenana.userservice.model.Phone;
 import com.quetoquenana.userservice.dto.PhoneCreateRequest;
 import com.quetoquenana.userservice.service.PhoneService;
 import com.quetoquenana.userservice.service.SecurityService;
@@ -19,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -29,9 +26,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;

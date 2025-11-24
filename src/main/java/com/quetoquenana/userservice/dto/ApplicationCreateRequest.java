@@ -11,5 +11,7 @@ public class ApplicationCreateRequest {
     private String description;
 
     private Boolean isActive;
+
+
 }
 

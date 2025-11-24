@@ -129,6 +129,16 @@ class AddressControllerSecurityTest {
     }
 
     @Test
+    @DisplayName("PUT /api/persons/address/{id} returns 200")
+    void updateAddress_Unauthenticated_Returns200() throws Exception {
+        mockMvc.perform(put("/api/persons/address/" + ADDRESS_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
     @DisplayName("DELETE /api/persons/address/{id} returns 204")
     void deleteAddress_UserRole_Returns204() throws Exception {
         mockMvc.perform(delete("/api/persons/address/" + ADDRESS_ID))

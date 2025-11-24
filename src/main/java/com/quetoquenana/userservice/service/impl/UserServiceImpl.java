@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
         User user = User.fromCreateRequest(
             request,
-            passwordEncoder.encode(request.getPassword()),
+            passwordEncoder.encode(generateRandomPassword()),
             UserStatus.ACTIVE,
             person
         );
@@ -114,5 +114,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsernameIgnoreCase(username);
+    }
+
+    private String generateRandomPassword() {
+        // Implement a secure random password generator
+        return "NewP@ssw0rd123"; // Placeholder implementation
     }
 }

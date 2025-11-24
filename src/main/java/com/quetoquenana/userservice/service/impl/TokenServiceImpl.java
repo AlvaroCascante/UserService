@@ -26,7 +26,7 @@ public class TokenServiceImpl implements TokenService {
                             JwtDecoder jwtDecoder,
                             @Value("${security.jwt.access-token-seconds:604800}") long accessTokenSeconds,
                             @Value("${security.jwt.refresh-token-seconds:604800}") long refreshTokenSeconds,
-                            @Value("${security.jwt.issuer}") String issuer) {
+                            @Value("${security.jwt.issuer:user-service}") String issuer) {
         this.jwtEncoder = jwtEncoder;
         this.jwtDecoder = jwtDecoder;
         this.accessTokenSeconds = accessTokenSeconds;

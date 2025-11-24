@@ -10,6 +10,7 @@ import com.quetoquenana.userservice.model.*;
 import com.quetoquenana.userservice.repository.*;
 import com.quetoquenana.userservice.service.ApplicationService;
 import com.quetoquenana.userservice.service.CurrentUserService;
+import com.quetoquenana.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final AppRoleRepository appRoleRepository;
     private final AppRoleUserRepository appRoleUserRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final CurrentUserService currentUserService;
     private final DefaultDataRepository defaultDataRepository;
 
@@ -40,11 +42,6 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public Optional<Application> findById(UUID id) {
         return applicationRepository.findById(id);
-    }
-
-    @Override
-    public Optional<Application> findByName(String name) {
-        return applicationRepository.findByName(name);
     }
 
     @Override
@@ -115,8 +112,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
 
         // Persist role directly to ensure id/version are initialized
-        AppRole saved = appRoleRepository.saveAndFlush(role);
-        return saved;
+        return appRoleRepository.saveAndFlush(role);
     }
     @Override
     @Transactional
@@ -125,16 +121,13 @@ public class ApplicationServiceImpl implements ApplicationService {
         applicationRepository.findById(applicationId)
                 .orElseThrow(RecordNotFoundException::new);
 
-        // find matching app role for the application (use repo to get managed entity)
+        // find matching app role for the application
         AppRole role = appRoleRepository.findByApplicationIdAndRoleName(applicationId, request.getRoleName())
                 .orElseThrow(RecordNotFoundException::new);
 
-        // reload role by id to ensure it's managed and version is initialized
-        role = appRoleRepository.findById(role.getId()).orElseThrow(RecordNotFoundException::new);
-
-        // find user by username
-        User user = userRepository.findByUsernameIgnoreCase(request.getUsername())
-                .orElseThrow(RecordNotFoundException::new);
+        // Step 1: see if a User with the username already exists. If yes, reuse it.
+        User user = userService.findByUsername(request.getUser().getUsername())
+                .orElseGet(() -> userService.save(request.getUser()));
 
         // check if mapping already exists for this user and application
         List<AppRoleUser> existingMappings = appRoleUserRepository.findByUserIdAndRoleApplicationId(user.getId(), applicationId);
@@ -143,10 +136,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
 
         // create match record
-        AppRoleUser aru = AppRoleUser.of(user, role);
-        aru.setCreatedAt(LocalDateTime.now());
-        aru.setCreatedBy(currentUserService.getCurrentUsername());
-        return appRoleUserRepository.save(aru);
+        AppRoleUser appRoleUser = AppRoleUser.of(user, role);
+        appRoleUser.setCreatedAt(LocalDateTime.now());
+        appRoleUser.setCreatedBy(currentUserService.getCurrentUsername());
+        return appRoleUserRepository.save(appRoleUser);
     }
 
     @Override

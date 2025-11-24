@@ -5,8 +5,6 @@ import com.quetoquenana.userservice.config.RsaKeyProperties;
 import com.quetoquenana.userservice.config.SecurityConfig;
 import com.quetoquenana.userservice.controller.ProfileController;
 import com.quetoquenana.userservice.dto.ProfileCreateRequest;
-import com.quetoquenana.userservice.dto.ProfileUpdateRequest;
-import com.quetoquenana.userservice.model.Profile;
 import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.ApplicationRepository;
 import com.quetoquenana.userservice.repository.UserRepository;
@@ -23,12 +21,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;

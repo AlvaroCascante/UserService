@@ -5,7 +5,6 @@ import com.quetoquenana.userservice.config.RsaKeyProperties;
 import com.quetoquenana.userservice.config.SecurityConfig;
 import com.quetoquenana.userservice.controller.PersonController;
 import com.quetoquenana.userservice.dto.PersonCreateRequest;
-import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.ApplicationRepository;
 import com.quetoquenana.userservice.repository.UserRepository;
@@ -19,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -29,9 +26,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -119,25 +113,6 @@ class PersonControllerSecurityTest {
     }
 
     @Test
-    @DisplayName("POST /api/persons returns 401 when unauthenticated")
-    void createPerson_Unauthenticated_Returns401() throws Exception {
-        mockMvc.perform(post("/api/persons")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @DisplayName("POST /api/persons returns 403 for AUDITOR role")
-    @WithMockUser(username = "auditor", roles = {"AUDITOR"})
-    void createPerson_AuditorRole_Returns403() throws Exception {
-        mockMvc.perform(post("/api/persons")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     @DisplayName("PUT /api/persons/{id} returns 401 when unauthenticated")
     void updatePerson_AuditorRole_Returns403() throws Exception {
         when(securityService.canAccessIdPerson(any(), any())).thenReturn(false);
@@ -145,13 +120,5 @@ class PersonControllerSecurityTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @DisplayName("DELETE /api/persons/{id} returns 403 for USER role")
-    @WithMockUser(username = "user", roles = {"USER"})
-    void deletePerson_UserRole_Returns403() throws Exception {
-        mockMvc.perform(delete("/api/persons/{id}", "00000000-0000-0000-0000-000000000000"))
-                .andExpect(status().isForbidden());
     }
 }

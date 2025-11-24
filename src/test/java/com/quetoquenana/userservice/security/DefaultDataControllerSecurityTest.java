@@ -96,8 +96,32 @@ class DefaultDataControllerSecurityTest {
     @Test
     @DisplayName("GET /api/default-data/name/{name} returns 401 when unauthenticated")
     void getDefaultDataByName_Unauthenticated_Returns401() throws Exception {
-        mockMvc.perform(get("/api/default-data/name/{name}", "abc"))
+        mockMvc.perform(get("/api/default-data/page/category/{category}", "abc"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("GET /api/default-data/page returns 403 when forbidden")
+    @WithMockUser(username = "user")
+    void getDefaultDataPage_Unauthenticated_Returns403() throws Exception {
+        mockMvc.perform(get("/api/default-data/page"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("GET /api/default-data/{id} returns 403 when forbidden")
+    @WithMockUser(username = "user")
+    void getDefaultDataById_Unauthenticated_Returns403() throws Exception {
+        mockMvc.perform(get("/api/default-data/{id}", "00000000-0000-0000-0000-000000000000"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("GET /api/default-data/name/{name} returns 403 when forbidden")
+    @WithMockUser(username = "user")
+    void getDefaultDataByName_Unauthenticated_Returns403() throws Exception {
+        mockMvc.perform(get("/api/default-data/page/category/{category}", "abc"))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -127,7 +151,7 @@ class DefaultDataControllerSecurityTest {
 
     @Test
     @DisplayName("POST /api/default-data returns 403 for USER role")
-    @WithMockUser(username = "user", roles = {"USER"})
+    @WithMockUser(username = "user")
     void createDefaultData_UserRole_Returns403() throws Exception {
         mockMvc.perform(post("/api/default-data")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -147,7 +171,7 @@ class DefaultDataControllerSecurityTest {
 
     @Test
     @DisplayName("PUT /api/default-data/{id} returns 403 for USER role")
-    @WithMockUser(username = "user", roles = {"USER"})
+    @WithMockUser(username = "user")
     void updateDefaultData_UserRole_Returns403() throws Exception {
         mockMvc.perform(put("/api/default-data/{id}", "00000000-0000-0000-0000-000000000000")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -167,7 +191,7 @@ class DefaultDataControllerSecurityTest {
 
     @Test
     @DisplayName("DELETE /api/default-data/{id} returns 403 for USER role")
-    @WithMockUser(username = "user", roles = {"USER"})
+    @WithMockUser(username = "user")
     void deleteDefaultData_UserRole_Returns403() throws Exception {
         mockMvc.perform(delete("/api/default-data/{id}", "00000000-0000-0000-0000-000000000000"))
                 .andExpect(status().isForbidden());

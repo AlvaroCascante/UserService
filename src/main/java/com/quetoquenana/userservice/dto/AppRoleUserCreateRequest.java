@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class AppRoleUserCreateRequest {
     @NotBlank
-    private String username;
+    private UserCreateRequest user;
 
     @NotBlank
     private String roleName;

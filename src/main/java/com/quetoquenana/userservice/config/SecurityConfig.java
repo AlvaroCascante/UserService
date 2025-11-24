@@ -10,6 +10,8 @@ import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.ApplicationRepository;
 import com.quetoquenana.userservice.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,6 +52,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @AllArgsConstructor
 public class SecurityConfig {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
+
     private final CorsConfigProperties corsConfigProperties;
     private final RsaKeyProperties rsaKeys;
     private final UserRepository userRepository;
@@ -85,16 +89,26 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withPublicKey(rsaKeys.getPublicRsaKey()).build();
+        try {
+            LOG.debug("Creating JwtDecoder using public key configured as: {}", rsaKeys.getPublicKey());
+            return NimbusJwtDecoder.withPublicKey(rsaKeys.getPublicRsaKey()).build();
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to create JwtDecoder. Check security.rsa.public-key property and format of the public key.", e);
+        }
     }
 
     @Bean
     public JwtEncoder jwtEncoder() {
-        RSAKey jwk = new RSAKey.Builder(rsaKeys.getPublicRsaKey())
-                .privateKey(rsaKeys.getPrivateRsaKey())
-                .build();
-        JWKSet set = new JWKSet(jwk);
-        return new NimbusJwtEncoder(new ImmutableJWKSet<>(set));
+        try {
+            LOG.debug("Creating JwtEncoder using publicKey={} privateKeyPresent={}", rsaKeys.getPublicKey(), rsaKeys.getPrivateKey() != null);
+            RSAKey jwk = new RSAKey.Builder(rsaKeys.getPublicRsaKey())
+                    .privateKey(rsaKeys.getPrivateRsaKey())
+                    .build();
+            JWKSet set = new JWKSet(jwk);
+            return new NimbusJwtEncoder(new ImmutableJWKSet<>(set));
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to create JwtEncoder. Check security.rsa.private-key and public-key properties and formats.", e);
+        }
     }
 
     @Bean

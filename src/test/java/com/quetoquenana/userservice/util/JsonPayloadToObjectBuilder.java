@@ -10,15 +10,9 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
-public class JsonPayloadToObjectBuilder<T> {
+public record JsonPayloadToObjectBuilder<T>(Class<?> model) {
 
-    private final Class<?> model;
-
-    public JsonPayloadToObjectBuilder(Class<T> model) {
-        this.model = model;
-    }
-
-    public List<T> loadListJsonFile(String fileName) throws IOException{
+    public List<T> loadListJsonFile(String fileName) throws IOException {
         ClassLoader classLoader = this.getClass().getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(fileName);
 

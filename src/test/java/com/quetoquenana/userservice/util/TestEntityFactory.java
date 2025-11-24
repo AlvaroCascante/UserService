@@ -78,36 +78,15 @@ public class TestEntityFactory {
         req.setIdNumber(idNumber);
         req.setName("John");
         req.setLastname("White");
-        req.setIsActive(isActive);
         return req;
     }
 
     public static UserCreateRequest getUserCreateRequest() {
         UserCreateRequest req = new UserCreateRequest();
         req.setUsername(DEFAULT_USERNAME);
-        req.setPassword("pass");
         req.setNickname("nick");
         req.setPerson(getPersonCreateRequest(DEFAULT_ID_NUMBER, true));
-        req.setUserStatus(UserStatus.ACTIVE);
         return req;
-    }
-
-    public static String createUserPayload(ObjectMapper objectMapper) {
-        try {
-            UserCreateRequest req = getUserCreateRequest();
-            return objectMapper.writeValueAsString(req);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static String createPersonPayload(ObjectMapper objectMapper) {
-        try {
-            PersonCreateRequest req = getPersonCreateRequest(DEFAULT_ID_NUMBER, true);
-            return objectMapper.writeValueAsString(req);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static PersonUpdateRequest getPersonUpdateRequest(Boolean isActive) {
@@ -140,22 +119,6 @@ public class TestEntityFactory {
         return profile;
     }
 
-    public static String createProfilePayload(ObjectMapper objectMapper) {
-        Profile profilePayload = Profile.builder()
-                .birthday(LocalDate.of(1990, 1, 1))
-                .gender("M")
-                .nationality("TestNationality")
-                .maritalStatus("Single")
-                .occupation("Engineer")
-                .profilePictureUrl("https://example.com/profile.jpg")
-                .build();
-        try {
-            return objectMapper.writeValueAsString(profilePayload);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static Phone createPhone(Person person, String phoneNumber) {
         return Phone.builder()
                 .person(person)
@@ -178,25 +141,5 @@ public class TestEntityFactory {
     public static Address createAddress(Person person) {
         return createAddress(person, "Country");
     }
-    public static String createPhonePayload(ObjectMapper objectMapper, String phoneNumber) {
-        try {
-            return objectMapper.writeValueAsString(createPhone(null, phoneNumber));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize phone payload", e);
-        }
-    }
-    public static String createAddressPayload(ObjectMapper objectMapper, String country) {
-        try {
-            return objectMapper.writeValueAsString(createAddress(null, country));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize phone payload", e);
-        }
-    }
-    public static String createAddressPayload(ObjectMapper objectMapper) {
-        try {
-            return objectMapper.writeValueAsString(createAddress(null));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize phone payload", e);
-        }
-    }
+
 }

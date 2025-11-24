@@ -5,16 +5,23 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.quetoquenana.userservice.dto.ApplicationCreateRequest;
 import com.quetoquenana.userservice.dto.ApplicationUpdateRequest;
+import com.quetoquenana.userservice.dto.AppRoleCreateRequest;
+import com.quetoquenana.userservice.dto.AppRoleUserCreateRequest;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.ApiResponse;
 import com.quetoquenana.userservice.model.Application;
+import com.quetoquenana.userservice.model.AppRole;
+import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.service.ApplicationService;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -22,6 +29,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -66,30 +74,16 @@ class ApplicationControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         ApiResponse apiResponse = response.getBody();
         assertNotNull(apiResponse);
-        Application data = (Application) apiResponse.getData();
+
+        Map<String, Object> dataMap = (Map<String, Object>) apiResponse.getData();
+        assertNotNull(dataMap);
+        Application data = (Application) dataMap.get("application");
         assertEquals(application, data);
 
         String json = objectMapper.writerWithView(Application.ApplicationDetail.class).writeValueAsString(data);
         assertTrue(json.contains("name"));
         assertTrue(json.contains("description"));
         assertTrue(json.contains("isActive"));
-    }
-
-    @Test
-    void testGetApplicationByName_NotFound() {
-        when(applicationService.findByName("unknown")).thenReturn(Optional.empty());
-        assertThrows(RecordNotFoundException.class, () -> applicationController.getApplicationByName("unknown"));
-    }
-
-    @Test
-    void testGetApplicationByName_Found() throws Exception {
-        when(applicationService.findByName("my-app")).thenReturn(Optional.of(application));
-        ResponseEntity<ApiResponse> response = applicationController.getApplicationByName("my-app");
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        ApiResponse apiResponse = response.getBody();
-        assertNotNull(apiResponse);
-        Application data = (Application) apiResponse.getData();
-        assertEquals(application, data);
     }
 
     @Test
@@ -105,8 +99,12 @@ class ApplicationControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         ApiResponse apiResponse = response.getBody();
         assertNotNull(apiResponse);
-        Application data = (Application) apiResponse.getData();
-        assertEquals(application, data);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> dataMap = (Map<String, Object>) apiResponse.getData();
+        assertNotNull(dataMap);
+        Application returned = (Application) dataMap.get("application");
+        assertEquals(application, returned);
     }
 
     @Test
@@ -132,7 +130,11 @@ class ApplicationControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         ApiResponse apiResponse = response.getBody();
         assertNotNull(apiResponse);
-        Application data = (Application) apiResponse.getData();
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> dataMap = (Map<String, Object>) apiResponse.getData();
+        assertNotNull(dataMap);
+        Application data = (Application) dataMap.get("application");
         assertEquals(application, data);
     }
 
@@ -156,5 +158,102 @@ class ApplicationControllerTest {
         // simulate service throwing when not found
         org.mockito.Mockito.doThrow(new RecordNotFoundException()).when(applicationService).deleteById(appId);
         assertThrows(RecordNotFoundException.class, () -> applicationController.deleteApplication(appId));
+    }
+
+    @Test
+    void testGetAllApplicationsPage_returnsOk() {
+        var page = new PageImpl<>(List.of(application));
+        when(applicationService.findAll(any(Pageable.class))).thenReturn(page);
+
+        ResponseEntity<ApiResponse> response = applicationController.getAllApplicationsPage(0, 10);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        ApiResponse apiResponse = response.getBody();
+        assertNotNull(apiResponse);
+        assertNotNull(apiResponse.getData());
+    }
+
+    @Test
+    void testSearchApplications_returnsOk() {
+        var page = new PageImpl<>(List.of(application));
+        when(applicationService.searchByName(eq("my"), any(Pageable.class))).thenReturn(page);
+
+        ResponseEntity<ApiResponse> response = applicationController.searchApplications("my", 0, 10);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        ApiResponse apiResponse = response.getBody();
+        assertNotNull(apiResponse);
+        assertNotNull(apiResponse.getData());
+    }
+
+    @Test
+    void testAddRole_ReturnsCreated() {
+        AppRoleCreateRequest req = new AppRoleCreateRequest();
+        req.setRoleName("ADMIN");
+        AppRole role = AppRole.builder().id(UUID.randomUUID()).roleName("ADMIN").build();
+        when(applicationService.addRole(eq(appId), any(AppRoleCreateRequest.class))).thenReturn(role);
+
+        ResponseEntity<ApiResponse> response = applicationController.addRole(appId, req);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        ApiResponse apiResponse = response.getBody();
+        assertNotNull(apiResponse);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> dataMap = (Map<String, Object>) apiResponse.getData();
+        assertEquals(role, dataMap.get("appRole"));
+    }
+
+    @Test
+    void testAddUser_ReturnsCreated() {
+        AppRoleUserCreateRequest req = getAppRoleUserCreateRequest();
+
+        AppRoleUser aru = AppRoleUser.builder().id(UUID.randomUUID()).build();
+        when(applicationService.addUser(eq(appId), any(AppRoleUserCreateRequest.class))).thenReturn(aru);
+
+        ResponseEntity<ApiResponse> response = applicationController.addUser(appId, req);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        ApiResponse apiResponse = response.getBody();
+        assertNotNull(apiResponse);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> dataMap = (Map<String, Object>) apiResponse.getData();
+        assertEquals(aru, dataMap.get("appRoleUser"));
+    }
+
+    private static @NotNull AppRoleUserCreateRequest getAppRoleUserCreateRequest() {
+        AppRoleUserCreateRequest req = new AppRoleUserCreateRequest();
+        // construct nested user request
+        com.quetoquenana.userservice.dto.UserCreateRequest ureq = new com.quetoquenana.userservice.dto.UserCreateRequest();
+        ureq.setUsername("u@example.com");
+        com.quetoquenana.userservice.dto.PersonCreateRequest preq = new com.quetoquenana.userservice.dto.PersonCreateRequest();
+        preq.setIdNumber("ID1");
+        ureq.setPerson(preq);
+        req.setUser(ureq);
+        req.setRoleName("ADMIN");
+        return req;
+    }
+
+    @Test
+    void testDeleteUser_Success() {
+        doNothing().when(applicationService).removeUser(appId, "user");
+        ResponseEntity<Void> response = applicationController.deleteUser(appId, "user");
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
+
+    @Test
+    void testDeleteUser_NotFound() {
+        org.mockito.Mockito.doThrow(new RecordNotFoundException()).when(applicationService).removeUser(appId, "user");
+        assertThrows(RecordNotFoundException.class, () -> applicationController.deleteUser(appId, "user"));
+    }
+
+    @Test
+    void testDeleteRole_Success() {
+        UUID roleId = UUID.randomUUID();
+        doNothing().when(applicationService).deleteRole(appId, roleId);
+        ResponseEntity<Void> response = applicationController.deleteRole(appId, roleId);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
+
+    @Test
+    void testDeleteRole_NotFound() {
+        UUID roleId = UUID.randomUUID();
+        org.mockito.Mockito.doThrow(new RecordNotFoundException()).when(applicationService).deleteRole(appId, roleId);
+        assertThrows(RecordNotFoundException.class, () -> applicationController.deleteRole(appId, roleId));
     }
 }

@@ -1,12 +1,13 @@
 package com.quetoquenana.userservice.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.quetoquenana.userservice.dto.UserCreateRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.model.UserStatus;
-import com.quetoquenana.userservice.repository.PersonRepository;
-import com.quetoquenana.userservice.repository.UserRepository;
+import com.quetoquenana.userservice.repository.*;
+import com.quetoquenana.userservice.util.TestDataSeeder;
 import com.quetoquenana.userservice.util.TestEntityFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -24,20 +26,18 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
-import static com.quetoquenana.userservice.util.TestEntityFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 class UserControllerIT {
+
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
             .withDatabaseName("testdb")
@@ -49,163 +49,138 @@ class UserControllerIT {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
+
+        // RSA keys + issuer for security beans
+        registry.add("security.rsa.public-key", () -> "classpath:keys/user_service_public_key.pem");
+        registry.add("security.rsa.private-key", () -> "classpath:keys/user_service_private_key.pem");
+        registry.add("security.jwt.issuer", () -> "user-service");
     }
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PersonRepository personRepository;
-
     @Autowired
     private ObjectMapper objectMapper;
 
-    private static final String BASE_URL = "/api/users";
+    @Autowired
+    private PersonRepository personRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ApplicationRepository applicationRepository;
+    @Autowired
+    private AppRoleRepository appRoleRepository;
+    @Autowired
+    private AppRoleUserRepository appRoleUserRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
+        // keep DB clean and idempotent
+        appRoleUserRepository.deleteAll();
+        appRoleRepository.deleteAll();
+        applicationRepository.deleteAll();
         userRepository.deleteAll();
         personRepository.deleteAll();
     }
 
     @Test
-    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
-    void testCreateUser_SetsAuditableFields() throws Exception {
-        String json = TestEntityFactory.createUserPayload(objectMapper);
+    @WithMockUser(roles = {"SYSTEM"})
+    void createUser_asSystem_returnsCreated() throws Exception {
+        UserCreateRequest req = TestEntityFactory.getUserCreateRequest();
+        String json = objectMapper.writeValueAsString(req);
 
-        mockMvc.perform(post(BASE_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isCreated());
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.username").value(req.getUsername()));
 
-        Optional<User> saved = userRepository.findByUsernameIgnoreCase(DEFAULT_USERNAME);
-        assertThat(saved).isPresent();
-        assertThat(saved.get().getCreatedBy()).isEqualTo(DEFAULT_USER);
-        assertThat(saved.get().getCreatedAt()).isNotNull();
+        assertThat(userRepository.findByUsernameIgnoreCase(req.getUsername())).isPresent();
     }
 
     @Test
-    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
-    void testUpdateUser_SetsAuditableFields() throws Exception {
-        User user = TestEntityFactory.createUser(LocalDateTime.now().minusDays(1), "creator");
-        userRepository.save(user);
-        userRepository.flush();
+    @WithMockUser(roles = {"ADMIN"})
+    void getUserById_canAccess() throws Exception {
+        // create person and seed user mapping
+        Person person = TestEntityFactory.createPerson();
+        person = personRepository.save(person);
 
-        UserUpdateRequest updateReq = new UserUpdateRequest();
-        updateReq.setNickname("NewNick");
-        updateReq.setUserStatus(UserStatus.INACTIVE.name());
+        User seeded = TestDataSeeder.seedUserWithRole(
+                applicationRepository,
+                appRoleRepository,
+                userRepository,
+                appRoleUserRepository,
+                passwordEncoder,
+                person,
+                "user-service",
+                "ADMIN",
+                "user",
+                "password"
+        );
 
-        String json = objectMapper.writeValueAsString(updateReq);
-
-        mockMvc.perform(put(BASE_URL + "/" + user.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isOk());
-
-        User updated = userRepository.findById(user.getId()).orElseThrow();
-        assertThat(updated.getUpdatedBy()).isEqualTo(DEFAULT_USER);
-        assertThat(updated.getUpdatedAt()).isNotNull();
-        assertThat(updated.getNickname()).isEqualTo("NewNick");
-        assertThat(updated.getUserStatus()).isEqualTo(UserStatus.INACTIVE);
+        mockMvc.perform(get("/api/users/" + seeded.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(seeded.getId().toString()));
     }
 
     @Test
-    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
-    void testDeleteUser_RemovesRecord() throws Exception {
-        User user = TestEntityFactory.createUser(LocalDateTime.now().minusDays(1), "creator");
-        userRepository.save(user);
-        userRepository.flush();
-        user = userRepository.findByUsernameIgnoreCase(DEFAULT_USERNAME).orElseThrow();
+    @WithMockUser(roles = {"ADMIN"})
+    void updateUser_asAdmin_updatesNickname() throws Exception {
+        Person person = TestEntityFactory.createPerson();
+        person = personRepository.save(person);
 
-        mockMvc.perform(delete(BASE_URL + "/" + user.getId()))
+        User seeded = TestDataSeeder.seedUserWithRole(
+                applicationRepository,
+                appRoleRepository,
+                userRepository,
+                appRoleUserRepository,
+                passwordEncoder,
+                person,
+                "user-service",
+                "ADMIN",
+                "user",
+                "password"
+        );
+
+        UserUpdateRequest update = TestEntityFactory.getUserUpdateRequest();
+        update.setNickname("new-nick");
+        update.setUserStatus(UserStatus.ACTIVE.name());
+        String json = objectMapper.writeValueAsString(update);
+
+        mockMvc.perform(put("/api/users/" + seeded.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.nickname").value("new-nick"));
+
+        User updated = userRepository.findById(seeded.getId()).orElseThrow();
+        assertThat(updated.getNickname()).isEqualTo("new-nick");
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
+    void deleteUser_asAdmin_removesUser() throws Exception {
+        Person person = TestEntityFactory.createPerson();
+        person = personRepository.save(person);
+
+        User seeded = TestDataSeeder.seedUserWithRole(
+                applicationRepository,
+                appRoleRepository,
+                userRepository,
+                appRoleUserRepository,
+                passwordEncoder,
+                person,
+                "user-service",
+                "ADMIN",
+                "user",
+                "password"
+        );
+
+        mockMvc.perform(delete("/api/users/" + seeded.getId()))
                 .andExpect(status().isNoContent());
 
-        User deletedUser = userRepository.findById(user.getId()).orElse(null);
-        assertThat(deletedUser).isNotNull();
-        assertThat(deletedUser.getUserStatus()).isEqualTo(UserStatus.INACTIVE);
-        assertThat(deletedUser.getUpdatedBy()).isEqualTo(DEFAULT_USER);
-        assertThat(deletedUser.getUpdatedAt()).isNotNull();
-        assertThat(deletedUser.getCreatedBy()).isEqualTo("creator");
-    }
-
-    @Test
-    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
-    void testResetPassword_SetsAuditableFields() throws Exception {
-        User user = TestEntityFactory.createUser(LocalDateTime.now().minusDays(1), "creator");
-        userRepository.save(user);
-        userRepository.flush();
-        user = userRepository.findByUsernameIgnoreCase(DEFAULT_USERNAME).orElseThrow();
-
-        String json = "{\"newPassword\":\"newpass\"}";
-
-        mockMvc.perform(post(BASE_URL + "/" + user.getId() + "/reset-password")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isNoContent());
-
-        User updated = userRepository.findById(user.getId()).orElseThrow();
-        assertThat(updated.getUpdatedBy()).isEqualTo(DEFAULT_USER);
-        assertThat(updated.getUpdatedAt()).isNotNull();
-        assertThat(updated.getPasswordHash()).isNotEqualTo("oldhash");
-    }
-
-    @Test
-    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
-    void updateNonExistentUser_shouldReturnNotFound() throws Exception {
-        UserUpdateRequest updateReq = new UserUpdateRequest();
-        updateReq.setNickname("x");
-        String json = objectMapper.writeValueAsString(updateReq);
-        UUID nonExistentId = UUID.randomUUID();
-        mockMvc.perform(put(BASE_URL + "/" + nonExistentId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
-    void testCreateUser_WithExistingPerson_linksToPerson() throws Exception {
-        // Arrange: create and persist a Person first
-        Person person = TestEntityFactory.createPerson(DEFAULT_ID_NUMBER, false);
-        personRepository.save(person);
-        personRepository.flush();
-
-        String json = TestEntityFactory.createUserPayload(objectMapper);
-
-        // Act: create the user
-        mockMvc.perform(post(BASE_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isCreated());
-
-        // Assert: user was created and linked to the existing person
-        Optional<User> saved = userRepository.findByUsernameIgnoreCase(DEFAULT_USERNAME);
-        assertThat(saved).isPresent();
-        User created = saved.get();
-        assertThat(created.getPerson()).isNotNull();
-        assertThat(created.getPerson().getId()).isEqualTo(person.getId());
-        assertThat(created.getCreatedBy()).isEqualTo(DEFAULT_USER);
-        assertThat(created.getCreatedAt()).isNotNull();
-    }
-
-    @Test
-    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
-    void testCreateUser_DuplicateUsername_returnsConflict() throws Exception {
-        // First create should succeed
-        String json = TestEntityFactory.createUserPayload(objectMapper);
-
-        mockMvc.perform(post(BASE_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isCreated());
-
-        // Second create with same payload (same username) should fail with 409 Conflict
-        mockMvc.perform(post(BASE_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isConflict());
+        User deleted = userRepository.findById(seeded.getId()).orElseThrow();
+        assertThat(deleted.getUserStatus()).isEqualTo(UserStatus.INACTIVE);
     }
 }

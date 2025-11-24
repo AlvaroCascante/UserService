@@ -80,7 +80,6 @@ class ProfileControllerTest {
     void testAddProfile_Success() {
         when(profileService.addProfile(any(), any())).thenReturn(profile);
         var response = profileController.addProfile(personId, profileCreateRequest);
-        assertDoesNotThrow(() -> response);
         assertNotNull(response);
         assertNotNull(response.getBody());
         assertEquals(profile.getId(), response.getBody().getId());
@@ -104,7 +103,6 @@ class ProfileControllerTest {
     void testUpdateProfile_Success() {
         when(profileService.updateProfile(any(), any())).thenReturn(profile);
         var response = profileController.updateProfile(profileId, profileUpdateRequest);
-        assertDoesNotThrow(() -> response);
         assertNotNull(response);
         assertNotNull(response.getBody());
         assertEquals(profile.getId(), response.getBody().getId());

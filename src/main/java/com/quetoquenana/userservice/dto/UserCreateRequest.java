@@ -11,23 +11,16 @@ public class UserCreateRequest {
     @Email(message = "{user.email.invalid}")
     private String username;
 
-    @NotBlank(message = "{field.not.blank}")
-    private String password;
-
     @NotNull(message = "{field.not.null}")
     private PersonCreateRequest person;
 
     private String nickname;
 
-    private UserStatus userStatus;
-
     @Override
     public String toString() {
         return "UserCreateRequest(username=" + username
-                + ", password=<hidden>"
                 + ", person=" + person
                 + ", nickname=" + nickname
-                + ", userStatus=" + userStatus
                 + ")";
     }
 }

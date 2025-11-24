@@ -82,18 +82,6 @@ public class PersonController {
                 });
     }
 
-    @PostMapping
-    @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("hasRole('ADMIN')") // Only ADMIN role can access
-    public ResponseEntity<ApiResponse> createPerson(
-            @Valid @RequestBody PersonCreateRequest request
-    ) {
-        log.info("POST /api/persons called with payload: {}", request);
-        Person entity = personService.save(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse(entity));
-    }
-
     @PutMapping("/{id}")
     @JsonView(Person.PersonDetail.class)
     @PreAuthorize("@securityService.canAccessIdPerson(authentication, #id)")
@@ -105,15 +93,5 @@ public class PersonController {
         Person entity = personService.update(id, request);
         return ResponseEntity.ok(new ApiResponse(entity));
 
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')") // Only ADMIN role can access
-    public ResponseEntity<Void> deletePerson(
-            @PathVariable UUID id
-    ) {
-        log.info("DELETE /api/persons/{} called", id);
-        personService.deleteById(id);
-        return ResponseEntity.noContent().build();
     }
 }

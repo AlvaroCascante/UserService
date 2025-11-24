@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,12 +62,19 @@ public class RsaKeyProperties {
         // classpath:
         if (v.startsWith("classpath:")) {
             String path = v.substring("classpath:".length());
-            var res = getClass().getClassLoader().getResourceAsStream(path);
+            // try without leading slash first
+            InputStream res = getClass().getClassLoader().getResourceAsStream(path);
             if (res == null) {
-                throw new IllegalStateException("Resource not found: " + path);
+                // try with leading slash
+                res = getClass().getResourceAsStream(path.startsWith("/") ? path : "/" + path);
             }
-            byte[] bytes = res.readAllBytes();
-            return normalizeDecodedBytes(bytes);
+            if (res == null) {
+                throw new IllegalStateException("Resource not found on classpath: " + path);
+            }
+            try (InputStream is = res) {
+                byte[] bytes = is.readAllBytes();
+                return normalizeDecodedBytes(bytes);
+            }
         }
 
         // file: or filesystem path

@@ -10,7 +10,6 @@ import com.quetoquenana.userservice.model.ApiResponse;
 import com.quetoquenana.userservice.model.AppRole;
 import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.Application;
-import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.service.ApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -58,19 +57,6 @@ public class ApplicationController {
                 });
     }
 
-    @GetMapping("/name/{name}")
-    @PreAuthorize("hasRole('SYSTEM')")
-    @JsonView(Application.ApplicationDetail.class)
-    public ResponseEntity<ApiResponse> getApplicationByName(@PathVariable String name) {
-        log.info("GET /api/applications/name/{} called", name);
-        return applicationService.findByName(name)
-                .map(entity -> ResponseEntity.ok(new ApiResponse(Collections.singletonMap("application", entity))))
-                .orElseGet(() -> {
-                    log.error("Application with name {} not found", name);
-                    throw new RecordNotFoundException();
-                });
-    }
-
     @GetMapping("/search")
     @PreAuthorize("hasRole('SYSTEM')")
     @JsonView(Application.ApplicationList.class)
@@ -80,7 +66,7 @@ public class ApplicationController {
             @RequestParam(defaultValue = "10") int size
     ) {
         log.info("GET /api/applications/search called with name={}, page={}, size={}", name, page, size);
-        org.springframework.data.domain.Page<Application> entities = applicationService.searchByName(name, org.springframework.data.domain.PageRequest.of(page, size));
+        Page<Application> entities = applicationService.searchByName(name, PageRequest.of(page, size));
         return ResponseEntity.ok(new ApiResponse(new com.quetoquenana.userservice.util.JsonViewPageUtil<>(entities, entities.getPageable())));
     }
 

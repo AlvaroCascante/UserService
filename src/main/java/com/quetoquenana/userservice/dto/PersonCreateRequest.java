@@ -13,7 +13,5 @@ public class PersonCreateRequest {
 
     @NotBlank(message = "{field.not.blank}")
     private String lastname;
-
-    private Boolean isActive;
 }
 

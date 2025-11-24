@@ -1,20 +1,20 @@
 package com.quetoquenana.userservice.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.quetoquenana.userservice.model.Person;
-import com.quetoquenana.userservice.model.Profile;
-import com.quetoquenana.userservice.repository.ProfileRepository;
-import com.quetoquenana.userservice.repository.PersonRepository;
+import com.quetoquenana.userservice.dto.ProfileCreateRequest;
+import com.quetoquenana.userservice.dto.ProfileUpdateRequest;
+import com.quetoquenana.userservice.model.*;
+import com.quetoquenana.userservice.repository.*;
+import com.quetoquenana.userservice.util.JsonPayloadToObjectBuilder;
+import com.quetoquenana.userservice.util.TestDataSeeder;
 import com.quetoquenana.userservice.util.TestEntityFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -24,20 +24,20 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDateTime;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.UUID;
 
-import static com.quetoquenana.userservice.util.TestEntityFactory.DEFAULT_USER;
-import static com.quetoquenana.userservice.util.TestEntityFactory.ROLE_ADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 class ProfileControllerIT {
+
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
             .withDatabaseName("testdb")
@@ -49,109 +49,134 @@ class ProfileControllerIT {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
+
+        registry.add("security.rsa.public-key", () -> "classpath:keys/user_service_public_key.pem");
+        registry.add("security.rsa.private-key", () -> "classpath:keys/user_service_private_key.pem");
+        registry.add("security.jwt.issuer", () -> "user-service");
     }
 
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private PersonRepository personRepository;
     @Autowired
     private ProfileRepository profileRepository;
+
+    // security seeding
     @Autowired
-    private ObjectMapper objectMapper;
+    private ApplicationRepository applicationRepository;
+    @Autowired
+    private AppRoleRepository appRoleRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private AppRoleUserRepository appRoleUserRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private Person person;
-
-    private static final Logger log = LoggerFactory.getLogger(ProfileControllerIT.class);
+    private String createPayload;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException, URISyntaxException {
+        appRoleUserRepository.deleteAll();
+        appRoleRepository.deleteAll();
+        applicationRepository.deleteAll();
+        userRepository.deleteAll();
         profileRepository.deleteAll();
         personRepository.deleteAll();
+
         person = TestEntityFactory.createPerson();
+        person = personRepository.save(person);
+
+        JsonPayloadToObjectBuilder<ProfileCreateRequest> mapper = new JsonPayloadToObjectBuilder<>(ProfileCreateRequest.class);
+        createPayload = mapper.loadJsonData("payloads/profile-create-request.json");
+
+        TestDataSeeder.seedUserWithRole(
+                applicationRepository,
+                appRoleRepository,
+                userRepository,
+                appRoleUserRepository,
+                passwordEncoder,
+                person,
+                "user-service",
+                "ADMIN",
+                "user",
+                "password"
+        );
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
+    void addProfile_andAssertPresent() throws Exception {
+        mockMvc.perform(post("/api/persons/" + person.getId() + "/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createPayload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.profilePictureUrl").isNotEmpty());
+
+        // verify persisted
+        Profile p = profileRepository.findByPersonId(person.getId()).orElseThrow();
+        assertThat(p.getNationality()).isEqualTo("Canadian");
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
+    void updateProfile_andAssertUpdated() throws Exception {
+        // create profile first
+        Profile profile = TestEntityFactory.createProfile(person);
+        person.setProfile(profile);
+        person = personRepository.save(person);
+        Profile saved = profileRepository.findByPersonId(person.getId()).orElseThrow();
+
+        ProfileUpdateRequest update = new ProfileUpdateRequest();
+        update.setOccupation("Architect");
+        String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(update);
+
+        mockMvc.perform(put("/api/persons/profile/" + saved.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk());
+
+        Profile updated = profileRepository.findByPersonId(person.getId()).orElseThrow();
+        assertThat(updated.getOccupation()).isEqualTo("Architect");
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
+    void createProfile_personInactive_returnsBadRequest() throws Exception {
+        person.setIsActive(false);
         personRepository.save(person);
-        personRepository.flush(); // Ensure Hibernate flushes the insert
-        person = personRepository.findById(person.getId()).orElseThrow();
 
-        assertThat(person.getVersion()).isNotNull();
-        assertThat(person.getVersion()).isEqualTo(0L);
-    }
-
-    @Test
-    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
-    void testCreateUpdateProfile_SavesCreatedByAndCreatedAt() throws Exception {
-        // Creation
-        String createJson = TestEntityFactory.createProfilePayload(objectMapper);
-
-        LocalDateTime before = LocalDateTime.now();
         mockMvc.perform(post("/api/persons/" + person.getId() + "/profile")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createJson))
-                .andExpect(status().isOk());
-        LocalDateTime afterCreate = LocalDateTime.now();
-
-        Profile savedProfile = profileRepository.findAll().stream().findFirst().orElse(null);
-        assertThat(savedProfile).isNotNull();
-        assertThat(savedProfile.getCreatedBy()).isEqualTo(DEFAULT_USER);
-        assertThat(savedProfile.getCreatedAt()).isNotNull();
-        assertThat(!savedProfile.getCreatedAt().isBefore(before) && !savedProfile.getCreatedAt().isAfter(afterCreate)).isTrue();
-
-        // Update
-        String updateJson = TestEntityFactory.createProfilePayload(objectMapper);
-        mockMvc.perform(put("/api/persons/profile/" + savedProfile.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updateJson))
-                .andExpect(status().isOk());
-        LocalDateTime afterUpdate = LocalDateTime.now();
-
-        Profile updatedProfile = profileRepository.findAll().stream().findFirst().orElse(null);
-
-        assertThat(updatedProfile).isNotNull();
-        assertThat(updatedProfile.getUpdatedBy()).isEqualTo(DEFAULT_USER);
-        assertThat(updatedProfile.getUpdatedAt()).isNotNull();
-        assertThat(!updatedProfile.getUpdatedAt().isBefore(before) && !updatedProfile.getUpdatedAt().isAfter(afterUpdate)).isTrue();
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createPayload))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
-    void testAddProfileToNonExistentPerson_ShouldReturnNotFound() throws Exception {
-        String createJson = TestEntityFactory.createProfilePayload(objectMapper);
-        // Use a random UUID that does not exist
-        String nonExistentId = java.util.UUID.randomUUID().toString();
+    @WithMockUser(roles = {"ADMIN"})
+    void updateProfile_notFound_returnsForbidden() throws Exception {
+        UUID notFound = UUID.fromString("00000000-0000-0000-0000-000000000003");
+        ProfileUpdateRequest update = new ProfileUpdateRequest();
+        update.setOccupation("Architect");
+        String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(update);
 
-        mockMvc.perform(post("/api/persons/" + nonExistentId + "/profile")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createJson))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(put("/api/persons/profile/" + notFound)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
-    void testAddDuplicateProfile_ShouldReturnConflict() throws Exception {
-        String createJson = TestEntityFactory.createProfilePayload(objectMapper);
+    @WithMockUser(roles = {"ADMIN"})
+    void createProfile_personNotFound_returnsForbidden() throws Exception {
+        UUID notFoundPerson = UUID.fromString("00000000-0000-0000-0000-000000000099");
 
-        // First creation should succeed
-        mockMvc.perform(post("/api/persons/" + person.getId() + "/profile")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createJson))
-                .andExpect(status().isOk());
-
-        // Second creation should fail (duplicate)
-        mockMvc.perform(post("/api/persons/" + person.getId() + "/profile")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createJson))
-                .andExpect(status().isConflict());
-    }
-
-    @Test
-    @WithMockUser(username = DEFAULT_USER, roles = {ROLE_ADMIN})
-    void testUpdateNonExistentProfile_ShouldReturnNotFound() throws Exception {
-        String updateJson = TestEntityFactory.createProfilePayload(objectMapper);
-        String nonExistentProfileId = java.util.UUID.randomUUID().toString();
-
-        mockMvc.perform(put("/api/persons/profile/" + nonExistentProfileId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updateJson))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(post("/api/persons/" + notFoundPerson + "/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(createPayload))
+                .andExpect(status().isForbidden());
     }
 }

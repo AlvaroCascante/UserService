@@ -18,8 +18,6 @@ public interface ApplicationService {
 
     Optional<Application> findById(UUID id);
 
-    Optional<Application> findByName(String name);
-
     Page<Application> searchByName(String name, Pageable pageable);
 
     Application save(ApplicationCreateRequest request);
