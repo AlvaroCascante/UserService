@@ -3,10 +3,7 @@ package com.quetoquenana.userservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.quetoquenana.userservice.dto.ApplicationCreateRequest;
-import com.quetoquenana.userservice.dto.ApplicationUpdateRequest;
-import com.quetoquenana.userservice.dto.AppRoleCreateRequest;
-import com.quetoquenana.userservice.dto.AppRoleUserCreateRequest;
+import com.quetoquenana.userservice.dto.*;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.ApiResponse;
@@ -217,16 +214,16 @@ class ApplicationControllerTest {
     }
 
     private static @NotNull AppRoleUserCreateRequest getAppRoleUserCreateRequest() {
-        AppRoleUserCreateRequest req = new AppRoleUserCreateRequest();
+        AppRoleUserCreateRequest appRoleUserCreateRequest = new AppRoleUserCreateRequest();
         // construct nested user request
-        com.quetoquenana.userservice.dto.UserCreateRequest ureq = new com.quetoquenana.userservice.dto.UserCreateRequest();
-        ureq.setUsername("u@example.com");
-        com.quetoquenana.userservice.dto.PersonCreateRequest preq = new com.quetoquenana.userservice.dto.PersonCreateRequest();
-        preq.setIdNumber("ID1");
-        ureq.setPerson(preq);
-        req.setUser(ureq);
-        req.setRoleName("ADMIN");
-        return req;
+        UserCreateRequest userCreateRequest = new UserCreateRequest();
+        userCreateRequest.setUsername("u@example.com");
+        PersonCreateRequest personCreateRequest = new PersonCreateRequest();
+        personCreateRequest.setIdNumber("ID1");
+        userCreateRequest.setPerson(personCreateRequest);
+        appRoleUserCreateRequest.setUser(userCreateRequest);
+        appRoleUserCreateRequest.setRoleName("ADMIN");
+        return appRoleUserCreateRequest;
     }
 
     @Test
