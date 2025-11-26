@@ -1992,7 +1992,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "{",
+				"value": "{{system_token}}",
 				"type": "string"
 			}
 		]
@@ -2001,7 +2001,7 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "6e71b205-4e67-4bd8-b0bf-ab9ac30ea8d0",
+				"id": "351ebae0-e511-4223-bdfc-fae9b14649ee",
 				"type": "text/javascript",
 				"packages": {},
 				"requests": {},
@@ -2013,7 +2013,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "ebafd340-c9f3-495f-bccf-a8267d989e95",
+				"id": "7181693c-ee36-492f-943f-e596600a6485",
 				"type": "text/javascript",
 				"packages": {},
 				"requests": {},
