@@ -576,6 +576,24 @@
 			"item": [
 				{
 					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5924420f-b835-4379-99e8-2da4f6f49892",
+								"exec": [
+									"",
+									"var jsonData = res.json();",
+									"pm.environment.set(\"system_token\", jsonData.accessToken);",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"id": "5067618-ef1fdae4-2e36-4b4d-a5dc-8bcfa32c6337",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -586,7 +604,7 @@
 							"basic": [
 								{
 									"key": "password",
-									"value": "MynewPass",
+									"value": "{{system_pass}}",
 									"type": "string"
 								},
 								{
