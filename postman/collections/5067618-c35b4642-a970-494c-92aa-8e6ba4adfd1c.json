@@ -680,13 +680,13 @@
 				"type": "basic",
 				"basic": [
 					{
-						"key": "username",
-						"value": "System",
+						"key": "password",
+						"value": "{{system_pass}}",
 						"type": "string"
 					},
 					{
-						"key": "password",
-						"value": "SYSP@ssw0rd!TEM",
+						"key": "username",
+						"value": "System",
 						"type": "string"
 					}
 				]
@@ -695,7 +695,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "3584fac6-ac8a-486b-8509-7328a843bd58",
+						"id": "1d843a79-3d7c-4beb-9f3a-0448705be523",
 						"type": "text/javascript",
 						"packages": {},
 						"requests": {},
@@ -707,7 +707,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "adc71d37-632b-48e4-9cb0-966d698955bf",
+						"id": "48c1545b-7033-4e1b-a2ac-dd76ff708593",
 						"type": "text/javascript",
 						"packages": {},
 						"requests": {},
