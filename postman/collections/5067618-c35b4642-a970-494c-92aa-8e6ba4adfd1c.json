@@ -1117,29 +1117,6 @@
 			"name": "Persons",
 			"item": [
 				{
-					"name": "Fetch All Persons",
-					"id": "5067618-39928138-6572-4709-8c3b-f9341f1e505d",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"persons"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Fetch All Persons Page",
 					"id": "5067618-c10ef250-8f15-4e7b-a472-fab1f95ad065",
 					"protocolProfileBehavior": {
