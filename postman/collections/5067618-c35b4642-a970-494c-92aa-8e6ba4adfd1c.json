@@ -582,10 +582,8 @@
 							"script": {
 								"id": "5924420f-b835-4379-99e8-2da4f6f49892",
 								"exec": [
-									"",
-									"var jsonData = res.json();",
+									"var jsonData = pm.response.json(); // Fixed to use pm.response",
 									"pm.environment.set(\"system_token\", jsonData.accessToken);",
-									"",
 									""
 								],
 								"type": "text/javascript",
@@ -1237,52 +1235,6 @@
 									"key": "status",
 									"value": "true"
 								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Person",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"id": "5067618-5d339f01-7ec2-40ba-9105-88a8877df61b",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"{{$randomFirstName}}\",\n  \"lastname\": \"{{$randomLastName}}\",\n  \"idNumber\": \"{{$randomUUID}}\"\n}\n",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/persons",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"persons"
 							]
 						}
 					},
