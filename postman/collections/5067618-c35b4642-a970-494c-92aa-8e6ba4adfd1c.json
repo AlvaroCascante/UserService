@@ -602,7 +602,7 @@
 							"basic": [
 								{
 									"key": "password",
-									"value": "{{system_pass}}",
+									"value": "system",
 									"type": "string"
 								},
 								{
