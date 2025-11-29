@@ -11,8 +11,8 @@ public interface SecurityService {
 
     Authentication authenticate(String username, String password, String applicationName);
     Authentication getAuthenticationForApplication(String username, String applicationName);
-    void resetPassword(String username, String newPassword);
-
+    void resetPassword(String username);
+    void decPass(String username);
     boolean canAccessIdNumber(Authentication authentication, String idNumber);
     boolean canAccessIdProfile(Authentication authentication, UUID idProfile);
     boolean canAccessIdPerson(Authentication authentication, UUID idPerson);

@@ -41,11 +41,10 @@ public class AuthController {
 
     @PostMapping("/reset")
     public ResponseEntity<Void> resetPassword(
-            Authentication authentication,
-            @Valid @RequestBody ResetPasswordRequest request
+            Authentication authentication
     ) {
         log.info("POST /api/auth/reset called");
-        securityService.resetPassword(authentication.getName(), request.getNewPassword());
+        securityService.resetPassword(authentication.getName());
         return ResponseEntity.noContent().build();
     }
 }

@@ -4,7 +4,9 @@ import com.quetoquenana.userservice.exception.AuthenticationException;
 import com.quetoquenana.userservice.model.*;
 import com.quetoquenana.userservice.repository.*;
 import com.quetoquenana.userservice.service.SecurityService;
+import com.quetoquenana.userservice.util.PasswordUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
  */
 @Service("securityService")
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityServiceImpl implements SecurityService {
 
     private final AddressRepository addressRepository;
@@ -77,13 +80,20 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
-    public void resetPassword(String username, String newPassword) {
+    public void resetPassword(String username) {
         User user = userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(AuthenticationException::new);
 
-        String passwordHash = passwordEncoder.encode(newPassword);
+        String passwordHash = passwordEncoder.encode(PasswordUtil.generateRandomPassword());
         user.updateStatus(UserStatus.ACTIVE, passwordHash, username);
         userRepository.save(user);
+    }
+
+    @Override
+    public void decPass(String username) {
+        User user = userRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow(AuthenticationException::new);
+        log.info(user.getPasswordHash());
     }
 
     @Override

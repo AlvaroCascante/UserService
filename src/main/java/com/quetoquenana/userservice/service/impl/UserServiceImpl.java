@@ -11,6 +11,7 @@ import com.quetoquenana.userservice.repository.UserRepository;
 import com.quetoquenana.userservice.service.CurrentUserService;
 import com.quetoquenana.userservice.service.PersonService;
 import com.quetoquenana.userservice.service.UserService;
+import com.quetoquenana.userservice.util.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,7 +57,7 @@ public class UserServiceImpl implements UserService {
 
         User user = User.fromCreateRequest(
             request,
-            passwordEncoder.encode(generateRandomPassword()),
+            passwordEncoder.encode(PasswordUtil.generateRandomPassword()),
             UserStatus.ACTIVE,
             person
         );
@@ -114,10 +115,5 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsernameIgnoreCase(username);
-    }
-
-    private String generateRandomPassword() {
-        // Implement a secure random password generator
-        return "NewP@ssw0rd123"; // Placeholder implementation
     }
 }
