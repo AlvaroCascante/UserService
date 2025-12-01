@@ -1947,6 +1947,21 @@
 				"disableBodyPruning": true
 			},
 			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "UZ*59+<mB=n?",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "system",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
