@@ -1707,7 +1707,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/by-username/:username",
+							"raw": "{{HOST}}/{{path}}/api/users/username/:username",
 							"host": [
 								"{{HOST}}"
 							],
@@ -1715,13 +1715,13 @@
 								"{{path}}",
 								"api",
 								"users",
-								"by-username",
+								"username",
 								":username"
 							],
 							"variable": [
 								{
 									"key": "username",
-									"value": "Jasen.Stoltenberg@gmail.com"
+									"value": "system"
 								}
 							]
 						}
