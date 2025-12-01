@@ -1729,6 +1729,52 @@
 					"response": []
 				},
 				{
+					"name": "Get By Username Copy",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-410c25ac-1633-4d4e-b7db-2993b7b273c6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users/username/:username",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users",
+								"username",
+								":username"
+							],
+							"variable": [
+								{
+									"id": "c3fd599d-7991-40ea-8a89-57d655a96314",
+									"key": "username",
+									"value": "system"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "UpdateUser",
 					"event": [
 						{
