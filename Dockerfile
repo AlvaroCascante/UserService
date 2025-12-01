@@ -5,8 +5,6 @@ WORKDIR /workspace
 
 # Copy only the files needed for dependency resolution first for better cache
 COPY pom.xml .
-COPY .mvn .mvn
-COPY mvnw .
 
 # Copy source and build
 COPY src ./src
@@ -29,4 +27,3 @@ EXPOSE 8080
 
 # Start the application and bind server.port to the PORT env var if provided
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dserver.port=${PORT:-8080} -jar /app/app.jar"]
-
