@@ -1752,7 +1752,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/username/:username",
+							"raw": "{{HOST}}/{{path}}/api/users/:idUaer/:idApplication",
 							"host": [
 								"{{HOST}}"
 							],
@@ -1760,14 +1760,17 @@
 								"{{path}}",
 								"api",
 								"users",
-								"username",
-								":username"
+								":idUaer",
+								":idApplication"
 							],
 							"variable": [
 								{
-									"id": "c3fd599d-7991-40ea-8a89-57d655a96314",
-									"key": "username",
-									"value": "system"
+									"key": "idUaer",
+									"value": "3eed5b61-0333-4c70-852d-5a1b7c8a11b2"
+								},
+								{
+									"key": "idApplication",
+									"value": "e6309cb2-7202-45eb-b808-78ffe7d37d21"
 								}
 							]
 						}
