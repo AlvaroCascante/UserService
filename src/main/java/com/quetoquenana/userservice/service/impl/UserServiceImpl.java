@@ -10,7 +10,6 @@ import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.model.UserStatus;
 import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.UserRepository;
-import com.quetoquenana.userservice.service.AppRoleUserService;
 import com.quetoquenana.userservice.service.CurrentUserService;
 import com.quetoquenana.userservice.service.PersonService;
 import com.quetoquenana.userservice.service.UserService;

@@ -1,13 +1,9 @@
 package com.quetoquenana.userservice.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.quetoquenana.userservice.dto.PersonCreateRequest;
 import com.quetoquenana.userservice.dto.PersonUpdateRequest;
 import com.quetoquenana.userservice.model.Person;
-import com.quetoquenana.userservice.model.User;
-import com.quetoquenana.userservice.model.UserStatus;
 import com.quetoquenana.userservice.repository.*;
-import com.quetoquenana.userservice.util.JsonPayloadToObjectBuilder;
 import com.quetoquenana.userservice.util.TestDataSeeder;
 import com.quetoquenana.userservice.util.TestEntityFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -29,12 +25,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -84,7 +80,7 @@ class PersonControllerIT {
     private Person person;
 
     @BeforeEach
-    void setUp() throws IOException, URISyntaxException {
+    void setUp() {
         appRoleUserRepository.deleteAll();
         appRoleRepository.deleteAll();
         applicationRepository.deleteAll();

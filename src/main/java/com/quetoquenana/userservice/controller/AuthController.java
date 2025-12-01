@@ -1,7 +1,6 @@
 package com.quetoquenana.userservice.controller;
 
 import com.quetoquenana.userservice.dto.RefreshRequest;
-import com.quetoquenana.userservice.dto.ResetPasswordRequest;
 import com.quetoquenana.userservice.dto.TokenResponse;
 import com.quetoquenana.userservice.service.SecurityService;
 import com.quetoquenana.userservice.service.TokenService;
