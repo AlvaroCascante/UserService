@@ -664,45 +664,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Dec",
-					"id": "5067618-11aef2ff-627b-4373-af60-d055ba0f80cc",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "X-Application-Name",
-								"value": "UserService",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"newPassword\": \"MynewPass\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/auth/reset",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"auth",
-								"reset"
-							]
-						}
-					},
-					"response": []
 				}
 			],
 			"id": "5067618-9f7a01ce-6942-4f0c-b7ea-32cbf99d1d2a",
