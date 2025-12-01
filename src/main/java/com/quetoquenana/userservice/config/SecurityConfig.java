@@ -63,23 +63,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable) // disable for API clients; enable if using browser forms
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/util/**").permitAll()
                         // allow unauthenticated access to auth endpoints (login/refresh)
                         .requestMatchers("/api/auth/**").permitAll()
-                        // public endpoints
-                        .requestMatchers("/api/executions").permitAll()
-
-                        // everything else: allow if user has ROLE_SYSTEM, otherwise require authentication
-                        .anyRequest().access((authentication, object) -> {
-                            var authObj = authentication.get();
-                            boolean isSystem = authObj != null && authObj.getAuthorities().stream()
-                                    .anyMatch(a -> ROLE_SYSTEM.equals(a.getAuthority()));
-                            if (isSystem) return new AuthorizationDecision(true);
-                            return new AuthorizationDecision(authObj != null && authObj.isAuthenticated());
-                        })
+                        .requestMatchers("/actuator/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 // enable basic auth so Spring decodes credentials automatically
                 .httpBasic(withDefaults())

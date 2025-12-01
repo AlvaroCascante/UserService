@@ -54,6 +54,17 @@ public class UserController {
                 });
     }
 
+    @GetMapping("/{idUser}/{idApplication}")
+    @JsonView(User.UserDetail.class)
+    @PreAuthorize("@securityService.canAccessIdUser(authentication, #idUser)")
+    public ResponseEntity<ApiResponse> getUserApplicationDetails(
+            @PathVariable UUID idUser,
+            @PathVariable UUID idApplication
+    ) {
+        log.info("GET /api/users/{}/{} called", idUser, idApplication);
+        return ResponseEntity.ok(new ApiResponse(userService.findAllAppRoleByApplicationId(idUser, idApplication)));
+    }
+
     @GetMapping("/username/{username}")
     @JsonView(User.UserDetail.class)
     @PreAuthorize("hasRole('ADMIN')")

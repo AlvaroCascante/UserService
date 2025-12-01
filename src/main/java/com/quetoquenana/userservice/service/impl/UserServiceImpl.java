@@ -4,10 +4,13 @@ import com.quetoquenana.userservice.dto.UserCreateRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
+import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.model.UserStatus;
+import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.UserRepository;
+import com.quetoquenana.userservice.service.AppRoleUserService;
 import com.quetoquenana.userservice.service.CurrentUserService;
 import com.quetoquenana.userservice.service.PersonService;
 import com.quetoquenana.userservice.service.UserService;
@@ -28,6 +31,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    private final AppRoleUserRepository appRoleUserRepository;
     private final UserRepository userRepository;
     private final PersonService personService;
     private final CurrentUserService currentUserService;
@@ -105,6 +109,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public List<AppRoleUser> findAllAppRoleByApplicationId(UUID idUser, UUID idApplication) {
+        return appRoleUserRepository.findByUserIdAndRoleApplicationId(idUser, idApplication);
     }
 
     @Override

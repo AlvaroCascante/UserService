@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
@@ -97,7 +98,7 @@ class ProfileControllerSecurityTest {
 
     @Test
     @DisplayName("PUT /api/persons/profile/{idProfile} returns 401 when unauthenticated")
-    void updateProfile_Unauthenticated_Returns401() throws Exception {
+    void    updateProfile_Unauthenticated_Returns401() throws Exception {
         when(securityService.canAccessIdProfile(any(), any())).thenReturn(false);
         mockMvc.perform(put("/api/persons/profile/" + PROFILE_ID)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -107,18 +108,20 @@ class ProfileControllerSecurityTest {
 
 
 
+    @WithMockUser(roles = {"ADMIN"})
     @Test
     @DisplayName("POST /api/persons/{id}/profile returns 200")
-    void addProfile_Unauthenticated_Returns200() throws Exception {
+    void addProfile_Returns200() throws Exception {
         mockMvc.perform(post("/api/persons/" + PERSON_ID + "/profile")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isOk());
     }
 
+    @WithMockUser(roles = {"ADMIN"})
     @Test
     @DisplayName("PUT /api/persons/profile/{idProfile} returns 200")
-    void updateProfile_Unauthenticated_Returns200() throws Exception {
+    void updateProfile_Returns200() throws Exception {
         mockMvc.perform(put("/api/persons/profile/" + PROFILE_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))

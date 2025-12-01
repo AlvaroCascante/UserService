@@ -30,7 +30,7 @@ public class AppRoleUser extends Auditable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "app_role_id", nullable = false)
-    @JsonView({AppRole.class, Application.ApplicationDetail.class})
+    @JsonView({Application.ApplicationDetail.class, User.UserDetail.class})
     private AppRole role;
 
     public static AppRoleUser of(User user, AppRole role) {

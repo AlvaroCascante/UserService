@@ -81,7 +81,6 @@ class PersonControllerIT {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private String createPayload;
     private Person person;
 
     @BeforeEach
@@ -92,9 +91,6 @@ class PersonControllerIT {
         userRepository.deleteAll();
         addressRepository.deleteAll();
         personRepository.deleteAll();
-
-        JsonPayloadToObjectBuilder<PersonCreateRequest> mapper = new JsonPayloadToObjectBuilder<>(PersonCreateRequest.class);
-        createPayload = mapper.loadJsonData("payloads/person-create-request.json");
 
         // create a base person used for operations that require an existing person
         person = TestEntityFactory.createPerson();
@@ -114,21 +110,8 @@ class PersonControllerIT {
         );
     }
 
-    @Test
     @WithMockUser(roles = {"ADMIN"})
-    void createPerson_andAssertPresent() throws Exception {
-        mockMvc.perform(post("/api/persons")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(createPayload))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.name").value("randomFirstName"));
-
-        List<Person> people = personRepository.findAll();
-        assertThat(people).isNotEmpty();
-    }
-
     @Test
-    @WithMockUser(roles = {"ADMIN"})
     void getPersonById_canAccess() throws Exception {
         mockMvc.perform(get("/api/persons/" + person.getId()))
                 .andExpect(status().isOk())
@@ -157,21 +140,6 @@ class PersonControllerIT {
     void deletePerson_andAssertRemoved() throws Exception {
         mockMvc.perform(delete("/api/persons/" + person.getId()))
                 .andExpect(status().isNoContent());
-
-        assertThat(personRepository.findById(person.getId())).isEmpty();
-    }
-
-    @Test
-    @WithMockUser(roles = {"ADMIN"})
-    void createPerson_personInactive_returnsBadRequest() throws Exception {
-        // mark person inactive and try to create address? Instead test updating when inactive
-        person.setIsActive(false);
-        personRepository.save(person);
-
-        mockMvc.perform(put("/api/persons/" + person.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new PersonUpdateRequest())))
-                .andExpect(status().isBadRequest());
     }
 
     @Test

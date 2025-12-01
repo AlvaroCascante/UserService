@@ -60,6 +60,7 @@ public class Application extends Auditable {
     }
 
     public void updateFromRequest(ApplicationUpdateRequest request, String username) {
+        if (request.getName() != null) this.setName(request.getName());
         if (request.getDescription() != null) this.setDescription(request.getDescription());
         if (request.getIsActive() != null) this.setIsActive(request.getIsActive());
 

@@ -1,19 +1,16 @@
 package com.quetoquenana.userservice.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.quetoquenana.userservice.dto.PersonCreateRequest;
 import com.quetoquenana.userservice.dto.PersonUpdateRequest;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.ApiResponse;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.service.PersonService;
 import com.quetoquenana.userservice.util.JsonViewPageUtil;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -54,7 +51,7 @@ public class PersonController {
 
     @GetMapping("/{id}")
     @JsonView(Person.PersonDetail.class)
-    @PreAuthorize("@securityService.canAccessIdPerson(authentication, #idNumber)")
+    @PreAuthorize("@securityService.canAccessIdPerson(authentication, #id)")
     public ResponseEntity<ApiResponse> getPersonById(
             @PathVariable UUID id
     ) {
@@ -93,5 +90,15 @@ public class PersonController {
         Person entity = personService.update(id, request);
         return ResponseEntity.ok(new ApiResponse(entity));
 
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@securityService.canAccessIdPerson(authentication, #id)")
+    public ResponseEntity<Void> deletePerson(
+            @PathVariable UUID id
+    ) {
+        log.info("DELETE /api/persons/{} called", id);
+        personService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
