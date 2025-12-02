@@ -38,6 +38,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Arrays;
@@ -82,7 +84,7 @@ public class SecurityConfig {
     public JwtDecoder jwtDecoder() {
         try {
             LOG.debug("Creating JwtDecoder using public key configured as: {}", rsaKeys.getPublicKey());
-            return NimbusJwtDecoder.withPublicKey(rsaKeys.getPublicRsaKey()).build();
+            return NimbusJwtDecoder.withPublicKey((RSAPublicKey) rsaKeys.getPublicRsaKey()).build();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to create JwtDecoder. Check security.rsa.public-key property and format of the public key.", e);
         }
@@ -92,7 +94,7 @@ public class SecurityConfig {
     public JwtEncoder jwtEncoder() {
         try {
             LOG.debug("Creating JwtEncoder using publicKey={} privateKeyPresent={}", rsaKeys.getPublicKey(), rsaKeys.getPrivateKey() != null);
-            RSAKey jwk = new RSAKey.Builder(rsaKeys.getPublicRsaKey())
+            RSAKey jwk = new RSAKey.Builder((RSAPublicKey) rsaKeys.getPublicRsaKey())
                     .privateKey(rsaKeys.getPrivateRsaKey())
                     .build();
             JWKSet set = new JWKSet(jwk);

@@ -6,15 +6,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.regex.Pattern;
 
 @Setter
 @Getter
@@ -24,96 +24,116 @@ public class RsaKeyProperties {
     private String publicKey;
     private String privateKey;
 
-    public RSAPublicKey getPublicRsaKey() {
+    public PrivateKey getPrivateRsaKey() {
         try {
-            byte[] der = loadKeyBytes(publicKey);
-            X509EncodedKeySpec spec = new X509EncodedKeySpec(der);
-            KeyFactory kf = KeyFactory.getInstance("RSA");
-            return (RSAPublicKey) kf.generatePublic(spec);
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to parse RSA public key", e);
-        }
-    }
-
-    public RSAPrivateKey getPrivateRsaKey() {
-        try {
-            byte[] der = loadKeyBytes(privateKey);
-            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(der);
-            KeyFactory kf = KeyFactory.getInstance("RSA");
-            return (RSAPrivateKey) kf.generatePrivate(spec);
+            byte[] keyBytes = normalizeAndDecode(privateKey);
+            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+            return KeyFactory.getInstance("RSA").generatePrivate(spec);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to parse RSA private key", e);
         }
     }
 
-    private byte[] loadKeyBytes(String value) throws IOException {
-        if (value == null || value.trim().isEmpty()) {
-            throw new IllegalStateException("Key value is null or empty");
+    public PublicKey getPublicRsaKey() {
+        try {
+            byte[] keyBytes = normalizeAndDecode(publicKey);
+            X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+            return KeyFactory.getInstance("RSA").generatePublic(spec);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to parse RSA public key", e);
         }
-
-        String v = value.trim();
-
-        // base64:<b64> -> decode to bytes, then handle as below
-        if (v.startsWith("base64:")) {
-            byte[] decoded = Base64.getDecoder().decode(v.substring("base64:".length()));
-            return normalizeDecodedBytes(decoded);
-        }
-
-        // classpath:
-        if (v.startsWith("classpath:")) {
-            String path = v.substring("classpath:".length());
-            // try without leading slash first
-            InputStream res = getClass().getClassLoader().getResourceAsStream(path);
-            if (res == null) {
-                // try with leading slash
-                res = getClass().getResourceAsStream(path.startsWith("/") ? path : "/" + path);
-            }
-            if (res == null) {
-                throw new IllegalStateException("Resource not found on classpath: " + path);
-            }
-            try (InputStream is = res) {
-                byte[] bytes = is.readAllBytes();
-                return normalizeDecodedBytes(bytes);
-            }
-        }
-
-        // file: or filesystem path
-        if (v.startsWith("file:")) {
-            String path = v.substring("file:".length());
-            byte[] bytes = Files.readAllBytes(Path.of(path));
-            return normalizeDecodedBytes(bytes);
-        }
-
-        // treat as a plain path
-        Path p = Path.of(v);
-        if (Files.exists(p)) {
-            byte[] bytes = Files.readAllBytes(p);
-            return normalizeDecodedBytes(bytes);
-        }
-
-        // otherwise treat as inline PEM/BASE64 text
-        return normalizeDecodedBytes(v.getBytes(StandardCharsets.UTF_8));
     }
 
-    private byte[] normalizeDecodedBytes(byte[] input) {
-        String asText = new String(input, StandardCharsets.UTF_8);
+    private static final Pattern NON_BASE64 = Pattern.compile("[^A-Za-z0-9+/=\\r\\n]\\+");
 
-        // If PEM (contains header), extract inner base64
-        if (asText.contains("-----BEGIN")) {
-            String inner = asText
-                    .replaceAll("(?s)-----BEGIN .*?-----", "")
-                    .replaceAll("(?s)-----END .*?-----", "")
+    private byte[] normalizeAndDecode(String key) {
+        if (key == null || key.isBlank()) {
+            throw new IllegalStateException("RSA key property is empty");
+        }
+
+        String value = key.trim();
+
+        // support railway-style prefix or similar: "base64:..."
+        if (value.startsWith("base64:")) {
+            value = value.substring("base64:".length()).trim();
+            return safeBase64Decode(value);
+        }
+
+        // support classpath resources: classpath:keys/...
+        if (value.startsWith("classpath:")) {
+            String path = value.substring("classpath:".length());
+            if (path.startsWith("/")) path = path.substring(1);
+            try (InputStream is = getClass().getClassLoader().getResourceAsStream(path)) {
+                if (is == null) {
+                    throw new IllegalStateException("Resource not found on classpath: " + path);
+                }
+                byte[] data = is.readAllBytes();
+                String s = new String(data);
+                if (s.contains("-----BEGIN")) {
+                    // PEM file on classpath
+                    String inner = s.replaceAll("-----BEGIN [A-Z0-9 ]+-----", "").replaceAll("-----END [A-Z0-9 ]+-----", "").replaceAll("\\s+", "");
+                    return safeBase64Decode(inner);
+                } else {
+                    // assume DER bytes
+                    return data;
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to read classpath resource: " + path, e);
+            }
+        }
+
+        // support file: URIs
+        if (value.startsWith("file:")) {
+            String path = value.substring("file:".length());
+            try {
+                byte[] data = Files.readAllBytes(Paths.get(path));
+                String s = new String(data);
+                if (s.contains("-----BEGIN")) {
+                    String inner = s.replaceAll("-----BEGIN [A-Z0-9 ]+-----", "").replaceAll("-----END [A-Z0-9 ]+-----", "").replaceAll("\\s+", "");
+                    return safeBase64Decode(inner);
+                } else {
+                    return data;
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to read file: " + path, e);
+            }
+        }
+
+        // If full PEM content provided directly, strip headers and decode
+        if (value.contains("-----BEGIN")) {
+            String inner = value
+                    .replaceAll("-----BEGIN [A-Z ]+-----", "")
+                    .replaceAll("-----END [A-Z ]+-----", "")
                     .replaceAll("\\s+", "");
-            return Base64.getDecoder().decode(inner);
+            return safeBase64Decode(inner);
         }
 
-        // If the content looks like base64 text (letters, digits, +/=/whitespace) -> decode it
-        if (asText.trim().matches("^[A-Za-z0-9+/=\\s]+$")) {
-            String cleaned = asText.replaceAll("\\s+", "");
-            return Base64.getDecoder().decode(cleaned);
-        }
+        // otherwise assume it's raw base64 (single-line) or tolerant base64
+        return safeBase64Decode(value);
+    }
 
-        // Otherwise assume it's already DER binary
-        return input;
+    private byte[] safeBase64Decode(String value) {
+        if (value == null) throw new IllegalArgumentException("empty base64");
+        String v = value.trim();
+        // remove characters that are not valid base64 (except = padding)
+        v = v.replaceAll("[^A-Za-z0-9+/=]", "");
+
+        IllegalArgumentException last = null;
+        try {
+            return Base64.getMimeDecoder().decode(v);
+        } catch (IllegalArgumentException e) {
+            last = e;
+        }
+        try {
+            return Base64.getUrlDecoder().decode(v);
+        } catch (IllegalArgumentException e) {
+            last = e;
+        }
+        try {
+            return Base64.getDecoder().decode(v);
+        } catch (IllegalArgumentException e) {
+            last = e;
+        }
+        throw new IllegalStateException("Failed to base64-decode RSA key (len=" + v.length() + ")", last);
     }
 }

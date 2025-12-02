@@ -60,4 +60,4 @@ src/main/java/com/quetoquenana/userservice/service/UtilService.java
 src/main/java/com/quetoquenana/userservice/service/impl/UtilServiceImpl.java
 
 # Local environment variables (do not commit secrets)
-.env
+railway-conf.env
