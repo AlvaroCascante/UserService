@@ -1,13 +1,12 @@
 # Multi-stage Dockerfile: builds the jar using Maven then creates a slim runtime image
 
 # Build stage: uses Maven to produce the fat JAR
-FROM maven:3.9.6-eclipse-temurin-25 AS build
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /workspace
 
 # Improve cache usage by copying only pom first
 COPY pom.xml .
-# If project uses .mvn wrapper, copy it too (no harm if missing)
-COPY .mvn .mvn
+# Note: .mvn/mvnw are not present in this repo, using the Maven binary from the official image
 
 # Copy source and build
 COPY src ./src
@@ -16,13 +15,13 @@ COPY src ./src
 RUN mvn -B -DskipTests package
 
 # Runtime stage
-FROM eclipse-temurin:25-jdk as runtime
+FROM eclipse-temurin:17-jre-jammy as runtime
 WORKDIR /app
 
-# Copy the jar produced in the build stage. This assumes the Spring Boot plugin produced a single jar in /workspace/target
-COPY --from=build /workspace/target/*SNAPSHOT.jar /app/app.jar
+# Copy the jar produced in the build stage. Use a wildcard to pick up the jar produced by Spring Boot
+COPY --from=build /workspace/target/*.jar /app/app.jar
 
 EXPOSE 8080
 ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
-ENTRYPOINT ["sh","-c","exec java $JAVA_OPTS -jar /app/app.jar"]
-
+# Respect Railway's PORT env var if provided
+ENTRYPOINT ["sh","-c","exec java $JAVA_OPTS -Dserver.port=${PORT:-8080} -jar /app/app.jar"]
