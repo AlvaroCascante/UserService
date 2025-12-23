@@ -673,7 +673,7 @@
 								}
 							]
 						},
-						"method": "POST",
+						"method": "GET",
 						"header": [
 							{
 								"key": "X-Application-Name",
@@ -682,15 +682,15 @@
 							}
 						],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/auth/login",
+							"raw": "{{HOST}}/{{path}}/api/.well-known/jwks.json",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"auth",
-								"login"
+								".well-known",
+								"jwks.json"
 							]
 						}
 					},
