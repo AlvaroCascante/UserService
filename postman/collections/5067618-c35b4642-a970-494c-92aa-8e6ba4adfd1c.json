@@ -636,7 +636,7 @@
 					"response": []
 				},
 				{
-					"name": "Login Copy",
+					"name": "JWKS",
 					"event": [
 						{
 							"listen": "test",
