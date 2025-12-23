@@ -10,8 +10,7 @@ import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.ApplicationRepository;
 import com.quetoquenana.userservice.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +42,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Arrays;
+import java.util.Base64;
 
 import static com.quetoquenana.userservice.util.Constants.*;
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -51,9 +51,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableConfigurationProperties({RsaKeyProperties.class, CorsConfigProperties.class})
 @AllArgsConstructor
+@Slf4j
 public class SecurityConfig {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
     private final CorsConfigProperties corsConfigProperties;
     private final RsaKeyProperties rsaKeys;
@@ -83,8 +82,8 @@ public class SecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder() {
         try {
-            LOG.debug("Creating JwtDecoder using public key configured as: {}", rsaKeys.getPublicKey());
-            return NimbusJwtDecoder.withPublicKey((RSAPublicKey) rsaKeys.getPublicRsaKey()).build();
+            log.debug("Creating JwtDecoder using public key configured as: {}", rsaKeys.publicKey());
+            return NimbusJwtDecoder.withPublicKey(rsaKeys.publicKey()).build();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to create JwtDecoder. Check security.rsa.public-key property and format of the public key.", e);
         }
@@ -93,9 +92,9 @@ public class SecurityConfig {
     @Bean
     public JwtEncoder jwtEncoder() {
         try {
-            LOG.debug("Creating JwtEncoder using publicKey={} privateKeyPresent={}", rsaKeys.getPublicKey(), rsaKeys.getPrivateKey() != null);
-            RSAKey jwk = new RSAKey.Builder((RSAPublicKey) rsaKeys.getPublicRsaKey())
-                    .privateKey(rsaKeys.getPrivateRsaKey())
+            log.debug("Creating JwtEncoder using publicKey={} privateKeyPresent={}", rsaKeys.publicKey(), rsaKeys.privateKey() != null);
+            RSAKey jwk = new RSAKey.Builder(rsaKeys.publicKey())
+                    .privateKey(rsaKeys.privateKey())
                     .build();
             JWKSet set = new JWKSet(jwk);
             return new NimbusJwtEncoder(new ImmutableJWKSet<>(set));

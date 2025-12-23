@@ -190,7 +190,7 @@ head -n 1 user_service_public_key.pem
 chmod 600 user_service_private_key.pem
 chown $(whoami) user_service_private_key.pem
 
-# produce single-line base64 values and export for the local process
+# produce single-line base64 values and export for the local process, keys are handled in the .env file 
 export SECURITY_RSA_PRIVATE_KEY_B64=$(base64 -i user_service_private_key.pem | tr -d '\n')
 export SECURITY_RSA_PUBLIC_KEY_B64=$(base64 -i user_service_public_key.pem | tr -d '\n')
 
