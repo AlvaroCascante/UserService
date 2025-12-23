@@ -2003,11 +2003,14 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"stringToEncode\":\"dydtrm\"\n}",
+							"raw": "{\n    \"stringToEncode\":\"system\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
