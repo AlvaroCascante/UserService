@@ -663,7 +663,7 @@
 							"basic": [
 								{
 									"key": "password",
-									"value": "%Obdq<J1VIgc",
+									"value": "{{system_pass}}",
 									"type": "string"
 								},
 								{
