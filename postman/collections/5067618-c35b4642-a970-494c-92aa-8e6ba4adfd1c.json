@@ -636,6 +636,67 @@
 					"response": []
 				},
 				{
+					"name": "Login Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5924420f-b835-4379-99e8-2da4f6f49892",
+								"exec": [
+									"var jsonData = pm.response.json(); // Fixed to use pm.response",
+									"pm.environment.set(\"system_token\", jsonData.accessToken);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-73fa89da-f00a-418b-a12d-ec6622b93ce1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{system_pass}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "system",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Application-Name",
+								"value": "UserService",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/auth/login",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Reset",
 					"id": "5067618-aed80b3b-8121-46c8-b755-775df7555813",
 					"protocolProfileBehavior": {
