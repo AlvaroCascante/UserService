@@ -663,7 +663,7 @@
 							"basic": [
 								{
 									"key": "password",
-									"value": "{{system_pass}}",
+									"value": "%Obdq<J1VIgc",
 									"type": "string"
 								},
 								{
@@ -682,13 +682,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/.well-known/jwks.json",
+							"raw": "{{HOST}}/{{path}}/api/jwks/.well-known/jwks.json",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
+								"jwks",
 								".well-known",
 								"jwks.json"
 							]
