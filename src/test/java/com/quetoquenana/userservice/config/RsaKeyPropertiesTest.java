@@ -2,6 +2,8 @@ package com.quetoquenana.userservice.config;
 
 import org.junit.jupiter.api.Test;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -12,16 +14,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RsaKeyPropertiesTest {
 
     @Test
-    void loadKeysFromClasspath_shouldParseKeys() {
-        RsaKeyProperties props = new RsaKeyProperties();
-        props.setPublicKey("classpath:keys/user_service_public_key.pem");
-        props.setPrivateKey("classpath:keys/user_service_private_key.pem");
+    void constructWithGeneratedKeys_shouldHoldRsaKeys() throws Exception {
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+        kpg.initialize(2048);
+        KeyPair kp = kpg.generateKeyPair();
 
-        PublicKey pub = props.getPublicRsaKey();
-        PrivateKey priv = props.getPrivateRsaKey();
+        RSAPublicKey pub = (RSAPublicKey) kp.getPublic();
+        RSAPrivateKey priv = (RSAPrivateKey) kp.getPrivate();
 
-        assertThat(pub).isNotNull();
-        assertThat(priv).isNotNull();
+        RsaKeyProperties props = new RsaKeyProperties(pub, priv);
+
+        assertThat(props.publicKey()).isNotNull();
+        assertThat(props.privateKey()).isNotNull();
+        assertThat(props.publicKey()).isInstanceOf(RSAPublicKey.class);
+        assertThat(props.privateKey()).isInstanceOf(RSAPrivateKey.class);
     }
 }
 
