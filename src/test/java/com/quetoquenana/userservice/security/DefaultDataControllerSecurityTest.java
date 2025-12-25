@@ -1,7 +1,7 @@
 package com.quetoquenana.userservice.security;
 
-import com.quetoquenana.userservice.config.CorsConfigProperties;
-import com.quetoquenana.userservice.config.RsaKeyProperties;
+import com.quetoquenana.userservice.properties.CorsConfigProperties;
+import com.quetoquenana.userservice.properties.RsaKeyProperties;
 import com.quetoquenana.userservice.config.SecurityConfig;
 import com.quetoquenana.userservice.controller.DefaultDataController;
 import com.quetoquenana.userservice.dto.DefaultDataCreateRequest;

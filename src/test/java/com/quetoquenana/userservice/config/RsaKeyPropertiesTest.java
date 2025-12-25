@@ -1,11 +1,10 @@
 package com.quetoquenana.userservice.config;
 
+import com.quetoquenana.userservice.properties.RsaKeyProperties;
 import org.junit.jupiter.api.Test;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -22,7 +21,7 @@ class RsaKeyPropertiesTest {
         RSAPublicKey pub = (RSAPublicKey) kp.getPublic();
         RSAPrivateKey priv = (RSAPrivateKey) kp.getPrivate();
 
-        RsaKeyProperties props = new RsaKeyProperties(pub, priv);
+        RsaKeyProperties props = new RsaKeyProperties(pub, priv, "test-key-id-");
 
         assertThat(props.publicKey()).isNotNull();
         assertThat(props.privateKey()).isNotNull();

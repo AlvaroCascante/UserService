@@ -1,14 +1,16 @@
 package com.quetoquenana.userservice.config;
 
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
 import com.quetoquenana.userservice.exception.AuthenticationException;
 import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.Application;
+import com.quetoquenana.userservice.properties.CorsConfigProperties;
+import com.quetoquenana.userservice.properties.RsaKeyProperties;
 import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.ApplicationRepository;
 import com.quetoquenana.userservice.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -30,21 +32,21 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
-
-import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Arrays;
-import java.util.Base64;
 
-import static com.quetoquenana.userservice.util.Constants.*;
+import static com.quetoquenana.userservice.util.Constants.Headers.*;
+import static com.quetoquenana.userservice.util.Constants.Methods.*;
+import static com.quetoquenana.userservice.util.Constants.OAuth2.TOKEN_CLAIM_ROLES;
+import static com.quetoquenana.userservice.util.Constants.OAuth2.TOKEN_CLAIM_SUB;
+import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_PREFIX;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @EnableMethodSecurity
@@ -55,10 +57,11 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     private final CorsConfigProperties corsConfigProperties;
-    private final RsaKeyProperties rsaKeys;
-    private final UserRepository userRepository;
+    private final RsaKeyProperties rsaKeyProperties;
+
     private final ApplicationRepository applicationRepository;
     private final AppRoleUserRepository appRoleUserRepository;
+    private final UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -82,25 +85,16 @@ public class SecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder() {
         try {
-            log.debug("Creating JwtDecoder using public key configured as: {}", rsaKeys.publicKey());
-            return NimbusJwtDecoder.withPublicKey(rsaKeys.publicKey()).build();
+            log.debug("Creating JwtDecoder using public key configured as: {}", rsaKeyProperties.publicKey());
+            return NimbusJwtDecoder.withPublicKey(rsaKeyProperties.publicKey()).build();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to create JwtDecoder. Check security.rsa.public-key property and format of the public key.", e);
         }
     }
 
     @Bean
-    public JwtEncoder jwtEncoder() {
-        try {
-            log.debug("Creating JwtEncoder using publicKey={} privateKeyPresent={}", rsaKeys.publicKey(), rsaKeys.privateKey() != null);
-            RSAKey jwk = new RSAKey.Builder(rsaKeys.publicKey())
-                    .privateKey(rsaKeys.privateKey())
-                    .build();
-            JWKSet set = new JWKSet(jwk);
-            return new NimbusJwtEncoder(new ImmutableJWKSet<>(set));
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to create JwtEncoder. Check security.rsa.private-key and public-key properties and formats.", e);
-        }
+    JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
+        return new NimbusJwtEncoder(jwkSource);
     }
 
     @Bean
@@ -142,7 +136,7 @@ public class SecurityConfig {
         String appName = null;
         if (attrs != null) {
             HttpServletRequest req = attrs.getRequest();
-            appName = req.getHeader(HEADER_APP_NAME);
+            appName = req.getHeader(APP_NAME);
         }
 
         // if application not provided, fail early (caller can change to allow default behavior)
@@ -187,7 +181,7 @@ public class SecurityConfig {
 
         List<String> allowedMethods;
         if (methodsCsv == null || methodsCsv.isBlank()) {
-            allowedMethods = List.of("GET", "POST", "PUT", "DELETE", "OPTIONS");
+            allowedMethods = List.of(GET, POST, PUT, DELETE);
         } else {
             allowedMethods = Arrays.stream(methodsCsv.split(","))
                     .map(String::trim)
@@ -197,7 +191,7 @@ public class SecurityConfig {
 
         List<String> allowedHeaders;
         if (headersCsv == null || headersCsv.isBlank()) {
-            allowedHeaders = List.of("Content-Type", "Authorization");
+            allowedHeaders = List.of(APP_NAME, CONTENT_TYPE, AUTHORIZATION);
         } else {
             allowedHeaders = Arrays.stream(headersCsv.split(","))
                     .map(String::trim)

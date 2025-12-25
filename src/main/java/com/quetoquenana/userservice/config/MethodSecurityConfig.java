@@ -13,7 +13,7 @@ public class MethodSecurityConfig {
 
     @Bean
     public RoleHierarchy roleHierarchy() {
-        return new CustomRoleHierarchy();
+        return new RoleHierarchyConfig();
     }
 
     @Bean

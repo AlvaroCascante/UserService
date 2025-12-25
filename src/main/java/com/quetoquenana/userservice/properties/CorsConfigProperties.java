@@ -1,4 +1,4 @@
-package com.quetoquenana.userservice.config;
+package com.quetoquenana.userservice.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

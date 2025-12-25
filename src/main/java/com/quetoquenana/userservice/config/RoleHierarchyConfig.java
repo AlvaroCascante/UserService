@@ -6,13 +6,15 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.*;
 
-public class CustomRoleHierarchy implements RoleHierarchy {
+import static com.quetoquenana.userservice.util.Constants.Roles.*;
+
+public class RoleHierarchyConfig implements RoleHierarchy {
 
     private final Map<String, Set<String>> implies = new HashMap<>();
 
-    public CustomRoleHierarchy() {
-        implies.put("ROLE_SYSTEM", Set.of("ROLE_ADMIN"));
-        implies.put("ROLE_ADMIN", Set.of("ROLE_USER"));
+    public RoleHierarchyConfig() {
+        implies.put(ROLE_SYSTEM, Set.of(ROLE_ADMIN));
+        implies.put(ROLE_ADMIN, Set.of(ROLE_USER));
     }
 
     @Override
@@ -20,8 +22,8 @@ public class CustomRoleHierarchy implements RoleHierarchy {
         Set<String> reachable = new HashSet<>();
         Deque<String> queue = new ArrayDeque<>();
 
-        for (GrantedAuthority ga : authorities) {
-            String role = ga.getAuthority();
+        for (GrantedAuthority grantedAuthority : authorities) {
+            String role = grantedAuthority.getAuthority();
             if (role != null) {
                 reachable.add(role);
                 queue.add(role);
