@@ -426,7 +426,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"roleName\": \"USER\",\n  \"description\": \"User Role\"\n}",
+							"raw": "{\n  \"roleName\": \"ADMIN\",\n  \"description\": \"Admin Role\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -448,7 +448,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "4901b34d-05a5-4cb2-9dc7-5d95008f44b4"
+									"value": "d89b7bd5-a28b-4e34-b306-5145be8e32e5"
 								}
 							]
 						}
