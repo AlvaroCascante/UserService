@@ -682,14 +682,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/jwks/.well-known/jwks.json",
+							"raw": "{{HOST}}/{{path}}/.well-known/jwks.json",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
-								"api",
-								"jwks",
 								".well-known",
 								"jwks.json"
 							]
