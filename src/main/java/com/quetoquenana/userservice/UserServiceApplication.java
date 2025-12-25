@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@ConfigurationPropertiesScan("com.quetoquenana.userservice.properties")
+@ConfigurationPropertiesScan("com.quetoquenana.userservice.config")
 @EnableConfigurationProperties
 public class UserServiceApplication {
 

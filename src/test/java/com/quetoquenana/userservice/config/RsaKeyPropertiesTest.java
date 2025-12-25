@@ -1,6 +1,5 @@
 package com.quetoquenana.userservice.config;
 
-import com.quetoquenana.userservice.properties.RsaKeyProperties;
 import org.junit.jupiter.api.Test;
 
 import java.security.KeyPair;

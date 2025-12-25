@@ -1,4 +1,4 @@
-package com.quetoquenana.userservice.properties;
+package com.quetoquenana.userservice.config;
 
 import com.quetoquenana.userservice.util.KeyUtils;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;

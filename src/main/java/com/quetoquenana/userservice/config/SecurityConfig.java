@@ -5,8 +5,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.quetoquenana.userservice.exception.AuthenticationException;
 import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.Application;
-import com.quetoquenana.userservice.properties.CorsConfigProperties;
-import com.quetoquenana.userservice.properties.RsaKeyProperties;
 import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.ApplicationRepository;
 import com.quetoquenana.userservice.repository.UserRepository;
