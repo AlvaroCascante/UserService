@@ -10,15 +10,16 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 @Component
-@ConfigurationPropertiesBinding
 public class RsaKeyConverter {
 
     @Bean
+    @ConfigurationPropertiesBinding
     Converter<String, RSAPrivateKey> privateKeyConverter() {
         return KeyUtils::parsePrivateKey;
     }
 
     @Bean
+    @ConfigurationPropertiesBinding
     Converter<String, RSAPublicKey> publicKeyConverter() {
         return KeyUtils::parsePublicKey;
     }
