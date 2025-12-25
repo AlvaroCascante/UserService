@@ -1,20 +1,23 @@
 package com.quetoquenana.userservice.config;
 
-
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
-import org.springframework.context.ApplicationListener;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.stream.Collectors;
 
 @Component
-public class BeanInspector implements ApplicationListener<ApplicationReadyEvent> {
+public class BeanInspector {
+
+    private static final Logger log = LoggerFactory.getLogger(BeanInspector.class);
 
     private final ApplicationContext ctx;
     private final Environment env;
@@ -24,45 +27,48 @@ public class BeanInspector implements ApplicationListener<ApplicationReadyEvent>
         this.env = env;
     }
 
-    @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
+    @EventListener(ApplicationStartedEvent.class)
+    public void onStarted(ApplicationStartedEvent e) {
+        log.info("[BeanInspector] application started");
+        inspect();
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void onReady(ApplicationReadyEvent e) {
+        log.info("[BeanInspector] application ready");
+        inspect();
+    }
+
+    private void inspect() {
         String[] all = ctx.getBeanDefinitionNames();
-        System.out.println("[BeanInspector] total beans = " + all.length);
+        log.info("[BeanInspector] total beans = {}", all.length);
 
-        // list Converter beans
         String[] converterBeans = ctx.getBeanNamesForType(Converter.class);
-        System.out.println("[BeanInspector] Converter beans (" + converterBeans.length + "): "
-                + Arrays.stream(converterBeans).sorted().collect(Collectors.joining(", ")));
+        log.info("[BeanInspector] Converter beans ({}) : {}", converterBeans.length,
+                Arrays.stream(converterBeans).sorted().collect(Collectors.joining(", ")));
 
-        // list beans whose class is annotated with @ConfigurationPropertiesBinding
         String cpbBeans = Arrays.stream(all)
                 .filter(name -> {
                     Class<?> type = ctx.getType(name);
-                    return type != null && type.isAnnotationPresent(ConfigurationPropertiesBinding.class);
+                    return type != null && type.isAnnotationPresent(org.springframework.boot.context.properties.ConfigurationPropertiesBinding.class);
                 })
                 .sorted()
                 .collect(Collectors.joining(", "));
-        System.out.println("[BeanInspector] @ConfigurationPropertiesBinding beans: " + cpbBeans);
+        log.info("[BeanInspector] @ConfigurationPropertiesBinding beans: {}", cpbBeans);
 
-        // check specific bean names that might be your converters
         Arrays.stream(new String[]{"rsaKeyConverter", "rsaPublicKeyConverter", "rsaPrivateKeyConverter"})
-                .forEach(n -> {
-                    boolean exists = ctx.containsBean(n);
-                    System.out.println("[BeanInspector] containsBean('" + n + "') = " + exists);
-                });
+                .forEach(n -> log.info("[BeanInspector] containsBean('{}') = {}", n, ctx.containsBean(n)));
 
-        // inspect the configured property value (safe snippet)
         String raw = env.getProperty("security.rsa.public-key");
         if (raw == null) {
-            System.out.println("[BeanInspector] security.rsa.public-key = <null>");
+            log.info("[BeanInspector] security.rsa.public-key = <null>");
         } else {
             String clean = raw.replace("\n", "\\n");
             int len = clean.length();
             String head = clean.substring(0, Math.min(40, len));
             String tail = len > 40 ? clean.substring(Math.max(0, len - 40)) : "";
-            System.out.println("[BeanInspector] security.rsa.public-key length=" + len + " head=\"" + head + "\" tail=\"" + tail + "\"");
+            log.info("[BeanInspector] security.rsa.public-key length={} head=\"{}\" tail=\"{}\"", len, head, tail);
 
-            // quick base64 sanity check (strip PEM markers if present)
             String maybeBase64 = clean;
             if (maybeBase64.contains("-----BEGIN")) {
                 maybeBase64 = maybeBase64.replaceAll("(?s)-----BEGIN[^-]+-----", "")
@@ -72,9 +78,9 @@ public class BeanInspector implements ApplicationListener<ApplicationReadyEvent>
             }
             try {
                 Base64.getDecoder().decode(maybeBase64);
-                System.out.println("[BeanInspector] base64 decode: OK");
+                log.info("[BeanInspector] base64 decode: OK");
             } catch (IllegalArgumentException ex) {
-                System.out.println("[BeanInspector] base64 decode: FAILED -> " + ex.getMessage());
+                log.info("[BeanInspector] base64 decode: FAILED -> {}", ex.getMessage());
             }
         }
     }
