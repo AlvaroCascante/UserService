@@ -1957,6 +1957,51 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Reset Copy",
+					"id": "5067618-6193dc94-91f9-4d23-982a-2099121085ee",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{user_pass}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "ajcr81@gmail.com",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Application-Name",
+								"value": "UserService",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/auth/reset",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"auth",
+								"reset"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "5067618-d5288b57-f8cf-4f04-b072-f4cecc0b864d"
