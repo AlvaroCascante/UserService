@@ -2107,47 +2107,48 @@
 			"id": "5067618-0cc9eb6f-19d7-467d-ab5e-d9e6c7e0bdde"
 		},
 		{
-			"name": "HElath",
-			"item": [],
-			"id": "5067618-149050af-ab03-4427-b602-9656182c02a5"
-		},
-		{
-			"name": "Health Check",
-			"id": "5067618-beded8d5-7600-469a-a549-0042901040b1",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "noauth"
+			"name": "Health",
+			"item": [
+				{
+					"name": "New Request",
+					"id": "5067618-338f9acd-820b-4843-839a-607c6d18bdb7",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{HOST}}/{{path}}/actuator/health",
-					"host": [
-						"{{HOST}}"
-					],
-					"path": [
-						"{{path}}",
-						"actuator",
-						"health"
-					]
+				{
+					"name": "Health Check",
+					"id": "5067618-beded8d5-7600-469a-a549-0042901040b1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/actuator/health",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"actuator",
+								"health"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
-		},
-		{
-			"name": "New Request",
-			"id": "5067618-338f9acd-820b-4843-839a-607c6d18bdb7",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
+			],
+			"id": "5067618-149050af-ab03-4427-b602-9656182c02a5"
 		}
 	],
 	"auth": {
