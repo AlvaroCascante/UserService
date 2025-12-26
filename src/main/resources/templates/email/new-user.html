@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title th:text="#{email.new.user.subject}">Welcome</title>
+    </head>
+    <body>
+        <p th:text="#{email.greeting(${name}, ${lastname})}">Hello</p>
+        <p th:text="#{email.new.user.intro(${username})}">An account has been created for you.</p>
+        <p th:text="#{email.new.user.password(${password})}">Your initial password is: ********</p>
+        <p th:text="#{email.new.user.instruction}">Please login and change your password immediately.</p>
+        <p th:text="#{email.contact.support(${supportEmail})}">Contact support</p>
+    </body>
+</html>

@@ -84,14 +84,14 @@ public class User extends Auditable {
         this.setUpdatedBy(username);
     }
 
-    public void updateStatus(UserStatus newStatus, String username) {
-        this.updateStatus(newStatus, null, username);
+    public void updateStatus(UserStatus newStatus, String updatedBy) {
+        this.updateStatus(newStatus, null, updatedBy);
     }
 
-    public void updateStatus(UserStatus newStatus, String passwordHash, String username) {
+    public void updateStatus(UserStatus newStatus, String passwordHash, String updatedBy) {
         this.setUserStatus(newStatus);
         this.setUpdatedAt(LocalDateTime.now());
-        this.setUpdatedBy(username);
+        this.setUpdatedBy(updatedBy);
 
         switch (newStatus) {
             case ACTIVE:

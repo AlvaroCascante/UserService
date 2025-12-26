@@ -1,8 +1,9 @@
 package com.quetoquenana.userservice.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.quetoquenana.userservice.dto.UserCreateRequest;
+import com.quetoquenana.userservice.dto.ChangePasswordRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
+import com.quetoquenana.userservice.model.Application;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.model.UserStatus;
@@ -16,45 +17,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Testcontainers
 @ExtendWith(SpringExtension.class)
-class UserControllerIT {
-
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
-            .withDatabaseName("testdb")
-            .withUsername("test")
-            .withPassword("test");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-
-        // RSA keys + issuer for security beans
-        registry.add("security.rsa.public-key", () -> "classpath:keys/user_service_public_key.pem");
-        registry.add("security.rsa.private-key", () -> "classpath:keys/user_service_private_key.pem");
-        registry.add("security.jwt.issuer", () -> "user-service");
-    }
+class UserControllerIT extends AbstractIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -82,21 +58,6 @@ class UserControllerIT {
         applicationRepository.deleteAll();
         userRepository.deleteAll();
         personRepository.deleteAll();
-    }
-
-    @Test
-    @WithMockUser(roles = {"SYSTEM"})
-    void createUser_asSystem_returnsCreated() throws Exception {
-        UserCreateRequest req = TestEntityFactory.getUserCreateRequest();
-        String json = objectMapper.writeValueAsString(req);
-
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.username").value(req.getUsername()));
-
-        assertThat(userRepository.findByUsernameIgnoreCase(req.getUsername())).isPresent();
     }
 
     @Test
@@ -182,5 +143,117 @@ class UserControllerIT {
 
         User deleted = userRepository.findById(seeded.getId()).orElseThrow();
         assertThat(deleted.getUserStatus()).isEqualTo(UserStatus.INACTIVE);
+    }
+
+
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
+    void getUserApplicationDetails_asAdmin_returnsAppRoles() throws Exception {
+        Person person = TestEntityFactory.createPerson();
+        person = personRepository.save(person);
+
+        User seeded = TestDataSeeder.seedUserWithRole(
+                applicationRepository,
+                appRoleRepository,
+                userRepository,
+                appRoleUserRepository,
+                passwordEncoder,
+                person,
+                "user-service",
+                "ADMIN",
+                "user",
+                "password"
+        );
+
+        // retrieve the created application id
+        Application app = applicationRepository.findAll().getFirst();
+
+        mockMvc.perform(get("/api/users/" + seeded.getId() + "/" + app.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
+    void getUsersPage_asAdmin_returnsPagedUsers() throws Exception {
+        // seed two users so page has content
+        Person p1 = personRepository.save(TestEntityFactory.createPerson());
+
+        TestDataSeeder.seedUserWithRole(
+                applicationRepository,
+                appRoleRepository,
+                userRepository,
+                appRoleUserRepository,
+                passwordEncoder,
+                p1,
+                "user-service",
+                "ADMIN",
+                "user1",
+                "password1"
+        );
+
+        mockMvc.perform(get("/api/users/page")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content").isArray())
+                .andExpect(jsonPath("$.data.content[0].id").exists());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
+    void getByUsername_asAdmin_returnsUser() throws Exception {
+        Person person = personRepository.save(TestEntityFactory.createPerson());
+
+        String username = "unique-username";
+        User seeded = TestDataSeeder.seedUserWithRole(
+                applicationRepository,
+                appRoleRepository,
+                userRepository,
+                appRoleUserRepository,
+                passwordEncoder,
+                person,
+                "user-service",
+                "ADMIN",
+                username,
+                "password"
+        );
+
+        mockMvc.perform(get("/api/users/username/" + username))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.username").value(username))
+                .andExpect(jsonPath("$.data.id").value(seeded.getId().toString()));
+    }
+
+    @Test
+    @WithMockUser(username = "reset-user", roles = {"ADMIN"})
+    void resetPassword_asAdmin_changesPassword() throws Exception {
+        Person person = personRepository.save(TestEntityFactory.createPerson());
+
+        User seeded = TestDataSeeder.seedUserWithRole(
+                applicationRepository,
+                appRoleRepository,
+                userRepository,
+                appRoleUserRepository,
+                passwordEncoder,
+                person,
+                "user-service",
+                "ADMIN",
+                "reset-user",
+                "old-password"
+        );
+
+        String newPassword = "new-secret-password";
+        ChangePasswordRequest req = new ChangePasswordRequest();
+        req.setNewPassword(newPassword);
+
+        mockMvc.perform(post("/api/users/" + seeded.getId() + "/reset-password")
+                        .header("X-Application-Name", "user-service")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isNoContent());
+
+        User updated = userRepository.findById(seeded.getId()).orElseThrow();
+        assertThat(passwordEncoder.matches(newPassword, updated.getPasswordHash())).isTrue();
     }
 }

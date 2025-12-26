@@ -4,8 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class ResetPasswordRequest {
-    @NotBlank(message = "{field.not.blank}")
-    private String newPassword;
+public class ResetUserRequest {
+
+    @NotBlank
+    private String username;
 }
 

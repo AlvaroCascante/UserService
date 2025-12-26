@@ -1,4 +1,12 @@
 {
-  "username": "username@ttest.com",
+  "user": {
+    "username": "username@ttest.com",
+    "nickname": "nickname",
+    "person": {
+      "idNumber": "1234567890",
+      "name": "First",
+      "lastName": "Last"
+    }
+  },
   "roleName": "USER"
 }

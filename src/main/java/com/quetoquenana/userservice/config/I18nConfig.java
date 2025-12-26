@@ -7,14 +7,17 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
+import static com.quetoquenana.userservice.util.Constants.MessageSource.BASENAME;
+import static com.quetoquenana.userservice.util.Constants.MessageSource.DEFAULT;
+
 @Configuration
 public class I18nConfig {
 
     @Bean
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:messages");
-        messageSource.setDefaultEncoding("UTF-8");
+        messageSource.setBasename(BASENAME);
+        messageSource.setDefaultEncoding(DEFAULT);
         return messageSource;
     }
 

@@ -1,12 +1,5 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="UserServiceApplication" type="Application" factoryName="Application">
-    <envs>
-      <env name="SPRING_DATASOURCE_PASSWORD" value="uvzJpVdeiRtmMjiAPyaCuMtgahPqDwRh" />
-      <env name="SPRING_DATASOURCE_URL" value="jdbc:postgresql://switchback.proxy.rlwy.net:37072/railway?sslmode=require" />
-      <env name="SPRING_DATASOURCE_USERNAME" value="postgres" />
-      <env name="SPRING_DOCKER_COMPOSE_ENABLED" value="false" />
-      <env name="SPRING_PROFILES_ACTIVE" value="" />
-    </envs>
     <option name="MAIN_CLASS_NAME" value="com.quetoquenana.userservice.UserServiceApplication" />
     <module name="userservice" />
     <extension name="coverage">
@@ -16,13 +9,14 @@
       </pattern>
     </extension>
     <extension name="net.ashald.envfile">
-      <option name="IS_ENABLED" value="false" />
-      <option name="IS_SUBST" value="false" />
-      <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
-      <option name="IS_IGNORE_MISSING_FILES" value="false" />
-      <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+      <option name="IS_ENABLED" value="true" />
+      <option name="IS_SUBST" value="true" />
+      <option name="IS_PATH_MACRO_SUPPORTED" value="true" />
+      <option name="IS_IGNORE_MISSING_FILES" value="true" />
+      <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="true" />
       <ENTRIES>
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        <ENTRY IS_ENABLED="true" PARSER="env" IS_EXECUTABLE="false" PATH="railway-conf.env" />
       </ENTRIES>
     </extension>
     <method v="2">

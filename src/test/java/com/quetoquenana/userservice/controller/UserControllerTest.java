@@ -3,7 +3,7 @@ package com.quetoquenana.userservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.quetoquenana.userservice.dto.ResetPasswordRequest;
+import com.quetoquenana.userservice.dto.ChangePasswordRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.ApiResponse;
@@ -138,7 +138,7 @@ class UserControllerTest {
 
     @Test
     void testResetPassword_Success() {
-        ResetPasswordRequest request = new ResetPasswordRequest();
+        ChangePasswordRequest request = new ChangePasswordRequest();
         request.setNewPassword("newpass");
         when(userService.findById(userId)).thenReturn(Optional.of(user));
         ResponseEntity<Void> response = userController.resetPassword(userId, request);

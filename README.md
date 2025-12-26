@@ -1,6 +1,6 @@
-# Person Service Spring Boot Project
+# User Service Spring Boot Project
 
-This repository is a template for creating new Spring Boot projects with a pre-configured set of essential dependencies and features. It is designed to help you quickly bootstrap robust, production-ready applications.
+Spring Boot projects with a pre-configured set of essential dependencies and features. It is designed to help you quickly bootstrap robust, production-ready applications.
 
 ## Project Information
 
@@ -34,34 +34,9 @@ This template includes the following dependencies by default (as listed in `pom.
 
 This template uses Spring Security with the following configuration:
 
-- **HTTP Basic Authentication** is enabled for all endpoints except `GET /api/executions`, which is public.
-- **User Details:**
-  - Username: `user`
-    - Password: `password`
-    - Role: `USER`
-  - Username: `system`
-      - Password: `password`
-      - Role: `SYSTEM
-  - Username: `admin`
-      - Password: `password`
-      - Role: `ADMIN`
-- **Access Rules:**
-  - `GET /api/executions`: Public (no authentication required)
-  - All other endpoints: Require authentication and some role
+- **HTTP Basic Authentication** is enabled for login endpoint
+- **JWT** is used for securing API endpoints.
 - **Configuration Location:** See `src/main/java/com/quetoquenana/template/config/SecurityConfig.java` for details.
-
-## Example Feature: Execution Tracking Table
-
-This template includes a complete example of tracking application executions:
-
-- **Database Table:** Automatically created using Flyway migrations (`executions` table).
-- **Model:** Java entity for executions, using @JsonView for API responses.
-- **Repository:** Spring Data JPA repository for CRUD operations.
-- **Service:** Business logic for saving and retrieving executions, including paginated queries.
-- **Controller:** REST API to view executions (`/api/executions`), with endpoints for list, detail, and paginated results. The app uses the artifactId as context path, so the full path is `/template/api/executions`.
-- **Startup Logic:** Records a new execution each time the app starts.
-- **Unit Tests:** Comprehensive test cases for the controller and service, including JsonView and pagination.
-- **Postman Collection:** Example requests to test the API, stored in the `.postman` folder.
 
 ## Internationalization (i18n) Support
 
@@ -119,12 +94,9 @@ Testcontainers will automatically start and stop containers as needed during int
    ```
 
 4. **Access the API:**
-
-   - List executions: `GET /api/executions` (public)
-   - Get execution by ID: `GET /api/executions/{id}` (requires authentication)
-   - Paginated executions: `GET /api/executions/page?page=0&size=10` (requires authentication)
-   - Monitor API: `GET /actuator/health` (requires authentication)
-
+    - The API will be available at `http://localhost:8080/api/`.
+    - Swagger UI is available at `http://localhost:8080/swagger-ui.html` for API documentation and testing.
+   
 5. **Test with Postman:**
    - Import the collection from the `postman/collections` folder and run example requests.
 
@@ -177,30 +149,81 @@ The API returns a standardized JSON error payload. Example:
 ### Generate RSA keys for JWT Signing
 To generate RSA keys for JWT signing, you can use the following OpenSSL commands:
 ```
-openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out user_service_private_key.pem
-openssl genpkey -algorithm RSA -aes256 -pkeyopt rsa_keygen_bits:4096 -out user_service_private_key_enc.pem
-user_service
-openssl rsa -pubout -in user_service_private_key.pem -out user_service_public_key.pem
+# Generate a 2048-bit RSA private key
+openssl genpkey -algorithm RSA -out user_service_private_key.pem -pkeyopt rsa_keygen_bits:2048
+openssl pkcs8 \
+  -topk8 \
+  -inform PEM \
+  -outform DER \
+  -nocrypt \
+  -in user_service_private_key.pem \
+  -out user_service_private_key.der
 
-# Verify headers
-head -n 1 user_service_private_key.pem
-head -n 1 user_service_public_key.pem
+# Extract the public key from the private key
+openssl rsa \
+  -pubin \
+  -inform PEM \
+  -outform DER \
+  -in user_service_public_key.pem \
+  -out user_service_public_key.der
 
-# Set secure filesystem permissions (owner read/write only)
-chmod 600 user_service_private_key.pem
-chown $(whoami) user_service_private_key.pem
+# To verify the generated keys, you can use:
+openssl pkcs8 -inform DER -in user_service_private_key.der -noout -topk8
 
-# produce single-line base64 values and export for the local process
-export SECURITY_RSA_PRIVATE_KEY_B64=$(base64 -i user_service_private_key.pem | tr -d '\n')
-export SECURITY_RSA_PUBLIC_KEY_B64=$(base64 -i user_service_public_key.pem | tr -d '\n')
+openssl rsa -pubin -inform DER -in user_service_public_key.der -noout
 
-# start only postgres container
-docker compose -f compose.yaml up -d postgres
+# To get the Base64 encoded versions of the keys (without line breaks), use:
+base64 < user_service_private_key.der | tr -d '\n'
+base64 < user_service_public_key.der | tr -d '\n'
 
-# run the app locally
-mvn spring-boot:run
+# Clean up the PEM files if not needed
+rm user_service_private_key.pem user_service_public_key.pem
 
+#Export the Base64 encoded keys as environment variables
 ```
+## Email Configuration
+
+This project sends transactional emails for two main flows:
+
+- New user welcome emails (initial password delivery)
+- Password reset / temporary password emails
+
+The implementation uses Spring's JavaMail support and Thymeleaf templates for localized HTML emails, with message bundle keys under `src/main/resources/messages*.properties` for text content.
+
+Local development and CI use Mailtrap as a safe SMTP sink. To enable email sending (Mailtrap) configure the following properties in your environment or in a gitignored env file (for example `railway-conf.env`):
+
+```bash
+# Mailtrap / SMTP settings (example values)
+spring.mail.host=sandbox.smtp.mailtrap.io
+spring.mail.port=2525
+spring.mail.username=5ddbc1a30e6fe2
+spring.mail.password=**********
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# Application support email used as visible From / Reply-To when SMTP login is not an email
+APP_SUPPORT_EMAIL=support@yourdomain.com
+# or set spring property
+app.support.email=support@yourdomain.com
+```
+
+Notes and behavior
+
+- The code prefers to use `spring.mail.username` as the `From` header only when it looks like an email address (contains `@`). If your SMTP login is a non-email string (Mailtrap often uses random IDs), the service will use `app.support.email` as the visible From address and set Reply‑To to the support email.
+- The HTML body is rendered with Thymeleaf templates located at `src/main/resources/templates/email/` and the message text is read from the message bundles (`messages.properties`, `messages_es.properties`).
+- Message keys for the templates include (examples):
+  - `email.new.user.subject`, `email.new.user.password` (the password placeholder), `email.new.user.instruction`
+  - `email.password.reset.subject`, `email.password.reset.text`, `email.password.reset.html`
+- Placeholder contract for message templates (order of arguments):
+  0: person.name
+  1: person.lastname
+  2: username
+  3: password (temporary or initial)
+  4: support email
+
+Security note
+
+- For development, we send initial/temporary passwords in emails (convenient for testing). For production, it is strongly recommended to use token-based password reset links rather than emailing passwords.
 
 ## License
 

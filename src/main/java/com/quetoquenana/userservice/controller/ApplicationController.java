@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.UUID;
 
+import static com.quetoquenana.userservice.util.Constants.Pagination.*;
+
 @RestController
 @RequestMapping("/api/applications")
 @RequiredArgsConstructor
@@ -36,8 +38,8 @@ public class ApplicationController {
     @PreAuthorize("hasRole('SYSTEM')")
     @JsonView(Application.ApplicationList.class)
     public ResponseEntity<ApiResponse> getAllApplicationsPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = PAGE) int page,
+            @RequestParam(defaultValue = PAGE_SIZE) int size
     ) {
         log.info("GET /api/applications/page called with page={}, size={}", page, size);
         Page<Application> entities = applicationService.findAll(PageRequest.of(page, size));
@@ -62,8 +64,8 @@ public class ApplicationController {
     @JsonView(Application.ApplicationList.class)
     public ResponseEntity<ApiResponse> searchApplications(
             @RequestParam String name,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = PAGE) int page,
+            @RequestParam(defaultValue = PAGE_SIZE) int size
     ) {
         log.info("GET /api/applications/search called with name={}, page={}, size={}", name, page, size);
         Page<Application> entities = applicationService.searchByName(name, PageRequest.of(page, size));

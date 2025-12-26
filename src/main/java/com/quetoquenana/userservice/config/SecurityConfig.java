@@ -1,17 +1,16 @@
 package com.quetoquenana.userservice.config;
 
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
 import com.quetoquenana.userservice.exception.AuthenticationException;
 import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.Application;
 import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.ApplicationRepository;
 import com.quetoquenana.userservice.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,55 +30,47 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Arrays;
 
-import static com.quetoquenana.userservice.util.Constants.*;
+import static com.quetoquenana.userservice.util.Constants.Headers.APP_NAME;
+import static com.quetoquenana.userservice.util.Constants.OAuth2.TOKEN_CLAIM_ROLES;
+import static com.quetoquenana.userservice.util.Constants.OAuth2.TOKEN_CLAIM_SUB;
+import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_PREFIX;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @EnableMethodSecurity
 @Configuration
 @EnableConfigurationProperties({RsaKeyProperties.class, CorsConfigProperties.class})
 @AllArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
-
     private final CorsConfigProperties corsConfigProperties;
-    private final RsaKeyProperties rsaKeys;
-    private final UserRepository userRepository;
+    private final RsaKeyProperties rsaKeyProperties;
+
     private final ApplicationRepository applicationRepository;
     private final AppRoleUserRepository appRoleUserRepository;
+    private final UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable) // disable for API clients; enable if using browser forms
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/util/**").permitAll()
                         // allow unauthenticated access to auth endpoints (login/refresh)
                         .requestMatchers("/api/auth/**").permitAll()
-                        // public endpoints
-                        .requestMatchers("/api/executions").permitAll()
-
-                        // everything else: allow if user has ROLE_SYSTEM, otherwise require authentication
-                        .anyRequest().access((authentication, object) -> {
-                            var authObj = authentication.get();
-                            boolean isSystem = authObj != null && authObj.getAuthorities().stream()
-                                    .anyMatch(a -> ROLE_SYSTEM.equals(a.getAuthority()));
-                            if (isSystem) return new AuthorizationDecision(true);
-                            return new AuthorizationDecision(authObj != null && authObj.isAuthenticated());
-                        })
+                        .requestMatchers("/actuator/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 // enable basic auth so Spring decodes credentials automatically
                 .httpBasic(withDefaults())
@@ -91,24 +82,10 @@ public class SecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder() {
         try {
-            LOG.debug("Creating JwtDecoder using public key configured as: {}", rsaKeys.getPublicKey());
-            return NimbusJwtDecoder.withPublicKey(rsaKeys.getPublicRsaKey()).build();
+            log.debug("Creating JwtDecoder using public key configured as: {}", rsaKeyProperties.publicKey());
+            return NimbusJwtDecoder.withPublicKey(rsaKeyProperties.publicKey()).build();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to create JwtDecoder. Check security.rsa.public-key property and format of the public key.", e);
-        }
-    }
-
-    @Bean
-    public JwtEncoder jwtEncoder() {
-        try {
-            LOG.debug("Creating JwtEncoder using publicKey={} privateKeyPresent={}", rsaKeys.getPublicKey(), rsaKeys.getPrivateKey() != null);
-            RSAKey jwk = new RSAKey.Builder(rsaKeys.getPublicRsaKey())
-                    .privateKey(rsaKeys.getPrivateRsaKey())
-                    .build();
-            JWKSet set = new JWKSet(jwk);
-            return new NimbusJwtEncoder(new ImmutableJWKSet<>(set));
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to create JwtEncoder. Check security.rsa.private-key and public-key properties and formats.", e);
         }
     }
 
@@ -151,7 +128,7 @@ public class SecurityConfig {
         String appName = null;
         if (attrs != null) {
             HttpServletRequest req = attrs.getRequest();
-            appName = req.getHeader(HEADER_APP_NAME);
+            appName = req.getHeader(APP_NAME);
         }
 
         // if application not provided, fail early (caller can change to allow default behavior)
@@ -178,41 +155,10 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Safely read CSV config values and provide sensible defaults when missing
-        String hostsCsv = corsConfigProperties == null ? null : corsConfigProperties.getHosts();
-        String methodsCsv = corsConfigProperties == null ? null : corsConfigProperties.getMethods();
-        String headersCsv = corsConfigProperties == null ? null : corsConfigProperties.getHeaders();
-
-        List<String> allowedOrigins;
-        if (hostsCsv == null || hostsCsv.isBlank()) {
-            // default to allowing any origin if not configured
-            allowedOrigins = List.of("*");
-        } else {
-            allowedOrigins = Arrays.stream(hostsCsv.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.toList());
-        }
-
-        List<String> allowedMethods;
-        if (methodsCsv == null || methodsCsv.isBlank()) {
-            allowedMethods = List.of("GET", "POST", "PUT", "DELETE", "OPTIONS");
-        } else {
-            allowedMethods = Arrays.stream(methodsCsv.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.toList());
-        }
-
-        List<String> allowedHeaders;
-        if (headersCsv == null || headersCsv.isBlank()) {
-            allowedHeaders = List.of("Content-Type", "Authorization");
-        } else {
-            allowedHeaders = Arrays.stream(headersCsv.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.toList());
-        }
+        // Read CORS properties defensively — tests or environments may not provide values.
+        List<String> allowedOrigins = splitToList(corsConfigProperties.getHosts());
+        List<String> allowedMethods = splitToList(corsConfigProperties.getMethods());
+        List<String> allowedHeaders = splitToList(corsConfigProperties.getHeaders());
 
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(allowedMethods);
@@ -221,4 +167,19 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+    // Helper: split a comma-separated string into a trimmed list, return empty list if null/blank
+    private List<String> splitToList(String value) {
+        if (value == null || value.isBlank()) return List.of();
+        return Arrays.stream(value.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+    }
+
+    @Bean
+    JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
+        return new NimbusJwtEncoder(jwkSource);
+    }
+
 }

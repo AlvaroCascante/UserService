@@ -16,11 +16,10 @@ public class TestSecurityConfig {
     public UserDetailsService userDetailsService() {
         return username -> {
             // provide a minimal user with SYSTEM role so security checks during tests don't fail
-            UserDetails ud = User.withUsername(username)
+            return User.withUsername(username)
                     .password("{noop}test")
                     .authorities(List.of(new SimpleGrantedAuthority("ROLE_SYSTEM")))
                     .build();
-            return ud;
         };
     }
 }

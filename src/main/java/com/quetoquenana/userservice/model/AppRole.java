@@ -29,7 +29,7 @@ public class AppRole extends Auditable {
     private Application application;
 
     @Column(name = "role_name", nullable = false, length = 50)
-    @JsonView(Application.ApplicationDetail.class)
+    @JsonView({Application.ApplicationDetail.class, User.UserDetail.class})
     private String roleName;
 
     @Column(name = "description", length = 100)

@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
@@ -119,6 +120,7 @@ class AddressControllerSecurityTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    @WithMockUser(roles = {"ADMIN"})
     @Test
     @DisplayName("POST /api/persons/{id}/address returns 200")
     void addAddress_UserRole_Returns200() throws Exception {
@@ -128,6 +130,7 @@ class AddressControllerSecurityTest {
                 .andExpect(status().isOk());
     }
 
+    @WithMockUser(roles = {"ADMIN"})
     @Test
     @DisplayName("PUT /api/persons/address/{id} returns 200")
     void updateAddress_Unauthenticated_Returns200() throws Exception {
@@ -137,7 +140,7 @@ class AddressControllerSecurityTest {
                 .andExpect(status().isOk());
     }
 
-
+    @WithMockUser(roles = {"ADMIN"})
     @Test
     @DisplayName("DELETE /api/persons/address/{id} returns 204")
     void deleteAddress_UserRole_Returns204() throws Exception {
