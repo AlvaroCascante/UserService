@@ -583,7 +583,13 @@
 								"id": "5924420f-b835-4379-99e8-2da4f6f49892",
 								"exec": [
 									"var jsonData = pm.response.json(); // Fixed to use pm.response",
-									"pm.environment.set(\"system_token\", jsonData.accessToken);",
+									"",
+									"// Check if the username sent in the authorization request is 'system'",
+									"if (pm.request.json().username === 'system') {",
+									"    pm.environment.set(\"system_token\", jsonData.accessToken); // Update system_token for 'system' user",
+									"} else {",
+									"    pm.environment.set(\"user_token\", jsonData.accessToken); // Update user_token for other users",
+									"}",
 									""
 								],
 								"type": "text/javascript",
