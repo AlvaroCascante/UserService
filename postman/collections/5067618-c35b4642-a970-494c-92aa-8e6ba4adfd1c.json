@@ -2135,8 +2135,34 @@
 					"response": []
 				},
 				{
-					"name": "Health",
+					"name": "Beans",
 					"id": "5067618-beded8d5-7600-469a-a549-0042901040b1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/actuator/health",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"actuator",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Health Copy",
+					"id": "5067618-951c5545-f13c-4efa-a446-6d74a6fd5559",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
