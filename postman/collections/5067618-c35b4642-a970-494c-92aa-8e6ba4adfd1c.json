@@ -1959,7 +1959,7 @@
 					"response": []
 				},
 				{
-					"name": "Reset Copy",
+					"name": "Reset User Pass",
 					"id": "5067618-6193dc94-91f9-4d23-982a-2099121085ee",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
