@@ -1988,16 +1988,31 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"newPassword\": \"ACUS@jcr812026\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/auth/reset",
+							"raw": "{{HOST}}/{{path}}/api/users/:id",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"auth",
-								"reset"
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "437297ff-1e86-4072-a21b-e8c8b0a462f6"
+								}
 							]
 						}
 					},
