@@ -480,7 +480,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"user\": {\n        \"username\": \"ajcr81@gmail.com\",\n        \"nickname\": \"KskntCR\",\n        \"person\": {\n            \"idNumber\": \"111080683\",\n            \"name\": \"Alvaro\",\n            \"lastname\": \"Cascante Retana\"\n        }\n    },\n    \"roleName\": \"ADMIN\"\n}",
+							"raw": "{\n    \"user\": {\n        \"username\": \"alvaro.cascante.r@gmail.com\",\n        \"nickname\": \"KskntCR\",\n        \"person\": {\n            \"idNumber\": \"211080683\",\n            \"name\": \"Alvaro\",\n            \"lastname\": \"Cascante Retana\"\n        }\n    },\n    \"roleName\": \"USER\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
