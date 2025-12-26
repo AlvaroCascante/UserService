@@ -2147,14 +2147,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/actuator/health",
+							"raw": "{{HOST}}/{{path}}/actuator/beans",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"actuator",
-								"health"
+								"beans"
 							]
 						}
 					},
