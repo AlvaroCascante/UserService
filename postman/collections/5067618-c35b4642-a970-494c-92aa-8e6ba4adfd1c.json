@@ -607,13 +607,13 @@
 							"type": "basic",
 							"basic": [
 								{
-									"key": "username",
-									"value": "system",
+									"key": "password",
+									"value": "{{user_pass}}",
 									"type": "string"
 								},
 								{
-									"key": "password",
-									"value": "{{system_pass}}",
+									"key": "username",
+									"value": "ajcr81@gmail.com",
 									"type": "string"
 								}
 							]
