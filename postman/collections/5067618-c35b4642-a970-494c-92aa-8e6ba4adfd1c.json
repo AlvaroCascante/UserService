@@ -2159,32 +2159,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Info",
-					"id": "5067618-338f9acd-820b-4843-839a-607c6d18bdb7",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/actuator/info",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"actuator",
-								"info"
-							]
-						}
-					},
-					"response": []
 				}
 			],
 			"id": "5067618-149050af-ab03-4427-b602-9656182c02a5"
