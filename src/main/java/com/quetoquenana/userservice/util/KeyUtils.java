@@ -15,9 +15,9 @@ public final class KeyUtils {
 
     private KeyUtils() {}
 
-    public static RSAPrivateKey parsePrivateKey(String base64Pem) {
+    public static RSAPrivateKey parsePrivateKey(String base64Der) {
         try {
-            byte[] decoded = Base64.getDecoder().decode(base64Pem);
+            byte[] decoded = Base64.getDecoder().decode(base64Der);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
             KeyFactory keyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
             PrivateKey key = keyFactory.generatePrivate(keySpec);
@@ -27,9 +27,9 @@ public final class KeyUtils {
         }
     }
 
-    public static RSAPublicKey parsePublicKey(String base64Pem) {
+    public static RSAPublicKey parsePublicKey(String base64Der) {
         try {
-            byte[] decoded = Base64.getDecoder().decode(base64Pem);
+            byte[] decoded = Base64.getDecoder().decode(base64Der);
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decoded);
             KeyFactory keyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
             PublicKey key = keyFactory.generatePublic(keySpec);

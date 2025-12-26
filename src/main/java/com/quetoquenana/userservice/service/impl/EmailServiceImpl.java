@@ -75,8 +75,8 @@ public class EmailServiceImpl implements EmailService {
 
         Object[] args = new Object[]{user.getPerson().getName(), user.getPerson().getLastname(), user.getUsername(), initialPassword, supportEmail};
 
-        String subject = messageSource.getMessage("email.newuser.subject", null, "Welcome to User Service", locale);
-        String textBody = messageSource.getMessage("email.newuser.text", args, "", locale);
+        String subject = messageSource.getMessage("email.new.user.subject", null, "Welcome to User Service", locale);
+        String textBody = messageSource.getMessage("email.new.user.text", args, "", locale);
 
         // render HTML via Thymeleaf template
         Context ctx = new Context(locale);

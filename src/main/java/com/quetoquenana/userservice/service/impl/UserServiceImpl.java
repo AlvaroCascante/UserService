@@ -72,12 +72,19 @@ public class UserServiceImpl implements UserService {
 
         user.setCreatedAt(LocalDateTime.now());
         user.setCreatedBy(currentUserService.getCurrentUsername());
+
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            log.error("Error saving new user {}", request.getUsername(), e);
+            throw new RuntimeException("Error saving new user " + request.getUsername(), e);
+        }
         try {
             emailService.sendNewUserEmail(user, plain, org.springframework.context.i18n.LocaleContextHolder.getLocale());
         } catch (Exception e) {
             log.error("Error sending new user email to {}", request.getUsername(), e);
         }
-        return userRepository.save(user);
+        return user;
     }
 
     @Transactional

@@ -98,7 +98,7 @@ class ProfileControllerSecurityTest {
 
     @Test
     @DisplayName("PUT /api/persons/profile/{idProfile} returns 401 when unauthenticated")
-    void    updateProfile_Unauthenticated_Returns401() throws Exception {
+    void updateProfile_Unauthenticated_Returns401() throws Exception {
         when(securityService.canAccessIdProfile(any(), any())).thenReturn(false);
         mockMvc.perform(put("/api/persons/profile/" + PROFILE_ID)
                 .contentType(MediaType.APPLICATION_JSON)
