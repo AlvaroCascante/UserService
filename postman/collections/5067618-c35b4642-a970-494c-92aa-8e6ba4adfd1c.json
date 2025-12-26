@@ -707,12 +707,12 @@
 							"basic": [
 								{
 									"key": "password",
-									"value": "system",
+									"value": "{{user_pass}}",
 									"type": "string"
 								},
 								{
 									"key": "username",
-									"value": "system",
+									"value": "ajcr81@gmail.com",
 									"type": "string"
 								}
 							]
