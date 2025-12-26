@@ -601,13 +601,13 @@
 							"type": "basic",
 							"basic": [
 								{
-									"key": "password",
-									"value": "{{user_pass}}",
+									"key": "username",
+									"value": "system",
 									"type": "string"
 								},
 								{
-									"key": "username",
-									"value": "ajcr81@gmail.com",
+									"key": "password",
+									"value": "{{system_pass}}",
 									"type": "string"
 								}
 							]
