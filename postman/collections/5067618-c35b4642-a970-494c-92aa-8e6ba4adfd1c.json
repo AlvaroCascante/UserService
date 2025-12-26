@@ -2026,7 +2026,43 @@
 					"response": []
 				}
 			],
-			"id": "5067618-d5288b57-f8cf-4f04-b072-f4cecc0b864d"
+			"id": "5067618-d5288b57-f8cf-4f04-b072-f4cecc0b864d",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{user_token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "fd7a47b6-d9fe-4c65-9684-86cbb695d3bb",
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "14bbe2ea-f3fc-4e6e-bdba-2a19b5fb8cd6",
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
 		},
 		{
 			"name": "Util",
