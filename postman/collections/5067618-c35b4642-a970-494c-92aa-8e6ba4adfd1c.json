@@ -602,12 +602,12 @@
 							"basic": [
 								{
 									"key": "password",
-									"value": "{{system_pass}}",
+									"value": "{{user_pass}}",
 									"type": "string"
 								},
 								{
 									"key": "username",
-									"value": "system",
+									"value": "ajcr81@gmail.com",
 									"type": "string"
 								}
 							]
