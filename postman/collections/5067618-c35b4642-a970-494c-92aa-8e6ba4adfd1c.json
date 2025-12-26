@@ -2185,6 +2185,32 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Info",
+					"id": "5067618-5c1eb90c-455f-44ed-8173-c4f94d151f84",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/actuator/health",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"actuator",
+								"health"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "5067618-149050af-ab03-4427-b602-9656182c02a5"
