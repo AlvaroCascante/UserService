@@ -1,17 +1,12 @@
 package com.quetoquenana.userservice.util;
 
+import java.time.format.DateTimeFormatter;
+
 public class Constants {
     public static class Headers {
         public static final String APP_NAME = "X-Application-Name";
         public static final String CONTENT_TYPE = "Content-Type";
         public static final String AUTHORIZATION = "Authorization";
-    }
-    public static class Methods {
-        public static final String GET = "GET";
-        public static final String POST = "POST";
-        public static final String PUT = "PUT";
-        public static final String DELETE = "DELETE";
-        public static final String OPTIONS = "OPTIONS";
     }
 
     public static class Roles {
@@ -26,5 +21,26 @@ public class Constants {
 
         public static final String TOKEN_CLAIM_SUB = "sub";
         public static final String TOKEN_CLAIM_ROLES = "roles";
+    }
+
+    public static class MessageSource {
+        public static final String BASENAME = "classpath:messages";
+        public static final String DEFAULT = "UTF-8";
+    }
+
+    public static class Dates {
+        public static final String YEAR_MONTH_FORMAT = "yyyy-MM";
+        public static final DateTimeFormatter YEAR_MONTH = DateTimeFormatter.ofPattern(YEAR_MONTH_FORMAT);
+    }
+
+    public static class Emails {
+        public static final String TEMPLATES_PATH = "templates/email/";
+        public static final String SUFFIX = ".html";
+        public static final String TEMPLATE_MODE = "HTML";
+    }
+
+    public static class Pagination {
+        public static final String PAGE = "0";
+        public static final String PAGE_SIZE = "10";
     }
 }

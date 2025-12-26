@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+import static com.quetoquenana.userservice.util.Constants.Pagination.PAGE;
+import static com.quetoquenana.userservice.util.Constants.Pagination.PAGE_SIZE;
+
 @RestController
 @RequestMapping("/api/default-data")
 @RequiredArgsConstructor
@@ -32,8 +35,8 @@ public class DefaultDataController {
     @PreAuthorize("hasRole('SYSTEM')")
     @JsonView(DefaultData.DefaultDataList.class)
     public ResponseEntity<ApiResponse> getDefaultDataPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = PAGE) int page,
+            @RequestParam(defaultValue = PAGE_SIZE) int size
     ) {
         log.info("GET /api/default-data/page called with page={}, size={}", page, size);
         Page<DefaultData> entities = defaultDataService.findAll(PageRequest.of(page, size));
@@ -59,8 +62,8 @@ public class DefaultDataController {
     @PreAuthorize("hasRole('SYSTEM')")
     @JsonView(DefaultData.DefaultDataDetail.class)
     public ResponseEntity<ApiResponse> getDefaultDataByCategory(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = PAGE) int page,
+            @RequestParam(defaultValue = PAGE_SIZE) int size,
             @PathVariable String category
     ) {
         log.info("GET /api/default-data/page/category/{} called", category);

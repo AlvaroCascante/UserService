@@ -1,6 +1,7 @@
 package com.quetoquenana.userservice.controller;
 
 import com.quetoquenana.userservice.dto.RefreshRequest;
+import com.quetoquenana.userservice.dto.ResetUserRequest;
 import com.quetoquenana.userservice.dto.TokenResponse;
 import com.quetoquenana.userservice.service.SecurityService;
 import com.quetoquenana.userservice.service.TokenService;
@@ -8,8 +9,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import static com.quetoquenana.userservice.util.Constants.Headers.APP_NAME;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -23,7 +27,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(
             Authentication authentication,
-            @RequestHeader(value = "X-Application-Name") String applicationName
+            @RequestHeader(value = APP_NAME) String applicationName
     ) {
         log.info("Login attempt for application: {}", applicationName);
         Authentication appAuth = securityService.getAuthenticationForApplication(authentication.getName(), applicationName);
@@ -38,12 +42,21 @@ public class AuthController {
         return ResponseEntity.ok(tokens);
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> recoverPassword(@Valid @RequestBody ResetUserRequest request) {
+        log.info("POST /api/auth/recoverPassword called for user: {}", request.getUsername());
+        securityService.recoverPassword(request.getUsername());
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/reset")
-    public ResponseEntity<Void> resetPassword(
-            Authentication authentication
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> resetUser(
+            Authentication authentication,
+            @Valid @RequestBody ResetUserRequest request
     ) {
-        log.info("POST /api/auth/reset called");
-        securityService.resetPassword(authentication.getName());
+        log.info("POST /api/auth/reset called for user: {}", request.getUsername());
+        securityService.resetUser(authentication, request.getUsername());
         return ResponseEntity.noContent().build();
     }
 }

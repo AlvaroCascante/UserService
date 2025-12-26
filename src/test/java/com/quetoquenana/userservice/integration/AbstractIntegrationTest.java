@@ -1,6 +1,7 @@
 package com.quetoquenana.userservice.integration;
 
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -8,6 +9,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+@Import(TestMailConfig.class)
 public abstract class AbstractIntegrationTest {
 
     // Manage the container lifecycle manually so it remains up across all integration test classes.

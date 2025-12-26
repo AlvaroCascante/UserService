@@ -1,7 +1,7 @@
 package com.quetoquenana.userservice.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.quetoquenana.userservice.dto.ResetPasswordRequest;
+import com.quetoquenana.userservice.dto.ChangePasswordRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.model.Application;
 import com.quetoquenana.userservice.model.Person;
@@ -244,8 +244,10 @@ class UserControllerIT extends AbstractIntegrationTest {
         );
 
         String newPassword = "new-secret-password";
-        ResetPasswordRequest req = new ResetPasswordRequest();
+        ChangePasswordRequest req = new ChangePasswordRequest();
         req.setNewPassword(newPassword);
+        // validation requires verification field as well
+        req.setNewPasswordVerification(newPassword);
 
         mockMvc.perform(post("/api/users/" + seeded.getId() + "/reset-password")
                         .contentType(MediaType.APPLICATION_JSON)

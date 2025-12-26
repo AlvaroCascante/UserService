@@ -181,6 +181,49 @@ rm user_service_private_key.pem user_service_public_key.pem
 
 #Export the Base64 encoded keys as environment variables
 ```
+## Email Configuration
+
+This project sends transactional emails for two main flows:
+
+- New user welcome emails (initial password delivery)
+- Password reset / temporary password emails
+
+The implementation uses Spring's JavaMail support and Thymeleaf templates for localized HTML emails, with message bundle keys under `src/main/resources/messages*.properties` for text content.
+
+Local development and CI use Mailtrap as a safe SMTP sink. To enable email sending (Mailtrap) configure the following properties in your environment or in a gitignored env file (for example `railway-conf.env`):
+
+```bash
+# Mailtrap / SMTP settings (example values)
+spring.mail.host=sandbox.smtp.mailtrap.io
+spring.mail.port=2525
+spring.mail.username=5ddbc1a30e6fe2
+spring.mail.password=**********
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# Application support email used as visible From / Reply-To when SMTP login is not an email
+APP_SUPPORT_EMAIL=support@yourdomain.com
+# or set spring property
+app.support.email=support@yourdomain.com
+```
+
+Notes and behavior
+
+- The code prefers to use `spring.mail.username` as the `From` header only when it looks like an email address (contains `@`). If your SMTP login is a non-email string (Mailtrap often uses random IDs), the service will use `app.support.email` as the visible From address and set Reply‑To to the support email.
+- The HTML body is rendered with Thymeleaf templates located at `src/main/resources/templates/email/` and the message text is read from the message bundles (`messages.properties`, `messages_es.properties`).
+- Message keys for the templates include (examples):
+  - `email.new.user.subject`, `email.new.user.password` (the password placeholder), `email.new.user.instruction`
+  - `email.password.reset.subject`, `email.password.reset.text`, `email.password.reset.html`
+- Placeholder contract for message templates (order of arguments):
+  0: person.name
+  1: person.lastname
+  2: username
+  3: password (temporary or initial)
+  4: support email
+
+Security note
+
+- For development, we send initial/temporary passwords in emails (convenient for testing). For production, it is strongly recommended to use token-based password reset links rather than emailing passwords.
 
 ## License
 

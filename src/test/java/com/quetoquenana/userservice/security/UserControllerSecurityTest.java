@@ -123,14 +123,4 @@ class UserControllerSecurityTest {
         mockMvc.perform(delete("/api/users/{id}", "00000000-0000-0000-0000-000000000000"))
                 .andExpect(status().isForbidden());
     }
-
-    @Test
-    @DisplayName("POST /api/users/{id}/reset-password returns 403 for USER role")
-    @WithMockUser(username = "user", roles = {"USER"})
-    void resetPassword_UserRole_Returns403() throws Exception {
-        mockMvc.perform(post("/api/users/{id}/reset-password", "00000000-0000-0000-0000-000000000000")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"newPassword\":\"x\"}"))
-                .andExpect(status().isForbidden());
-    }
 }

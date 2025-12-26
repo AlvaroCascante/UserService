@@ -40,8 +40,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.quetoquenana.userservice.util.Constants.Headers.*;
-import static com.quetoquenana.userservice.util.Constants.Methods.*;
+import static com.quetoquenana.userservice.util.Constants.Headers.APP_NAME;
 import static com.quetoquenana.userservice.util.Constants.OAuth2.TOKEN_CLAIM_ROLES;
 import static com.quetoquenana.userservice.util.Constants.OAuth2.TOKEN_CLAIM_SUB;
 import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_PREFIX;
@@ -88,11 +87,6 @@ public class SecurityConfig {
         } catch (Exception e) {
             throw new IllegalStateException("Failed to create JwtDecoder. Check security.rsa.public-key property and format of the public key.", e);
         }
-    }
-
-    @Bean
-    JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
-        return new NimbusJwtEncoder(jwkSource);
     }
 
     @Bean
@@ -161,41 +155,10 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Safely read CSV config values and provide sensible defaults when missing
-        String hostsCsv = corsConfigProperties == null ? null : corsConfigProperties.getHosts();
-        String methodsCsv = corsConfigProperties == null ? null : corsConfigProperties.getMethods();
-        String headersCsv = corsConfigProperties == null ? null : corsConfigProperties.getHeaders();
-
-        List<String> allowedOrigins;
-        if (hostsCsv == null || hostsCsv.isBlank()) {
-            // default to allowing any origin if not configured
-            allowedOrigins = List.of("*");
-        } else {
-            allowedOrigins = Arrays.stream(hostsCsv.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.toList());
-        }
-
-        List<String> allowedMethods;
-        if (methodsCsv == null || methodsCsv.isBlank()) {
-            allowedMethods = List.of(GET, POST, PUT, DELETE);
-        } else {
-            allowedMethods = Arrays.stream(methodsCsv.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.toList());
-        }
-
-        List<String> allowedHeaders;
-        if (headersCsv == null || headersCsv.isBlank()) {
-            allowedHeaders = List.of(APP_NAME, CONTENT_TYPE, AUTHORIZATION);
-        } else {
-            allowedHeaders = Arrays.stream(headersCsv.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.toList());
-        }
+        // Read CORS properties defensively — tests or environments may not provide values.
+        List<String> allowedOrigins = splitToList(corsConfigProperties.getHosts());
+        List<String> allowedMethods = splitToList(corsConfigProperties.getMethods());
+        List<String> allowedHeaders = splitToList(corsConfigProperties.getHeaders());
 
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(allowedMethods);
@@ -204,4 +167,19 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+    // Helper: split a comma-separated string into a trimmed list, return empty list if null/blank
+    private List<String> splitToList(String value) {
+        if (value == null || value.isBlank()) return List.of();
+        return Arrays.stream(value.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+    }
+
+    @Bean
+    JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
+        return new NimbusJwtEncoder(jwkSource);
+    }
+
 }

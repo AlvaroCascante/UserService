@@ -11,10 +11,12 @@ import com.quetoquenana.userservice.model.UserStatus;
 import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.UserRepository;
 import com.quetoquenana.userservice.service.CurrentUserService;
+import com.quetoquenana.userservice.service.EmailService;
 import com.quetoquenana.userservice.service.PersonService;
 import com.quetoquenana.userservice.service.UserService;
 import com.quetoquenana.userservice.util.PasswordUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,8 +28,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final AppRoleUserRepository appRoleUserRepository;
@@ -35,6 +39,7 @@ public class UserServiceImpl implements UserService {
     private final PersonService personService;
     private final CurrentUserService currentUserService;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Transactional
     @Override
@@ -57,16 +62,21 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByUsernameIgnoreCase(request.getUsername())) {
             throw new DuplicateRecordException("user.username.duplicate");
         }
-
+        String plain = PasswordUtil.generateRandomPassword();
         User user = User.fromCreateRequest(
             request,
-            passwordEncoder.encode(PasswordUtil.generateRandomPassword()),
-            UserStatus.ACTIVE,
+            passwordEncoder.encode(plain),
+            UserStatus.RESET,
             person
         );
 
         user.setCreatedAt(LocalDateTime.now());
         user.setCreatedBy(currentUserService.getCurrentUsername());
+        try {
+            emailService.sendNewUserEmail(user, plain, org.springframework.context.i18n.LocaleContextHolder.getLocale());
+        } catch (Exception e) {
+            log.error("Error sending new user email to {}", request.getUsername(), e);
+        }
         return userRepository.save(user);
     }
 
@@ -96,7 +106,7 @@ public class UserServiceImpl implements UserService {
         User existing = userRepository.findById(id)
                 .orElseThrow(RecordNotFoundException::new);
 
-        existing.updateStatus(UserStatus.RESET, passwordEncoder.encode(newPassword), currentUserService.getCurrentUsername());
+        existing.updateStatus(UserStatus.ACTIVE, passwordEncoder.encode(newPassword), currentUserService.getCurrentUsername());
         userRepository.save(existing);
     }
 

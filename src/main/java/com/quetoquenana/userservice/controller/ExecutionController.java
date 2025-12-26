@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+import static com.quetoquenana.userservice.util.Constants.Pagination.PAGE;
+import static com.quetoquenana.userservice.util.Constants.Pagination.PAGE_SIZE;
+
 @RestController
 @RequestMapping("/api/executions")
 @RequiredArgsConstructor
@@ -68,8 +71,8 @@ public class ExecutionController {
     @PreAuthorize("hasRole('ADMIN')") // Only ADMIN role can access
     @JsonView(Execution.ExecutionList.class)
     public ResponseEntity<ApiResponse> getExecutionsPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = PAGE) int page,
+            @RequestParam(defaultValue = PAGE_SIZE) int size) {
         log.info("GET /api/executions/page?page={}&size={} called", page, size);
         Page<Execution> entities = executionService.findAll(PageRequest.of(page, size));
         return ResponseEntity.ok(new ApiResponse(new JsonViewPageUtil<>(entities, entities.getPageable())));

@@ -4,6 +4,7 @@ import com.quetoquenana.userservice.exception.AuthenticationException;
 import com.quetoquenana.userservice.model.*;
 import com.quetoquenana.userservice.repository.*;
 import com.quetoquenana.userservice.service.SecurityService;
+import com.quetoquenana.userservice.service.EmailService;
 import com.quetoquenana.userservice.util.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class SecurityServiceImpl implements SecurityService {
     private final AppRoleUserRepository appRoleUserRepository;
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Override
     public Authentication authenticate(String username, String password, String applicationName) {
@@ -80,13 +82,36 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
-    public void resetPassword(String username) {
+    public void recoverPassword(String username) {
         User user = userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(AuthenticationException::new);
 
-        String passwordHash = passwordEncoder.encode(PasswordUtil.generateRandomPassword());
-        user.updateStatus(UserStatus.ACTIVE, passwordHash, username);
+        String plain = PasswordUtil.generateRandomPassword();
+        String passwordHash = passwordEncoder.encode(plain);
+        user.updateStatus(UserStatus.RESET, passwordHash, username);
         userRepository.save(user);
+        // send email with the temporary password (do not log plain value)
+        try {
+            emailService.sendPasswordEmail(user, plain, org.springframework.context.i18n.LocaleContextHolder.getLocale());
+        } catch (Exception e) {
+            log.error("Error sending password reset email to {}", username, e);
+        }
+    }
+
+    @Override
+    public void resetUser(Authentication authentication, String username) {
+        User user = userRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow(AuthenticationException::new);
+
+        String plain = PasswordUtil.generateRandomPassword();
+        String passwordHash = passwordEncoder.encode(plain);
+        user.updateStatus(UserStatus.RESET, passwordHash, authentication.getName());
+        userRepository.save(user);
+        try {
+            emailService.sendPasswordEmail(user, plain, org.springframework.context.i18n.LocaleContextHolder.getLocale());
+        } catch (Exception e) {
+            log.error("Error sending password reset email to {}", username, e);
+        }
     }
 
     @Override
