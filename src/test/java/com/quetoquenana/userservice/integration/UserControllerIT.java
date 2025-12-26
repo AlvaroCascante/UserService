@@ -226,7 +226,7 @@ class UserControllerIT extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"ADMIN"})
+    @WithMockUser(username = "reset-user", roles = {"ADMIN"})
     void resetPassword_asAdmin_changesPassword() throws Exception {
         Person person = personRepository.save(TestEntityFactory.createPerson());
 
@@ -246,10 +246,9 @@ class UserControllerIT extends AbstractIntegrationTest {
         String newPassword = "new-secret-password";
         ChangePasswordRequest req = new ChangePasswordRequest();
         req.setNewPassword(newPassword);
-        // validation requires verification field as well
-        req.setNewPasswordVerification(newPassword);
 
         mockMvc.perform(post("/api/users/" + seeded.getId() + "/reset-password")
+                        .header("X-Application-Name", "user-service")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isNoContent());
