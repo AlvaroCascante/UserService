@@ -2110,6 +2110,57 @@
 			"name": "Health",
 			"item": [
 				{
+					"name": "Actuator",
+					"id": "5067618-c9f3415b-b876-4e35-895a-b9caaa83bdaf",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/actuator",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"actuator"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Health",
+					"id": "5067618-beded8d5-7600-469a-a549-0042901040b1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/actuator/health",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"actuator",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Info",
 					"id": "5067618-338f9acd-820b-4843-839a-607c6d18bdb7",
 					"protocolProfileBehavior": {
@@ -2130,32 +2181,6 @@
 								"{{path}}",
 								"actuator",
 								"info"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Health Check",
-					"id": "5067618-beded8d5-7600-469a-a549-0042901040b1",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/actuator/health",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"actuator",
-								"health"
 							]
 						}
 					},
