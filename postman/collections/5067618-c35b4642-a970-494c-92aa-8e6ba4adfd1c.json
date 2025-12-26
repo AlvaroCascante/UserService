@@ -2161,7 +2161,7 @@
 					"response": []
 				},
 				{
-					"name": "Health Copy",
+					"name": "Health",
 					"id": "5067618-951c5545-f13c-4efa-a446-6d74a6fd5559",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
