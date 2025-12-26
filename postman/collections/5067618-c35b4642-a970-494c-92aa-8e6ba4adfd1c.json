@@ -1998,7 +1998,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/:id",
+							"raw": "{{HOST}}/{{path}}/api/users/:id/reset-password",
 							"host": [
 								"{{HOST}}"
 							],
@@ -2006,7 +2006,8 @@
 								"{{path}}",
 								"api",
 								"users",
-								":id"
+								":id",
+								"reset-password"
 							],
 							"variable": [
 								{
