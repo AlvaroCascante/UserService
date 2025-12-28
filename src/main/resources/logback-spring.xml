@@ -1,0 +1,15 @@
+<configuration>
+    <springProperty name="ENV" source="app.environment" defaultValue="${spring.profiles.active:dev}"/>
+    <springProperty name="LOG_PATTERN" source="logging.pattern.console"
+                    defaultValue="%d{yyyy-MM-dd HH:mm:ss.SSS} [${ENV}] %-5level %logger{36} - %msg  %n%X{env}"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

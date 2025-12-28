@@ -43,4 +43,10 @@ public class Constants {
         public static final String PAGE = "0";
         public static final String PAGE_SIZE = "10";
     }
+
+    public static class Logging {
+        public static final String ENV_PROPERTY = "app.environment";
+        public static final String ENV_PROPERTY_DEFAULT = "env unknown";
+        public static final String MDC_ENV_KEY = "env";
+    }
 }
