@@ -1706,7 +1706,7 @@
 					"response": []
 				},
 				{
-					"name": "Get All Page Copy",
+					"name": "Reset as ADMIN",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -1726,10 +1726,10 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
+						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/page?page=0&size=5",
+							"raw": "{{HOST}}/{{path}}/api/users/reset",
 							"host": [
 								"{{HOST}}"
 							],
@@ -1737,17 +1737,7 @@
 								"{{path}}",
 								"api",
 								"users",
-								"page"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "5"
-								}
+								"reset"
 							]
 						}
 					},
