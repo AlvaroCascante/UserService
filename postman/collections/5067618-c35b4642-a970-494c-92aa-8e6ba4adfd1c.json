@@ -730,45 +730,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Reset",
-					"id": "5067618-aed80b3b-8121-46c8-b755-775df7555813",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "X-Application-Name",
-								"value": "UserService",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\":\"alvaro.cascante.r@gmail.com\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/reset",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"users",
-								"reset"
-							]
-						}
-					},
-					"response": []
 				}
 			],
 			"id": "5067618-9f7a01ce-6942-4f0c-b7ea-32cbf99d1d2a",
@@ -1983,6 +1944,45 @@
 									"key": "id",
 									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset",
+					"id": "5067618-aed80b3b-8121-46c8-b755-775df7555813",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "X-Application-Name",
+								"value": "UserService",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\":\"alvaro.cascante.r@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users/reset",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users",
+								"reset"
 							]
 						}
 					},
