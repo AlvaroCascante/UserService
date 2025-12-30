@@ -638,12 +638,12 @@
 							"basic": [
 								{
 									"key": "password",
-									"value": "{{system_pass}}",
+									"value": "user_pass",
 									"type": "string"
 								},
 								{
 									"key": "username",
-									"value": "system",
+									"value": "alvaro.cascante.r@gmail.com",
 									"type": "string"
 								}
 							]
@@ -652,7 +652,7 @@
 						"header": [
 							{
 								"key": "X-Application-Name",
-								"value": "UserService",
+								"value": "PedalPalService",
 								"type": "text"
 							}
 						],
