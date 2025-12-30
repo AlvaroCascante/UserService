@@ -55,7 +55,6 @@ public final class PasswordUtil {
 
         StringBuilder sb = new StringBuilder(length);
         for (char c : chars) sb.append(c);
-        log.info(sb.toString());
         return sb.toString();
     }
 

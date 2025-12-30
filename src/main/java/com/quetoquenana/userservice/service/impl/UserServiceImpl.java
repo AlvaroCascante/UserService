@@ -24,11 +24,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 
 @Service
@@ -76,12 +78,22 @@ public class UserServiceImpl implements UserService {
         user.setCreatedBy(currentUserService.getCurrentUsername());
 
         userRepository.save(user);
-        try {
-            emailService.sendNewUserEmail(user, plain, org.springframework.context.i18n.LocaleContextHolder.getLocale());
-        } catch (Exception e) {
-            log.error("Error sending new user email to {}", request.getUsername(), e);
-        }
+        // send new user email asynchronously to avoid blocking the request
+        sendNewUserEmailAsync(user, plain);
         return user;
+    }
+
+    @Override
+    public void resetUser(Authentication authentication, String username) {
+        User user = userRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow(AuthenticationException::new);
+
+        String plain = PasswordUtil.generateRandomPassword();
+        String passwordHash = passwordEncoder.encode(plain);
+        user.updateStatus(UserStatus.RESET, passwordHash, authentication.getName());
+        userRepository.save(user);
+        // send password reset email asynchronously
+        sendPasswordEmailAsync(user, plain);
     }
 
     @Transactional
@@ -139,19 +151,24 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsernameIgnoreCase(username);
     }
 
-    @Override
-    public void resetUser(Authentication authentication, String username) {
-        User user = userRepository.findByUsernameIgnoreCase(username)
-                .orElseThrow(AuthenticationException::new);
+    // --- async email helpers ---
+    private void sendNewUserEmailAsync(User user, String plain) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                emailService.sendNewUserEmail(user, plain, LocaleContextHolder.getLocale());
+            } catch (Exception e) {
+                log.error("Error sending new user email to {}", user.getUsername(), e);
+            }
+        });
+    }
 
-        String plain = PasswordUtil.generateRandomPassword();
-        String passwordHash = passwordEncoder.encode(plain);
-        user.updateStatus(UserStatus.RESET, passwordHash, authentication.getName());
-        userRepository.save(user);
-        try {
-            emailService.sendPasswordEmail(user, plain, org.springframework.context.i18n.LocaleContextHolder.getLocale());
-        } catch (Exception e) {
-            log.error("Error sending password reset email to {}", username, e);
-        }
+    private void sendPasswordEmailAsync(User user, String plain) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                emailService.sendPasswordEmail(user, plain, LocaleContextHolder.getLocale());
+            } catch (Exception e) {
+                log.error("Error sending password reset email to {}", user.getUsername(), e);
+            }
+        });
     }
 }
