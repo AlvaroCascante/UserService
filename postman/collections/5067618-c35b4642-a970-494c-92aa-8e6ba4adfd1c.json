@@ -738,21 +738,6 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"auth": {
-							"type": "basic",
-							"basic": [
-								{
-									"key": "password",
-									"value": "{{user_pass}}",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "ajcr81@gmail.com",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [
 							{
@@ -771,14 +756,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/auth/reset",
+							"raw": "{{HOST}}/{{path}}/api/users/reset",
 							"host": [
 								"{{HOST}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
-								"auth",
+								"users",
 								"reset"
 							]
 						}
