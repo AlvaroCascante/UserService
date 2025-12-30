@@ -48,15 +48,4 @@ public class AuthController {
         securityService.recoverPassword(request.getUsername());
         return ResponseEntity.noContent().build();
     }
-
-    @PostMapping("/reset")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> resetUser(
-            Authentication authentication,
-            @Valid @RequestBody ResetUserRequest request
-    ) {
-        log.info("POST /api/auth/reset called for user: {}", request.getUsername());
-        securityService.resetUser(authentication, request.getUsername());
-        return ResponseEntity.noContent().build();
-    }
 }

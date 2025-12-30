@@ -2,6 +2,7 @@ package com.quetoquenana.userservice.service.impl;
 
 import com.quetoquenana.userservice.dto.UserCreateRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
+import com.quetoquenana.userservice.exception.AuthenticationException;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.AppRoleUser;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -135,5 +137,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsernameIgnoreCase(username);
+    }
+
+    @Override
+    public void resetUser(Authentication authentication, String username) {
+        User user = userRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow(AuthenticationException::new);
+
+        String plain = PasswordUtil.generateRandomPassword();
+        String passwordHash = passwordEncoder.encode(plain);
+        user.updateStatus(UserStatus.RESET, passwordHash, authentication.getName());
+        userRepository.save(user);
+        try {
+            emailService.sendPasswordEmail(user, plain, org.springframework.context.i18n.LocaleContextHolder.getLocale());
+        } catch (Exception e) {
+            log.error("Error sending password reset email to {}", username, e);
+        }
     }
 }

@@ -99,29 +99,6 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
-    public void resetUser(Authentication authentication, String username) {
-        User user = userRepository.findByUsernameIgnoreCase(username)
-                .orElseThrow(AuthenticationException::new);
-
-        String plain = PasswordUtil.generateRandomPassword();
-        String passwordHash = passwordEncoder.encode(plain);
-        user.updateStatus(UserStatus.RESET, passwordHash, authentication.getName());
-        userRepository.save(user);
-        try {
-            emailService.sendPasswordEmail(user, plain, org.springframework.context.i18n.LocaleContextHolder.getLocale());
-        } catch (Exception e) {
-            log.error("Error sending password reset email to {}", username, e);
-        }
-    }
-
-    @Override
-    public void decPass(String username) {
-        User user = userRepository.findByUsernameIgnoreCase(username)
-                .orElseThrow(AuthenticationException::new);
-        log.info(user.getPasswordHash());
-    }
-
-    @Override
     public boolean canAccessIdNumber(Authentication authentication, String idNumber) {
         if (authentication == null || authentication.getName() == null) return false;
         return userRepository.findByUsernameIgnoreCase(authentication.getName())

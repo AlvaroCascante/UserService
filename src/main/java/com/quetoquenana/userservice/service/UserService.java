@@ -6,6 +6,7 @@ import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,4 +31,7 @@ public interface UserService {
     void delete(UUID id);
 
     void resetPassword(UUID id, String newPassword);
+
+    void resetUser(Authentication authentication, String username);
+
 }
