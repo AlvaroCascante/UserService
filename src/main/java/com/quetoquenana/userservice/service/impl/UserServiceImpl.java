@@ -1,5 +1,6 @@
 package com.quetoquenana.userservice.service.impl;
 
+import com.quetoquenana.userservice.dto.UserEmailInfo;
 import com.quetoquenana.userservice.dto.UserCreateRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.exception.AuthenticationException;
@@ -28,6 +29,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -78,11 +80,15 @@ public class UserServiceImpl implements UserService {
         user.setCreatedBy(currentUserService.getCurrentUsername());
 
         userRepository.save(user);
-        // send new user email asynchronously to avoid blocking the request
-        sendNewUserEmailAsync(user, plain);
+
+        // capture locale here (request thread) so it's preserved for the async task
+        Locale locale = LocaleContextHolder.getLocale();
+        UserEmailInfo emailInfo = UserEmailInfo.from(user);
+        sendNewUserEmailAsync(emailInfo, plain, locale);
         return user;
     }
 
+    @Transactional
     @Override
     public void resetUser(Authentication authentication, String username) {
         User user = userRepository.findByUsernameIgnoreCase(username)
@@ -92,8 +98,11 @@ public class UserServiceImpl implements UserService {
         String passwordHash = passwordEncoder.encode(plain);
         user.updateStatus(UserStatus.RESET, passwordHash, authentication.getName());
         userRepository.save(user);
-        // send password reset email asynchronously
-        sendPasswordEmailAsync(user, plain);
+
+        // capture locale here (request thread) so it's preserved for the async task
+        Locale locale = LocaleContextHolder.getLocale();
+        UserEmailInfo emailInfo = UserEmailInfo.from(user);
+        sendPasswordEmailAsync(emailInfo, plain, locale);
     }
 
     @Transactional
@@ -152,23 +161,43 @@ public class UserServiceImpl implements UserService {
     }
 
     // --- async email helpers ---
-    private void sendNewUserEmailAsync(User user, String plain) {
+    private void sendNewUserEmailAsync(UserEmailInfo user, String plain, Locale locale) {
         CompletableFuture.runAsync(() -> {
             try {
-                emailService.sendNewUserEmail(user, plain, LocaleContextHolder.getLocale());
+                emailService.sendNewUserEmail(user, plain, locale);
             } catch (Exception e) {
                 log.error("Error sending new user email to {}", user.getUsername(), e);
             }
         });
     }
 
-    private void sendPasswordEmailAsync(User user, String plain) {
+    private void sendPasswordEmailAsync(UserEmailInfo user, String plain, Locale locale) {
         CompletableFuture.runAsync(() -> {
             try {
-                emailService.sendPasswordEmail(user, plain, LocaleContextHolder.getLocale());
+                emailService.sendPasswordEmail(user, plain, locale);
             } catch (Exception e) {
                 log.error("Error sending password reset email to {}", user.getUsername(), e);
             }
         });
     }
+
+    /**
+     * Build a lightweight detached User object containing only the fields needed by the EmailService.
+     * This avoids accessing lazy-loaded associations inside asynchronous tasks after the Hibernate session
+     * has been closed.
+     */
+    @SuppressWarnings("unused")
+    private User buildDetachedUserForEmail(User source) {
+        User user = new User();
+        user.setUsername(source.getUsername());
+        Person p = new Person();
+        if (source.getPerson() != null) {
+            // Access fields while in transactional context to ensure values are available
+            p.setName(source.getPerson().getName());
+            p.setLastname(source.getPerson().getLastname());
+        }
+        user.setPerson(p);
+        return user;
+    }
 }
+
