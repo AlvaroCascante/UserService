@@ -37,7 +37,7 @@ public class GmailEmailServiceImpl implements EmailService {
     @Value("${GMAIL_FROM:}")
     private String fromAddress;
 
-    @Value("${app.support.email:no-reply@quetoquenana.com}")
+    @Value("${app.support.email:admin@quetoquenana.com}")
     private String supportEmail;
 
     @Override

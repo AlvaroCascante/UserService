@@ -30,7 +30,7 @@ public class EmailServiceImpl implements EmailService {
     @Value("${spring.mail.username:}")
     private String fromAddress;
 
-    @Value("${app.support.email:no-reply@quetoquenana.com}")
+    @Value("${app.support.email:admin@quetoquenana.com}")
     private String supportEmail;
 
     private void send(String to, String subject, String textBody, String htmlBody) {
