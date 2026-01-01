@@ -2129,7 +2129,7 @@
 					"response": []
 				},
 				{
-					"name": "Reset User Pass",
+					"name": "Change Password",
 					"id": "5067618-6193dc94-91f9-4d23-982a-2099121085ee",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
