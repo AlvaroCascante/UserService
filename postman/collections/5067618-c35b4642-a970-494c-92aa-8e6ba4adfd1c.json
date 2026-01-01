@@ -2150,21 +2150,6 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"auth": {
-							"type": "basic",
-							"basic": [
-								{
-									"key": "password",
-									"value": "{{user_pass}}",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "ajcr81@gmail.com",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [
 							{
