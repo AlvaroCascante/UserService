@@ -85,7 +85,8 @@ public class UserServiceImpl implements UserService {
 
         // capture locale here (request thread) so it's preserved for the async task
         Locale locale = LocaleContextHolder.getLocale();
-        UserEmailInfo emailInfo = UserEmailInfo.from(user);
+        UserEmailInfo emailInfo = UserEmailInfo.builder()
+                .build();
         sendNewUserEmailAsync(emailInfo, plain, locale);
         return user;
     }
@@ -103,7 +104,11 @@ public class UserServiceImpl implements UserService {
 
         // capture locale here (request thread) so it's preserved for the async task
         Locale locale = LocaleContextHolder.getLocale();
-        UserEmailInfo emailInfo = UserEmailInfo.from(user);
+        UserEmailInfo emailInfo = UserEmailInfo.builder()
+                .personName(user.getPerson().getName())
+                .personLastname(user.getPerson().getLastname())
+                .username(user.getUsername())
+                .build();
         sendPasswordEmailAsync(emailInfo, plain, locale);
     }
 

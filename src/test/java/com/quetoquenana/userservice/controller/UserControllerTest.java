@@ -139,11 +139,11 @@ class UserControllerTest {
     }
 
     @Test
-    void testResetPassword_Success() {
+    void testChangePassword_Success() {
         ChangePasswordRequest request = new ChangePasswordRequest();
         request.setNewPassword("newpass");
         when(userService.findById(userId)).thenReturn(Optional.of(user));
-        ResponseEntity<Void> response = userController.resetPassword(userId, request);
+        ResponseEntity<Void> response = userController.changePassword(userId, request);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 

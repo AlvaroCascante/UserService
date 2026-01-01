@@ -88,7 +88,7 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
-    public void recoverPassword(String username) {
+    public void forgotPassword(String username) {
         User user = userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(AuthenticationException::new);
 
@@ -99,7 +99,11 @@ public class SecurityServiceImpl implements SecurityService {
 
         // capture Locale and lightweight DTO inside the request thread to avoid ThreadLocal loss and lazy-loading
         Locale locale = LocaleContextHolder.getLocale();
-        UserEmailInfo emailInfo = UserEmailInfo.from(user);
+        UserEmailInfo emailInfo = UserEmailInfo.builder()
+                .personName(user.getPerson().getName())
+                .personLastname(user.getPerson().getLastname())
+                .username(user.getUsername())
+                .build();
         CompletableFuture.runAsync(() -> {
             try {
                 emailService.sendPasswordEmail(emailInfo, plain, locale);

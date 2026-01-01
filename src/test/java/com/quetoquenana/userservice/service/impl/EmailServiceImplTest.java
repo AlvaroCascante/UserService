@@ -1,36 +1,45 @@
+// java
 package com.quetoquenana.userservice.service.impl;
 
+import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.Message;
 import com.quetoquenana.userservice.dto.UserEmailInfo;
-import com.quetoquenana.userservice.model.Person;
-import com.quetoquenana.userservice.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.MessageSource;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import jakarta.mail.Session;
-import jakarta.mail.internet.MimeMessage;
-
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Locale;
-import java.util.Properties;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class EmailServiceImplTest {
 
-    private JavaMailSender javaMailSender;
+    private Gmail gmail;
+    private Gmail.Users gmailUsers;
+    private Gmail.Users.Messages gmailUsersMessages;
+    private Gmail.Users.Messages.Send gmailSend;
     private MessageSource messageSource;
     private SpringTemplateEngine templateEngine;
     private EmailServiceImpl emailService;
 
     @BeforeEach
     void setUp() throws Exception {
-        javaMailSender = mock(JavaMailSender.class);
+        // Mock Gmail API chain
+        gmail = mock(Gmail.class);
+        gmailUsers = mock(Gmail.Users.class);
+        gmailUsersMessages = mock(Gmail.Users.Messages.class);
+        gmailSend = mock(Gmail.Users.Messages.Send.class);
+
+        when(gmail.users()).thenReturn(gmailUsers);
+        when(gmailUsers.messages()).thenReturn(gmailUsersMessages);
+        when(gmailUsersMessages.send(eq("me"), any(Message.class))).thenReturn(gmailSend);
+        when(gmailSend.execute()).thenReturn(new Message());
+
         messageSource = mock(MessageSource.class);
 
         // configure a lightweight template engine that loads templates from classpath templates/email
@@ -43,7 +52,7 @@ class EmailServiceImplTest {
         templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(resolver);
 
-        emailService = new EmailServiceImpl(javaMailSender, messageSource, templateEngine);
+        emailService = new EmailServiceImpl(gmail, templateEngine, messageSource);
 
         // ensure there's a support email fallback (since @Value is not processed outside Spring)
         Field supportField = EmailServiceImpl.class.getDeclaredField("supportEmail");
@@ -59,50 +68,39 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendPasswordResetEmail_sendsMessage() {
+    void sendPasswordResetEmail_sendsMessage() throws IOException {
         // Arrange
-        Session session = Session.getInstance(new Properties());
-        MimeMessage mimeMessage = new MimeMessage(session);
-        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
-
-        UserEmailInfo user = new UserEmailInfo();
-        user.setUsername("alice@example.com");
-        user.setPersonName("Alice");
-        user.setPersonLastname("Smith");
+        UserEmailInfo user = UserEmailInfo.builder()
+                .personLastname("Doe")
+                .personName("John")
+                .username("test")
+                .build();
 
         String plainPassword = "Temp1234!";
 
         // Act
         emailService.sendPasswordEmail(user, plainPassword, Locale.ENGLISH);
 
-        // Assert
-        verify(javaMailSender, times(1)).send(any(MimeMessage.class));
+        // Assert - verify Gmail messages.send was called
+        verify(gmailUsersMessages, times(1)).send(eq("me"), any(Message.class));
     }
 
     @Test
-    void sendPasswordResetEmail_withDtoFromUser_sendsMessage() {
-        // Arrange
-        Session session = Session.getInstance(new Properties());
-        MimeMessage mimeMessage = new MimeMessage(session);
-        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
-
-        Person person = new Person();
-        person.setName("Alice");
-        person.setLastname("Smith");
-
-        User user = new User();
-        user.setUsername("alice@example.com");
-        user.setPerson(person);
+    void sendPasswordResetEmail_withDtoFromUser_sendsMessage() throws IOException {
 
         String plainPassword = "Temp1234!";
 
         // build DTO (simulate building inside transactional thread)
-        UserEmailInfo dto = UserEmailInfo.from(user);
+        UserEmailInfo dto = UserEmailInfo.builder()
+                .personLastname("Doe")
+                .personName("John")
+                .username("test")
+                .build();
 
         // Act
         emailService.sendPasswordEmail(dto, plainPassword, Locale.ENGLISH);
 
         // Assert
-        verify(javaMailSender, times(1)).send(any(MimeMessage.class));
+        verify(gmailUsersMessages, times(1)).send(eq("me"), any(Message.class));
     }
 }

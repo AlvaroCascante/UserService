@@ -12,29 +12,27 @@ import java.sql.SQLException;
 @Import(TestMailConfig.class)
 public abstract class AbstractIntegrationTest {
 
-    // Manage the container lifecycle manually so it remains up across all integration test classes.
-    public static final PostgreSQLContainer<?> postgres;
-
-    static {
-        postgres = new PostgreSQLContainer<>("postgres:15-alpine")
-                .withDatabaseName("testdb")
-                .withUsername("test")
-                .withPassword("test");
-        // start immediately and register a shutdown hook so it isn't stopped between test classes
-        postgres.start();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                postgres.stop();
-            } catch (Throwable ignored) {
-            }
-        }));
-    }
+    // Define the container but do NOT start it at class load time. Starting during static
+    // initialization can throw when Docker is unavailable and will fail the test class
+    // loading (which leads to confusing "ApplicationContext failure threshold" errors).
+    public static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test");
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
-        // Ensure the Testcontainers Postgres instance is started before we read its JDBC properties.
+        // Start the Testcontainers Postgres instance lazily when the Spring context is being prepared.
+        // This avoids classloader-time failures and keeps lifecycle management controlled here.
         if (!postgres.isRunning()) {
             postgres.start();
+            // Register a shutdown hook only once after the container has started successfully.
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    postgres.stop();
+                } catch (Throwable ignored) {
+                }
+            }));
         }
 
         // Wait until the database is accepting JDBC connections (prevents Hikari timeouts)

@@ -43,9 +43,9 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Void> recoverPassword(@Valid @RequestBody ResetUserRequest request) {
-        log.info("Password recovery requested for user: {}", request.getUsername());
-        securityService.recoverPassword(request.getUsername());
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ResetUserRequest request) {
+        log.info("ForgotPassword requested for user: {}", request.getUsername());
+        securityService.forgotPassword(request.getUsername());
         return ResponseEntity.noContent().build();
     }
 }
