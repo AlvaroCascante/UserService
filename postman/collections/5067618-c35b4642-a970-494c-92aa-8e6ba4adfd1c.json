@@ -1852,53 +1852,6 @@
 			"name": "Users",
 			"item": [
 				{
-					"name": "Reset as ADMIN",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"id": "5067618-9c4be6d3-a9d6-4a1e-935a-6b427e48ea9e",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\":\"alvaro.cascante.r@gmail.com\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/reset",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"users",
-								"reset"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get All Page",
 					"event": [
 						{
@@ -2185,6 +2138,53 @@
 									"key": "id",
 									"value": "d870e328-07eb-479d-bf22-b24f1f3f6611"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset as ADMIN",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-9c4be6d3-a9d6-4a1e-935a-6b427e48ea9e",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\":\"alvaro.cascante.r@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users/reset",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users",
+								"reset"
 							]
 						}
 					},
