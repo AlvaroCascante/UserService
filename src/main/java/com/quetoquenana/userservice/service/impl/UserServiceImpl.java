@@ -33,6 +33,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 
 @Service
@@ -46,6 +47,7 @@ public class UserServiceImpl implements UserService {
     private final CurrentUserService currentUserService;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final Executor emailExecutor;
 
     @Transactional
     @Override
@@ -168,7 +170,7 @@ public class UserServiceImpl implements UserService {
             } catch (Exception e) {
                 log.error("Error sending new user email to {}", user.getUsername(), e);
             }
-        });
+        }, emailExecutor);
     }
 
     private void sendPasswordEmailAsync(UserEmailInfo user, String plain, Locale locale) {
@@ -178,26 +180,7 @@ public class UserServiceImpl implements UserService {
             } catch (Exception e) {
                 log.error("Error sending password reset email to {}", user.getUsername(), e);
             }
-        });
-    }
-
-    /**
-     * Build a lightweight detached User object containing only the fields needed by the EmailService.
-     * This avoids accessing lazy-loaded associations inside asynchronous tasks after the Hibernate session
-     * has been closed.
-     */
-    @SuppressWarnings("unused")
-    private User buildDetachedUserForEmail(User source) {
-        User user = new User();
-        user.setUsername(source.getUsername());
-        Person p = new Person();
-        if (source.getPerson() != null) {
-            // Access fields while in transactional context to ensure values are available
-            p.setName(source.getPerson().getName());
-            p.setLastname(source.getPerson().getLastname());
-        }
-        user.setPerson(p);
-        return user;
+        }, emailExecutor);
     }
 }
 

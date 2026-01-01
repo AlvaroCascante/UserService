@@ -56,9 +56,9 @@ public class EmailServiceImpl implements EmailService {
 
             log.info("Email sent to {} (from={}) subject={}", to, effectiveFrom, subject);
         } catch (MessagingException e) {
-            log.error("Failed to prepare email for recipient {}: {}", to, e.getMessage());
+            log.error("Failed to prepare email for recipient {}: {}", to, e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Failed to send email to {}: {}", to, e.getMessage());
+            log.error("Failed to send email to {}: {}", to, e.getMessage(), e);
         }
     }
 

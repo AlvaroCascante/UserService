@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.quetoquenana.userservice.dto.ChangePasswordRequest;
+import com.quetoquenana.userservice.dto.ResetUserRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.ApiResponse;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -29,7 +31,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class UserControllerTest {
     @Mock
@@ -143,6 +145,17 @@ class UserControllerTest {
         when(userService.findById(userId)).thenReturn(Optional.of(user));
         ResponseEntity<Void> response = userController.resetPassword(userId, request);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
+
+    @Test
+    void testResetUser_AsAdmin_callsService() {
+        ResetUserRequest req = new ResetUserRequest();
+        req.setUsername("alice@example.com");
+        // call controller with a mock Authentication
+        Authentication auth = mock(Authentication.class);
+        ResponseEntity<Void> response = userController.resetUser(auth, req);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(userService, times(1)).resetUser(auth, "alice@example.com");
     }
 
     @Test

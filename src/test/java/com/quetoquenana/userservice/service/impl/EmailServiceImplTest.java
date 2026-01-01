@@ -80,7 +80,7 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendPasswordResetEmail_withDto_sendsMessage() {
+    void sendPasswordResetEmail_withDtoFromUser_sendsMessage() {
         // Arrange
         Session session = Session.getInstance(new Properties());
         MimeMessage mimeMessage = new MimeMessage(session);

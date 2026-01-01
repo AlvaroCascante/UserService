@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,7 @@ public class SecurityServiceImpl implements SecurityService {
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final Executor emailExecutor;
 
     @Override
     public Authentication authenticate(String username, String password, String applicationName) {
@@ -94,21 +96,17 @@ public class SecurityServiceImpl implements SecurityService {
         String passwordHash = passwordEncoder.encode(plain);
         user.updateStatus(UserStatus.RESET, passwordHash, username);
         userRepository.save(user);
-        // send email with the temporary password (do not log plain value)
-        try {
-            // capture Locale and lightweight DTO inside the request thread to avoid ThreadLocal loss and lazy-loading
-            Locale locale = LocaleContextHolder.getLocale();
-            UserEmailInfo emailInfo = UserEmailInfo.from(user);
-            CompletableFuture.runAsync(() -> {
-                try {
-                    emailService.sendPasswordEmail(emailInfo, plain, locale);
-                } catch (Exception e) {
-                    log.error("Error sending password reset email to {}", username, e);
-                }
-            });
-        } catch (Exception e) {
-            log.error("Error sending password reset email to {}", username, e);
-        }
+
+        // capture Locale and lightweight DTO inside the request thread to avoid ThreadLocal loss and lazy-loading
+        Locale locale = LocaleContextHolder.getLocale();
+        UserEmailInfo emailInfo = UserEmailInfo.from(user);
+        CompletableFuture.runAsync(() -> {
+            try {
+                emailService.sendPasswordEmail(emailInfo, plain, locale);
+            } catch (Exception e) {
+                log.error("Error sending password reset email to {}", username, e);
+            }
+        }, emailExecutor);
     }
 
     @Override

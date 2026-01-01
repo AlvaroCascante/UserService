@@ -10,11 +10,13 @@ import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 @Configuration
+@ConditionalOnProperty(name = "gmail.enabled", havingValue = "true")
 public class GmailConfig {
 
     @Value("${GMAIL_CLIENT_ID}")
