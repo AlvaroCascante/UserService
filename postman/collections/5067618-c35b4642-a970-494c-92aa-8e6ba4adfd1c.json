@@ -769,6 +769,103 @@
 					"response": []
 				},
 				{
+					"name": "Refresh Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5924420f-b835-4379-99e8-2da4f6f49892",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"var accessToken = jsonData.accessToken;",
+									"",
+									"// Extract username from request authorization",
+									"var username = null;",
+									"",
+									"if (pm.request.auth) {",
+									"    var authType = pm.request.auth.type;",
+									"    ",
+									"    if (authType === 'basic') {",
+									"        // For Basic Auth, get the username parameter",
+									"        var basicAuth = pm.request.auth.parameters();",
+									"        if (basicAuth) {",
+									"            username = basicAuth.get('username');",
+									"        }",
+									"    } else if (authType === 'digest') {",
+									"        // For Digest Auth",
+									"        var digestAuth = pm.request.auth.parameters();",
+									"        if (digestAuth) {",
+									"            username = digestAuth.get('username');",
+									"        }",
+									"    } else if (authType === 'ntlm') {",
+									"        // For NTLM Auth",
+									"        var ntlmAuth = pm.request.auth.parameters();",
+									"        if (ntlmAuth) {",
+									"            username = ntlmAuth.get('username');",
+									"        }",
+									"    }",
+									"}",
+									"",
+									"// Print the username to the console",
+									"console.log(\"Username:\", username);",
+									"",
+									"// Set the appropriate token based on the username",
+									"if (username === 'system') {",
+									"    pm.environment.set(\"system_token\", accessToken);",
+									"} else {",
+									"    pm.environment.set(\"user_token\", accessToken);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-c5775b14-8356-4762-a403-cee95bc17812",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "ajcr81@gmail.com",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "{{user_pass}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Application-Name",
+								"value": "UserService",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/auth/refresh",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "JWKS",
 					"event": [
 						{
