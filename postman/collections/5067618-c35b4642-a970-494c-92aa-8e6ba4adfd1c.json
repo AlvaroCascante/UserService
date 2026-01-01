@@ -827,21 +827,6 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"auth": {
-							"type": "basic",
-							"basic": [
-								{
-									"key": "username",
-									"value": "ajcr81@gmail.com",
-									"type": "string"
-								},
-								{
-									"key": "password",
-									"value": "{{user_pass}}",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [
 							{
