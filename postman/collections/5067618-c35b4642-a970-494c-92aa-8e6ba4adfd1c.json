@@ -2153,7 +2153,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/:id/reset-password",
+							"raw": "{{HOST}}/{{path}}/api/users/:id/change-password",
 							"host": [
 								"{{HOST}}"
 							],
@@ -2162,7 +2162,7 @@
 								"api",
 								"users",
 								":id",
-								"reset-password"
+								"change-password"
 							],
 							"variable": [
 								{
