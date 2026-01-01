@@ -1944,51 +1944,6 @@
 					"response": []
 				},
 				{
-					"name": "Get By Username",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
-								"exec": [
-									""
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
-					"id": "5067618-f9a254d0-3c5d-46ce-a845-98228a5998e6",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{HOST}}/{{path}}/api/users/username/:username",
-							"host": [
-								"{{HOST}}"
-							],
-							"path": [
-								"{{path}}",
-								"api",
-								"users",
-								"username",
-								":username"
-							],
-							"variable": [
-								{
-									"key": "username",
-									"value": "ajcr81@gmail.com"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get AppRoles",
 					"event": [
 						{
@@ -2031,6 +1986,51 @@
 								{
 									"key": "idApplication",
 									"value": "d89b7bd5-a28b-4e34-b306-5145be8e32e5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Username",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-f9a254d0-3c5d-46ce-a845-98228a5998e6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/users/username/:username",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"users",
+								"username",
+								":username"
+							],
+							"variable": [
+								{
+									"key": "username",
+									"value": "ajcr81@gmail.com"
 								}
 							]
 						}
