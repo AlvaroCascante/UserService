@@ -1,7 +1,9 @@
 package com.quetoquenana.userservice.service.impl;
 
+import com.quetoquenana.userservice.dto.UserEmailInfo;
 import com.quetoquenana.userservice.dto.UserCreateRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
+import com.quetoquenana.userservice.exception.AuthenticationException;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.AppRoleUser;
@@ -19,14 +21,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 
 @Service
@@ -40,6 +47,7 @@ public class UserServiceImpl implements UserService {
     private final CurrentUserService currentUserService;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final Executor emailExecutor;
 
     @Transactional
     @Override
@@ -74,12 +82,29 @@ public class UserServiceImpl implements UserService {
         user.setCreatedBy(currentUserService.getCurrentUsername());
 
         userRepository.save(user);
-        try {
-            emailService.sendNewUserEmail(user, plain, org.springframework.context.i18n.LocaleContextHolder.getLocale());
-        } catch (Exception e) {
-            log.error("Error sending new user email to {}", request.getUsername(), e);
-        }
+
+        // capture locale here (request thread) so it's preserved for the async task
+        Locale locale = LocaleContextHolder.getLocale();
+        UserEmailInfo emailInfo = UserEmailInfo.from(user);
+        sendNewUserEmailAsync(emailInfo, plain, locale);
         return user;
+    }
+
+    @Transactional
+    @Override
+    public void resetUser(Authentication authentication, String username) {
+        User user = userRepository.findByUsernameIgnoreCase(username)
+                .orElseThrow(AuthenticationException::new);
+
+        String plain = PasswordUtil.generateRandomPassword();
+        String passwordHash = passwordEncoder.encode(plain);
+        user.updateStatus(UserStatus.RESET, passwordHash, authentication.getName());
+        userRepository.save(user);
+
+        // capture locale here (request thread) so it's preserved for the async task
+        Locale locale = LocaleContextHolder.getLocale();
+        UserEmailInfo emailInfo = UserEmailInfo.from(user);
+        sendPasswordEmailAsync(emailInfo, plain, locale);
     }
 
     @Transactional
@@ -136,4 +161,26 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsernameIgnoreCase(username);
     }
+
+    // --- async email helpers ---
+    private void sendNewUserEmailAsync(UserEmailInfo user, String plain, Locale locale) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                emailService.sendNewUserEmail(user, plain, locale);
+            } catch (Exception e) {
+                log.error("Error sending new user email to {}", user.getUsername(), e);
+            }
+        }, emailExecutor);
+    }
+
+    private void sendPasswordEmailAsync(UserEmailInfo user, String plain, Locale locale) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                emailService.sendPasswordEmail(user, plain, locale);
+            } catch (Exception e) {
+                log.error("Error sending password reset email to {}", user.getUsername(), e);
+            }
+        }, emailExecutor);
+    }
 }
+

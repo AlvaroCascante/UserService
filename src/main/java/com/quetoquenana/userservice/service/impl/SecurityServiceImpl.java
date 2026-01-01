@@ -5,6 +5,7 @@ import com.quetoquenana.userservice.model.*;
 import com.quetoquenana.userservice.repository.*;
 import com.quetoquenana.userservice.service.SecurityService;
 import com.quetoquenana.userservice.service.EmailService;
+import com.quetoquenana.userservice.dto.UserEmailInfo;
 import com.quetoquenana.userservice.util.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +15,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +41,7 @@ public class SecurityServiceImpl implements SecurityService {
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final Executor emailExecutor;
 
     @Override
     public Authentication authenticate(String username, String password, String applicationName) {
@@ -90,35 +96,17 @@ public class SecurityServiceImpl implements SecurityService {
         String passwordHash = passwordEncoder.encode(plain);
         user.updateStatus(UserStatus.RESET, passwordHash, username);
         userRepository.save(user);
-        // send email with the temporary password (do not log plain value)
-        try {
-            emailService.sendPasswordEmail(user, plain, org.springframework.context.i18n.LocaleContextHolder.getLocale());
-        } catch (Exception e) {
-            log.error("Error sending password reset email to {}", username, e);
-        }
-    }
 
-    @Override
-    public void resetUser(Authentication authentication, String username) {
-        User user = userRepository.findByUsernameIgnoreCase(username)
-                .orElseThrow(AuthenticationException::new);
-
-        String plain = PasswordUtil.generateRandomPassword();
-        String passwordHash = passwordEncoder.encode(plain);
-        user.updateStatus(UserStatus.RESET, passwordHash, authentication.getName());
-        userRepository.save(user);
-        try {
-            emailService.sendPasswordEmail(user, plain, org.springframework.context.i18n.LocaleContextHolder.getLocale());
-        } catch (Exception e) {
-            log.error("Error sending password reset email to {}", username, e);
-        }
-    }
-
-    @Override
-    public void decPass(String username) {
-        User user = userRepository.findByUsernameIgnoreCase(username)
-                .orElseThrow(AuthenticationException::new);
-        log.info(user.getPasswordHash());
+        // capture Locale and lightweight DTO inside the request thread to avoid ThreadLocal loss and lazy-loading
+        Locale locale = LocaleContextHolder.getLocale();
+        UserEmailInfo emailInfo = UserEmailInfo.from(user);
+        CompletableFuture.runAsync(() -> {
+            try {
+                emailService.sendPasswordEmail(emailInfo, plain, locale);
+            } catch (Exception e) {
+                log.error("Error sending password reset email to {}", username, e);
+            }
+        }, emailExecutor);
     }
 
     @Override

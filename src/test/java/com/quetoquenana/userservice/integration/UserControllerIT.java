@@ -256,4 +256,39 @@ class UserControllerIT extends AbstractIntegrationTest {
         User updated = userRepository.findById(seeded.getId()).orElseThrow();
         assertThat(passwordEncoder.matches(newPassword, updated.getPasswordHash())).isTrue();
     }
+
+    @Test
+    @WithMockUser(roles = {"ADMIN"})
+    void resetUser_asAdmin_resetsPasswordAndStatus() throws Exception {
+        Person person = personRepository.save(TestEntityFactory.createPerson());
+
+        User seeded = TestDataSeeder.seedUserWithRole(
+                applicationRepository,
+                appRoleRepository,
+                userRepository,
+                appRoleUserRepository,
+                passwordEncoder,
+                person,
+                "user-service",
+                "ADMIN",
+                "to-reset-user",
+                "old-password"
+        );
+
+        // Build request
+        com.quetoquenana.userservice.dto.ResetUserRequest req = new com.quetoquenana.userservice.dto.ResetUserRequest();
+        req.setUsername(seeded.getUsername());
+
+        mockMvc.perform(put("/api/users/reset")
+                        .header("X-Application-Name", "user-service")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isNoContent());
+
+        User updated = userRepository.findById(seeded.getId()).orElseThrow();
+        // status must be RESET
+        assertThat(updated.getUserStatus()).isEqualTo(UserStatus.RESET);
+        // password should not be the original plain text
+        assertThat(passwordEncoder.matches("old-password", updated.getPasswordHash())).isFalse();
+    }
 }

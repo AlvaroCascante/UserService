@@ -2,6 +2,7 @@ package com.quetoquenana.userservice.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.quetoquenana.userservice.dto.ChangePasswordRequest;
+import com.quetoquenana.userservice.dto.ResetUserRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.ApiResponse;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -113,6 +115,18 @@ public class UserController {
     ) {
         log.info("POST /api/users/{}/reset-password called", id);
         userService.resetPassword(id, request.getNewPassword());
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @PutMapping("/reset")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> resetUser(
+            Authentication authentication,
+            @Valid @RequestBody ResetUserRequest request
+    ) {
+        log.info("PUT /api/users/reset called for user: {}", request.getUsername());
+        userService.resetUser(authentication, request.getUsername());
         return ResponseEntity.noContent().build();
     }
 }
