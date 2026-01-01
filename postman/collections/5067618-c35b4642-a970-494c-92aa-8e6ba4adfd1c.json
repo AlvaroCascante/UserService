@@ -769,7 +769,7 @@
 					"response": []
 				},
 				{
-					"name": "Refresh Copy",
+					"name": "Forgot Password",
 					"event": [
 						{
 							"listen": "test",
