@@ -850,7 +850,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/auth/change-password",
+							"raw": "{{HOST}}/{{path}}/api/auth/forgot-password",
 							"host": [
 								"{{HOST}}"
 							],
@@ -858,7 +858,7 @@
 								"{{path}}",
 								"api",
 								"auth",
-								"change-password"
+								"forgot-password"
 							]
 						}
 					},
