@@ -637,13 +637,13 @@
 							"type": "basic",
 							"basic": [
 								{
-									"key": "username",
-									"value": "ajcr81@gmail.com",
+									"key": "password",
+									"value": "{{alvaro.cascante.r_pass}}",
 									"type": "string"
 								},
 								{
-									"key": "password",
-									"value": "{{user_pass}}",
+									"key": "username",
+									"value": "alvaro.cascante.r@gmail.com",
 									"type": "string"
 								}
 							]
