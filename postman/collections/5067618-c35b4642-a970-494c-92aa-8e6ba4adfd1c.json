@@ -283,7 +283,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"PedalPalService\",\n    \"description\": \"Smart Bike Maintenance Tracker\",\n    \"getIsActive\": true\n}",
+							"raw": "{\n    \"name\": \"TestService\",\n    \"description\": \"Test Service\",\n    \"getIsActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
