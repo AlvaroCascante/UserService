@@ -640,12 +640,12 @@
 							"basic": [
 								{
 									"key": "password",
-									"value": "{{alvaro.cascante.r_pass}}",
+									"value": "{{system_pass}}",
 									"type": "string"
 								},
 								{
 									"key": "username",
-									"value": "alvaro.cascante.r@gmail.com",
+									"value": "system",
 									"type": "string"
 								}
 							]
