@@ -25,6 +25,8 @@ public interface PersonService {
 
     Person update(UUID id, PersonUpdateRequest request);
 
+    Person getReference(UUID id);
+
     void activateById(UUID id);
 
     void deleteById(UUID id);

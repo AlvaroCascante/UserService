@@ -86,6 +86,11 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
+    public Person getReference(UUID id) {
+        return personRepository.getReferenceById(id);
+    }
+
+    @Override
     public void activateById(UUID id) {
         Person existingPerson = personRepository.findById(id)
                 .orElseThrow(RecordNotFoundException::new);
