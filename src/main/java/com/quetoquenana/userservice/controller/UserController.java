@@ -107,13 +107,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/reset-password")
+    @PostMapping("/{id}/change-password")
     @PreAuthorize("@securityService.canAccessIdUser(authentication, #id)")
-    public ResponseEntity<Void> resetPassword(
+    public ResponseEntity<Void> changePassword(
             @PathVariable UUID id,
             @Valid @RequestBody ChangePasswordRequest request
     ) {
-        log.info("POST /api/users/{}/reset-password called", id);
+        log.info("POST /api/users/{}/change-password called", id);
         userService.resetPassword(id, request.getNewPassword());
         return ResponseEntity.noContent().build();
     }

@@ -13,7 +13,5 @@ CREATE TABLE app_roles_users (
     version BIGINT NOT NULL
 );
 
--- Unique constraint: one role per user per application
+-- Unique constraint: A user should have just one role per application
 CREATE UNIQUE INDEX IF NOT EXISTS ux_aru_user_app ON app_roles_users(user_id, app_role_id);
-
-CREATE INDEX IF NOT EXISTS idx_aru_user_id ON app_roles_users(user_id);

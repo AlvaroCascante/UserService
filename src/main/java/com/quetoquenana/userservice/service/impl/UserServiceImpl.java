@@ -26,6 +26,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,6 +54,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public User save(UserCreateRequest request) {
+        // Check username uniqueness (case-insensitive)
+        if (userRepository.existsByUsernameIgnoreCase(request.getUsername())) {
+            throw new DuplicateRecordException("user.username.duplicate");
+        }
+
         // Create or get person
         Person person = personService.findByIdNumber(request.getPerson().getIdNumber())
             .map(found -> {
@@ -66,16 +73,12 @@ public class UserServiceImpl implements UserService {
                 personService.save(request.getPerson())
             );
 
-        // Check username uniqueness (case-insensitive)
-        if (userRepository.existsByUsernameIgnoreCase(request.getUsername())) {
-            throw new DuplicateRecordException("user.username.duplicate");
-        }
         String plain = PasswordUtil.generateRandomPassword();
         User user = User.fromCreateRequest(
             request,
             passwordEncoder.encode(plain),
             UserStatus.RESET,
-            person
+                personService.getReference(person.getId())
         );
 
         user.setCreatedAt(LocalDateTime.now());
@@ -85,8 +88,23 @@ public class UserServiceImpl implements UserService {
 
         // capture locale here (request thread) so it's preserved for the async task
         Locale locale = LocaleContextHolder.getLocale();
-        UserEmailInfo emailInfo = UserEmailInfo.from(user);
-        sendNewUserEmailAsync(emailInfo, plain, locale);
+        UserEmailInfo emailInfo = UserEmailInfo.builder()
+                .personLastname(person.getLastname())
+                .personName(person.getName())
+                .username(request.getUsername())
+                .build();
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    sendNewUserEmailAsync(emailInfo, plain, locale);
+                }
+            });
+        } else {
+            sendNewUserEmailAsync(emailInfo, plain, locale);
+        }
+
         return user;
     }
 
@@ -103,8 +121,22 @@ public class UserServiceImpl implements UserService {
 
         // capture locale here (request thread) so it's preserved for the async task
         Locale locale = LocaleContextHolder.getLocale();
-        UserEmailInfo emailInfo = UserEmailInfo.from(user);
-        sendPasswordEmailAsync(emailInfo, plain, locale);
+        UserEmailInfo emailInfo = UserEmailInfo.builder()
+                .personName(user.getPerson().getName())
+                .personLastname(user.getPerson().getLastname())
+                .username(user.getUsername())
+                .build();
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    sendPasswordEmailAsync(emailInfo, plain, locale);
+                }
+            });
+        } else {
+            sendPasswordEmailAsync(emailInfo, plain, locale);
+        }
     }
 
     @Transactional

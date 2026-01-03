@@ -247,7 +247,7 @@ class UserControllerIT extends AbstractIntegrationTest {
         ChangePasswordRequest req = new ChangePasswordRequest();
         req.setNewPassword(newPassword);
 
-        mockMvc.perform(post("/api/users/" + seeded.getId() + "/reset-password")
+        mockMvc.perform(post("/api/users/" + seeded.getId() + "/change-password")
                         .header("X-Application-Name", "user-service")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))

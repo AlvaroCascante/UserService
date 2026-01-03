@@ -36,9 +36,7 @@ public class StartupLogger implements ApplicationRunner {
         return new String[]{
                     "spring.datasource.url",
                     "spring.datasource.username",
-                    "app.support.email",
-                    "spring.mail.host",
-                    "spring.mail.port",
-                    "spring.mail.username"};
+                    "app.support.email"
+        };
     }
 }

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -61,15 +62,27 @@ public class SecurityConfig {
     private final UserRepository userRepository;
 
     @Bean
+    public SecurityFilterChain basicAuthChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/api/auth/login", "/api/auth/reset")
+                .authorizeHttpRequests(auth -> auth
+                    .anyRequest().authenticated()
+                )
+                .httpBasic(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        return http.build();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // disable for API clients; enable if using browser forms
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/util/**").permitAll()
-                        // allow unauthenticated access to auth endpoints (login/refresh)
-                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/api/auth/forgot-password", "/api/auth/refresh").permitAll()
                         .anyRequest().authenticated()
                 )
                 // enable basic auth so Spring decodes credentials automatically
@@ -92,50 +105,6 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        // The application name should be supplied by the client in a header (e.g. X-Application-Name).
-        // We read it from the current request using RequestContextHolder so we can determine the
-        // user's roles for that specific application during username/password authentication.
-        return username ->
-                userRepository.findByUsernameIgnoreCase(username)
-                        .map(user -> {
-                            // try to read application name from current request
-                            String appName = getAppName();
-
-                            Application application = applicationRepository.findByName(appName)
-                                    .orElseThrow(() -> new AuthenticationException("error.authentication.application"));
-
-                            List<AppRoleUser> appRoleUsers = appRoleUserRepository.findByUserIdAndRoleApplicationId(user.getId(), application.getId());
-                            List<GrantedAuthority> authorities =  appRoleUsers.stream()
-                                    .map(mapping -> new SimpleGrantedAuthority(mapping.getRole().getRoleName()))
-                                    .collect(Collectors.toList());
-
-                            return org.springframework.security.core.userdetails.User
-                                    .withUsername(user.getUsername())
-                                    .password(user.getPasswordHash())
-                                    .authorities(authorities)
-                                    .accountLocked(user.accountLocked())
-                                    .build();
-                        })
-                        .orElseThrow(() -> new AuthenticationException("error.authentication"));
-    }
-
-    private static String getAppName() {
-        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        String appName = null;
-        if (attrs != null) {
-            HttpServletRequest req = attrs.getRequest();
-            appName = req.getHeader(APP_NAME);
-        }
-
-        // if application not provided, fail early (caller can change to allow default behavior)
-        if (appName == null || appName.isBlank()) {
-            throw new AuthenticationException("error.authentication.application.header");
-        }
-        return appName;
     }
 
     private JwtAuthenticationConverter jwtAuthenticationConverter() {
@@ -168,7 +137,6 @@ public class SecurityConfig {
         return source;
     }
 
-    // Helper: split a comma-separated string into a trimmed list, return empty list if null/blank
     private List<String> splitToList(String value) {
         if (value == null || value.isBlank()) return List.of();
         return Arrays.stream(value.split(","))
