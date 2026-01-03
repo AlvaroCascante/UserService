@@ -76,7 +76,6 @@ public class EmailServiceImpl implements EmailService {
 
     private void sendViaGmail(String to, String subject, String textBody, String htmlBody) {
         try {
-            // Build a MimeMessage with both plain text and HTML parts (same as EmailServiceImpl)
             Session session = Session.getInstance(new Properties());
             MimeMessage mimeMessage = new MimeMessage(session);
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
@@ -96,7 +95,6 @@ public class EmailServiceImpl implements EmailService {
 
             helper.setText(textBody, htmlBody);
 
-            // Encode message
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             mimeMessage.writeTo(buffer);
             String raw = Base64.getUrlEncoder().encodeToString(buffer.toByteArray());

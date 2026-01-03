@@ -61,7 +61,6 @@ public class SecurityConfig {
     private final AppRoleUserRepository appRoleUserRepository;
     private final UserRepository userRepository;
 
-    // Basic auth chain for login and reset so initial-password-reset can use user/pass (no bearer required)
     @Bean
     public SecurityFilterChain basicAuthChain(HttpSecurity http) throws Exception {
         http
@@ -138,7 +137,6 @@ public class SecurityConfig {
         return source;
     }
 
-    // Helper: split a comma-separated string into a trimmed list, return empty list if null/blank
     private List<String> splitToList(String value) {
         if (value == null || value.isBlank()) return List.of();
         return Arrays.stream(value.split(","))

@@ -1,4 +1,3 @@
-// java
 package com.quetoquenana.userservice.service.impl;
 
 import com.google.api.services.gmail.Gmail;
