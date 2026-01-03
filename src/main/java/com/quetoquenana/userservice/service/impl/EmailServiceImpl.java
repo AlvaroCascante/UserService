@@ -10,7 +10,6 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,7 @@ public class EmailServiceImpl implements EmailService {
     private final SpringTemplateEngine templateEngine;
     private final MessageSource messageSource;
 
-    @Value("${GMAIL_FROM:}")
+    @Value("${GMAIL_SENDER_EMAIL:}")
     private String fromAddress;
 
     @Value("${app.support.email:admin@quetoquenana.com}")
