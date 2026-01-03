@@ -26,6 +26,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -91,7 +93,18 @@ public class UserServiceImpl implements UserService {
                 .personName(person.getName())
                 .username(request.getUsername())
                 .build();
-        sendNewUserEmailAsync(emailInfo, plain, locale);
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    sendNewUserEmailAsync(emailInfo, plain, locale);
+                }
+            });
+        } else {
+            sendNewUserEmailAsync(emailInfo, plain, locale);
+        }
+
         return user;
     }
 
@@ -113,7 +126,17 @@ public class UserServiceImpl implements UserService {
                 .personLastname(user.getPerson().getLastname())
                 .username(user.getUsername())
                 .build();
-        sendPasswordEmailAsync(emailInfo, plain, locale);
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    sendPasswordEmailAsync(emailInfo, plain, locale);
+                }
+            });
+        } else {
+            sendPasswordEmailAsync(emailInfo, plain, locale);
+        }
     }
 
     @Transactional

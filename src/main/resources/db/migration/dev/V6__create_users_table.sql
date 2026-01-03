@@ -7,7 +7,7 @@ CREATE TYPE user_status_t AS ENUM ('ACTIVE', 'INACTIVE', 'BLOCKED', 'RESET');
 -- Create table
 CREATE TABLE users (
     id UUID PRIMARY KEY,
-    person_id UUID UNIQUE REFERENCES persons(id) ON DELETE CASCADE,
+    person_id UUID REFERENCES persons(id) ON DELETE CASCADE,
 
     username VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
