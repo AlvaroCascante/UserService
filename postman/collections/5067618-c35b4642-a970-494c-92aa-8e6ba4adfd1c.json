@@ -426,7 +426,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"roleName\": \"USER\",\n  \"description\": \"Regular User Role\"\n}",
+							"raw": "{\n  \"roleName\": \"MECHANIC\",\n  \"description\": \"Mechanic User Role\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -448,7 +448,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "d89b7bd5-a28b-4e34-b306-5145be8e32e5"
+									"value": "4dad827a-fba4-4755-bd61-3453d0dda01f"
 								}
 							]
 						}
