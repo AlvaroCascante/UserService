@@ -1,5 +1,7 @@
 package com.quetoquenana.userservice.service;
 
+import com.quetoquenana.userservice.dto.ChangePasswordRequest;
+import com.quetoquenana.userservice.dto.ResetUserRequest;
 import org.springframework.security.core.Authentication;
 
 import java.util.UUID;
@@ -9,8 +11,8 @@ import java.util.UUID;
  */
 public interface SecurityService {
 
-    Authentication authenticate(String username, String password, String applicationName);
-    Authentication getAuthenticationForApplication(String username, String applicationName);
+    void login(Authentication authentication);
+    void resetUser(Authentication authentication, ChangePasswordRequest request);
     void forgotPassword(String username);
     boolean canAccessIdNumber(Authentication authentication, String idNumber);
     boolean canAccessIdProfile(Authentication authentication, UUID idProfile);
