@@ -2242,7 +2242,7 @@
 				"bearer": [
 					{
 						"key": "token",
-						"value": "{{user_token}}",
+						"value": "{{system_token}}",
 						"type": "string"
 					}
 				]
@@ -2251,7 +2251,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "fd7a47b6-d9fe-4c65-9684-86cbb695d3bb",
+						"id": "f1129bfb-1174-4b6a-8a62-3de937bfe4a3",
 						"type": "text/javascript",
 						"packages": {},
 						"requests": {},
@@ -2263,7 +2263,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "14bbe2ea-f3fc-4e6e-bdba-2a19b5fb8cd6",
+						"id": "508711b4-9a0b-4201-b7d6-7097d61a7bf3",
 						"type": "text/javascript",
 						"packages": {},
 						"requests": {},
