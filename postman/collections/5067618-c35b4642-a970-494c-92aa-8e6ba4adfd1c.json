@@ -426,7 +426,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"roleName\": \"USER\",\n  \"description\": \"User Role\"\n}",
+							"raw": "{\n  \"roleName\": \"ADMIN\",\n  \"description\": \"Admin Role\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
