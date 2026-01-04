@@ -448,7 +448,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "8ee3722d-8b96-4261-9b7f-74aee4999150"
+									"value": "{{application_id}}"
 								}
 							]
 						}
