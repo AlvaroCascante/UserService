@@ -480,7 +480,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"user\": {\n        \"username\": \"quetoquenana+user@gmail.com\",\n        \"nickname\": \"User\",\n        \"person\": {\n            \"idNumber\": \"711080683\",\n            \"name\": \"Que\",\n            \"lastname\": \"Toque Nana\"\n        }\n    },\n    \"roleName\": \"USER\"\n}",
+							"raw": "{\n    \"user\": {\n        \"username\": \"quetoquenana+a@gmail.com\",\n        \"nickname\": \"Admin User\",\n        \"person\": {\n            \"idNumber\": \"711080683\",\n            \"name\": \"Que\",\n            \"lastname\": \"Toque Nana\"\n        }\n    },\n    \"roleName\": \"ADMIN\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -502,7 +502,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "8ee3722d-8b96-4261-9b7f-74aee4999150"
+									"value": "{{application_id}}"
 								}
 							]
 						}
