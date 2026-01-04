@@ -426,7 +426,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"roleName\": \"MECHANIC\",\n  \"description\": \"Mechanic User Role\"\n}",
+							"raw": "{\n  \"roleName\": \"USER\",\n  \"description\": \"User Role\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -448,7 +448,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "ed2de3b4-f217-4c3d-a91e-99014553dae4"
+									"value": "8ee3722d-8b96-4261-9b7f-74aee4999150"
 								}
 							]
 						}
@@ -2335,7 +2335,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/util/encode",
+							"raw": "{{HOST}}/{{path}}/api/util/send-email?to=ajcr81@gmail.com",
 							"host": [
 								"{{HOST}}"
 							],
@@ -2343,7 +2343,13 @@
 								"{{path}}",
 								"api",
 								"util",
-								"encode"
+								"send-email"
+							],
+							"query": [
+								{
+									"key": "to",
+									"value": "ajcr81@gmail.com"
+								}
 							]
 						}
 					},
