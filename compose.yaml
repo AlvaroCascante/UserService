@@ -1,9 +1,11 @@
 services:
   postgres:
     image: 'postgres:latest'
+    env_file: # Load variables from this file into the container environment
+      - railway-conf.env
     environment:
-      - 'POSTGRES_DB=user_service_dev'
-      - 'POSTGRES_PASSWORD=postgres'
-      - 'POSTGRES_USER=postgres'
+      - POSTGRES_DB=user_service_dev
+      - POSTGRES_USER=${SPRING_DATASOURCE_USERNAME}
+      - POSTGRES_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
     ports:
       - '5432:5432'
