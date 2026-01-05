@@ -52,6 +52,7 @@ mvnw
 mvnw.cmd
 
 src/main/resources/keys/
+src/main/resources/db/utils
 src/test/resources/keys/
 
 src/main/java/com/quetoquenana/userservice/controller/UtilController.java

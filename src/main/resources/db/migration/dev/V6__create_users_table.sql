@@ -23,5 +23,4 @@ CREATE TABLE users (
 );
 
 -- Indexes
-CREATE UNIQUE INDEX IF NOT EXISTS idx_users_person_id ON users(person_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(LOWER(username));
