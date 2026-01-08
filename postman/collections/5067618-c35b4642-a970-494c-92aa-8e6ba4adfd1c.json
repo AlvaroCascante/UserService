@@ -888,19 +888,7 @@
 					},
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
-								{
-									"key": "password",
-									"value": "{{system_pass}}",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "system",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "GET",
 						"header": [
