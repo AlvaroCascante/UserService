@@ -111,6 +111,6 @@ public class User extends Auditable {
         if (this.person != null) {
             return this.person.getName() + " " + this.person.getLastname();
         }
-        return null;
+        return this.username;
     }
 }

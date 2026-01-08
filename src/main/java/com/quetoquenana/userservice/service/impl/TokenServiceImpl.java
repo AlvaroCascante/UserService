@@ -37,13 +37,15 @@ public class TokenServiceImpl implements TokenService {
     private final long accessTokenSeconds;
     private final long refreshTokenSeconds;
     private final String issuer;
+    private final String configuredAudience;
 
     public TokenServiceImpl(ApplicationService applicationService, UserService userService, UserDetailsService userDetailsService,
                             JwtEncoder jwtEncoder,
                             JwtDecoder jwtDecoder,
                             @Value("${security.jwt.access-token-seconds:604800}") long accessTokenSeconds,
                             @Value("${security.jwt.refresh-token-seconds:604800}") long refreshTokenSeconds,
-                            @Value("${security.jwt.issuer}") String issuer) {
+                            @Value("${security.jwt.issuer}") String issuer,
+                            @Value("${security.jwt.audience:}") String configuredAudience) {
         this.applicationService = applicationService;
         this.userService = userService;
         this.userDetailsService = userDetailsService;
@@ -52,6 +54,7 @@ public class TokenServiceImpl implements TokenService {
         this.accessTokenSeconds = accessTokenSeconds;
         this.refreshTokenSeconds = refreshTokenSeconds;
         this.issuer = issuer;
+        this.configuredAudience = configuredAudience;
     }
 
     @Override
@@ -111,9 +114,20 @@ public class TokenServiceImpl implements TokenService {
     private List<String> getAudienceList() {
         // Use active application names as audience entries (aud). Map to a list of strings.
         List<Application> applications = applicationService.findActive();
-        return applications.stream()
+        List<String> list = applications.stream()
                 .map(Application::getName)
+                .filter(n -> n != null && !n.isBlank())
                 .collect(Collectors.toList());
+
+        if (list.isEmpty()) {
+            // No active applications found; fall back to configured audience if present, otherwise use issuer
+            if (configuredAudience != null && !configuredAudience.isBlank()) {
+                return List.of(configuredAudience);
+            }
+            return List.of(issuer);
+        }
+
+        return list;
     }
 
     private JwtClaimsSet buildCommonClaims(

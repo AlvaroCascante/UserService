@@ -29,13 +29,12 @@ public class JwksController {
                 new JWKSelector(new JWKMatcher.Builder().build()),
                 null
         );
-        Map<String, Object> data = Map.of(
+        return Map.of(
                 "keys",
                 jwks.stream()
                         .map(JWK::toPublicJWK)
                         .map(JWK::toJSONObject)
                         .toList()
         );
-        return data;
     }
 }
