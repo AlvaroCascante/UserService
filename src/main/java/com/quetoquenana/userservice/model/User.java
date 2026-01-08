@@ -47,7 +47,7 @@ public class User extends Auditable {
     @Column(name = "user_status", nullable = false)
     @JsonView(UserList.class)
     @JdbcType(value = PostgreSQLEnumJdbcType.class)
-    private UserStatus userStatus = UserStatus.ACTIVE;
+    private UserStatus userStatus;
 
     // JSON Views
     public static class UserList extends ApiBaseResponseView.Always {}
@@ -105,5 +105,12 @@ public class User extends Auditable {
             default:
                 throw new IllegalArgumentException("Invalid user status: " + newStatus);
         }
+    }
+
+    public String getFullName() {
+        if (this.person != null) {
+            return this.person.getName() + " " + this.person.getLastname();
+        }
+        return null;
     }
 }

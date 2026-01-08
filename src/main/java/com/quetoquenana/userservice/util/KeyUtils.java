@@ -9,7 +9,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-import static com.quetoquenana.userservice.util.Constants.OAuth2.KEY_FACTORY_ALGORITHM;
+import static com.quetoquenana.userservice.util.Constants.JWTClaims.KEY_FACTORY_ALGORITHM;
 
 public final class KeyUtils {
 
