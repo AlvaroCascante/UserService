@@ -58,6 +58,11 @@ public abstract class AbstractIntegrationTest {
             String v = System.getenv("SECURITY_JWT_ISSUER");
             return (v != null && !v.isBlank()) ? v : "user-service";
         });
+        // Provide the legacy 'security.jwt.aud' placeholder expected by SecurityConfig in tests
+        registry.add("security.jwt.aud", () -> {
+            String v = System.getenv("SECURITY_JWT_AUD");
+            return (v != null && !v.isBlank()) ? v : "user-service";
+        });
     }
 
     private static void waitForJdbc(String jdbcUrl, String username, String password, long timeoutMs) {

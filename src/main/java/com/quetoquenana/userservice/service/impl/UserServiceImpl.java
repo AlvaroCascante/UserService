@@ -75,10 +75,7 @@ public class UserServiceImpl implements UserService {
 
         String plain = PasswordUtil.generateRandomPassword();
         User user = User.fromCreateRequest(
-            request,
-            passwordEncoder.encode(plain),
-            UserStatus.RESET,
-                personService.getReference(person.getId())
+            request, passwordEncoder.encode(plain), UserStatus.RESET, personService.getReference(person.getId())
         );
 
         user.setCreatedAt(LocalDateTime.now());

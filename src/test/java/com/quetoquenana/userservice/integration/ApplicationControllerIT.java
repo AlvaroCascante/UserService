@@ -102,7 +102,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
         Application app = Application.builder()
                 .name("get-by-id-app")
                 .description("d")
-                .isActive(true)
+                .active(true)
                 .build();
         app.setCreatedAt(LocalDateTime.now());
         app.setCreatedBy("test");
@@ -120,7 +120,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
         Application app = Application.builder()
                 .name("to-update-app")
                 .description("d")
-                .isActive(true)
+                .active(true)
                 .build();
         app.setCreatedAt(LocalDateTime.now());
         app.setCreatedBy("test");
@@ -137,12 +137,12 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
                         .content(objectMapper.writeValueAsString(update)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.application.description").value("updated-desc"))
-                .andExpect(jsonPath("$.data.application.isActive").value(false));
+                .andExpect(jsonPath("$.data.application.active").value(false));
 
         Application updated = applicationRepository.findById(app.getId()).orElseThrow();
         assertThat(updated.getName()).isEqualTo("updated-name");
         assertThat(updated.getDescription()).isEqualTo("updated-desc");
-        assertThat(updated.getIsActive()).isFalse();
+        assertThat(updated.isActive()).isFalse();
     }
 
     @Test
@@ -151,7 +151,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
         Application app = Application.builder()
                 .name("to-delete-app")
                 .description("d")
-                .isActive(true)
+                .active(true)
                 .build();
         app.setCreatedAt(LocalDateTime.now());
         app.setCreatedBy("test");
@@ -162,16 +162,16 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
                 .andExpect(status().isNoContent());
 
         Application after = applicationRepository.findById(app.getId()).orElseThrow();
-        assertThat(after.getIsActive()).isFalse();
+        assertThat(after.isActive()).isFalse();
     }
 
     @Test
     @WithMockUser(username = "system", roles = {"SYSTEM"})
     void getAllApplicationsPage_asSystem_returnsPage() throws Exception {
-        Application a1 = Application.builder().name("p1-app").description("d1").isActive(true).build();
+        Application a1 = Application.builder().name("p1-app").description("d1").active(true).build();
         a1.setCreatedAt(LocalDateTime.now());
         a1.setCreatedBy("test");
-        Application a2 = Application.builder().name("p2-app").description("d2").isActive(true).build();
+        Application a2 = Application.builder().name("p2-app").description("d2").active(true).build();
         a2.setCreatedAt(LocalDateTime.now());
         a2.setCreatedBy("test");
         applicationRepository.save(a1);
@@ -188,7 +188,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(username = "system", roles = {"SYSTEM"})
     void searchApplications_asSystem_returnsPage() throws Exception {
-        Application app = Application.builder().name("find-me-app").description("d").isActive(true).build();
+        Application app = Application.builder().name("find-me-app").description("d").active(true).build();
         app.setCreatedAt(LocalDateTime.now());
         app.setCreatedBy("test");
         applicationRepository.save(app);
@@ -206,7 +206,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(username = "system", roles = {"SYSTEM"})
     void addRole_asSystem_returnsCreated() throws Exception {
-        Application app = Application.builder().name("with-role-app").description("d").isActive(true).build();
+        Application app = Application.builder().name("with-role-app").description("d").active(true).build();
         app.setCreatedAt(LocalDateTime.now());
         app.setCreatedBy("test");
         app = applicationRepository.save(app);
@@ -227,7 +227,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(username = "system", roles = {"SYSTEM"})
     void addUser_asSystem_returnsCreated() throws Exception {
-        Application app = Application.builder().name("app-for-user").description("d").isActive(true).build();
+        Application app = Application.builder().name("app-for-user").description("d").active(true).build();
         app.setCreatedAt(LocalDateTime.now());
         app.setCreatedBy("test");
         app = applicationRepository.save(app);
@@ -265,7 +265,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(username = "system", roles = {"SYSTEM"})
     void deleteUser_asSystem_noContent() throws Exception {
-        Application app = Application.builder().name("app-for-delete").description("d").isActive(true).build();
+        Application app = Application.builder().name("app-for-delete").description("d").active(true).build();
         app.setCreatedAt(LocalDateTime.now());
         app.setCreatedBy("test");
         app = applicationRepository.save(app);
@@ -307,7 +307,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(username = "system", roles = {"SYSTEM"})
     void deleteRole_asSystem_noContent() throws Exception {
-        Application app = Application.builder().name("app-role-del").description("d").isActive(true).build();
+        Application app = Application.builder().name("app-role-del").description("d").active(true).build();
         app.setCreatedAt(LocalDateTime.now());
         app.setCreatedBy("test");
         app = applicationRepository.save(app);

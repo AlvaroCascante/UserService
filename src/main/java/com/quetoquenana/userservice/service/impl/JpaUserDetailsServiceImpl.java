@@ -43,6 +43,9 @@ public class JpaUserDetailsServiceImpl implements UserDetailsService {
 
         Application application = applicationRepository.findByName(getAppNameFromRequest())
                 .orElseThrow(() -> new AuthenticationException("error.authentication.application"));
+        if (!application.isActive()) {
+            throw new AuthenticationException("error.authentication.application.inactive");
+        }
 
         List<AppRoleUser> appRoleUsers = appRoleUserRepository.findByUserIdAndRoleApplicationId(user.getId(), application.getId());
 
