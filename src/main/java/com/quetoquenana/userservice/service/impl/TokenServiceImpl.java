@@ -150,6 +150,7 @@ public class TokenServiceImpl implements TokenService {
                 .claim(KEY_NAME, user.getFullName())
                 .claim(KEY_ROLES, roles)
                 .claim(KEY_TYPE, type)
+                .claim(KEY_USER_ID, user.getId().toString())
                 .build();
     }
 

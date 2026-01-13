@@ -9,6 +9,7 @@ public class Constants {
         public static final String KEY_NAME = "name";
         public static final String KEY_ROLES = "roles";
         public static final String KEY_TYPE = "type";
+        public static final String KEY_USER_ID = "userId";
 
         public static final String KEY_SUB = "sub";
 
