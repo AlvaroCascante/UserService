@@ -10,10 +10,13 @@ import com.quetoquenana.userservice.model.Application;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface ApplicationService {
+    List<Application> findActive();
+
     Page<Application> findAll(Pageable pageable);
 
     Optional<Application> findById(UUID id);

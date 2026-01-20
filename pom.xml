@@ -11,7 +11,7 @@
 	<groupId>com.quetoquenana</groupId>
 	<artifactId>userservice</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Template</name>
+	<name>UserService</name>
 	<description>User Service Spring Boot projects</description>
 	<url/>
 	<licenses>

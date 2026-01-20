@@ -35,6 +35,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final DefaultDataRepository defaultDataRepository;
 
     @Override
+    public List<Application> findActive() {
+        return applicationRepository.findByActiveTrue();
+    }
+
+    @Override
     public Page<Application> findAll(Pageable pageable) {
         return applicationRepository.findAll(pageable);
     }
@@ -177,8 +182,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     public void deleteById(UUID id) {
         Application existing = applicationRepository.findById(id)
                 .orElseThrow(RecordNotFoundException::new);
-        if (existing.getIsActive()) {
-            existing.setIsActive(false);
+        if (existing.isActive()) {
+            existing.setActive(false);
             existing.setUpdatedAt(LocalDateTime.now());
             existing.setUpdatedBy(currentUserService.getCurrentUsername());
             applicationRepository.save(existing);

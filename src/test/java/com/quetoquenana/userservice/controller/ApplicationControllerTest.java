@@ -50,7 +50,7 @@ class ApplicationControllerTest {
                 .id(appId)
                 .name("my-app")
                 .description("A test application")
-                .isActive(true)
+                .active(true)
                 .build();
 
         objectMapper = new ObjectMapper();
@@ -80,7 +80,7 @@ class ApplicationControllerTest {
         String json = objectMapper.writerWithView(Application.ApplicationDetail.class).writeValueAsString(data);
         assertTrue(json.contains("name"));
         assertTrue(json.contains("description"));
-        assertTrue(json.contains("isActive"));
+        assertTrue(json.contains("active"));
     }
 
     @Test

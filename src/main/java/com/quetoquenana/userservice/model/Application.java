@@ -37,7 +37,7 @@ public class Application extends Auditable {
 
     @Column(name = "is_active", nullable = false)
     @JsonView(ApplicationList.class)
-    private Boolean isActive = true;
+    private boolean active = true;
 
     @OneToMany(mappedBy = "application", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonView(value = ApplicationDetail.class)
@@ -55,14 +55,14 @@ public class Application extends Auditable {
         return Application.builder()
                 .name(request.getName())
                 .description(request.getDescription())
-                .isActive(Optional.ofNullable(request.getIsActive()).orElse(true))
+                .active(Optional.ofNullable(request.getIsActive()).orElse(true))
                 .build();
     }
 
     public void updateFromRequest(ApplicationUpdateRequest request, String username) {
         if (request.getName() != null) this.setName(request.getName());
         if (request.getDescription() != null) this.setDescription(request.getDescription());
-        if (request.getIsActive() != null) this.setIsActive(request.getIsActive());
+        if (request.getIsActive() != null) this.setActive(request.getIsActive());
 
         this.setUpdatedAt(LocalDateTime.now());
         this.setUpdatedBy(username);

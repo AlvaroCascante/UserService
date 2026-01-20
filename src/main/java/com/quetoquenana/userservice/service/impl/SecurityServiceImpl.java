@@ -125,7 +125,7 @@ public class SecurityServiceImpl implements SecurityService {
 
     @Override
     public boolean canAccessIdAddress(Authentication authentication, UUID idAddress) {
-        if (authentication == null || authentication.getName() == null || idAddress == null) return false;
+        if (!paramsValidation(authentication, idAddress)) return false;
 
         return userRepository.findByUsernameIgnoreCase(authentication.getName())
                 .map(User::getPerson)
@@ -138,7 +138,7 @@ public class SecurityServiceImpl implements SecurityService {
 
     @Override
     public boolean canAccessIdPhone(Authentication authentication, UUID idPhone) {
-        if (authentication == null || authentication.getName() == null || idPhone == null) return false;
+        if (!paramsValidation(authentication, idPhone)) return false;
 
         return userRepository.findByUsernameIgnoreCase(authentication.getName())
                 .map(User::getPerson)
@@ -151,9 +151,13 @@ public class SecurityServiceImpl implements SecurityService {
 
     @Override
     public boolean canAccessIdUser(Authentication authentication, UUID idUser) {
-        if (authentication == null || authentication.getName() == null || idUser == null) return false;
+        if (!paramsValidation(authentication, idUser)) return false;
 
         Optional<User> userOpt = userRepository.findByUsernameIgnoreCase(authentication.getName());
         return userOpt.map(user -> user.getId().equals(idUser)).orElse(false);
+    }
+
+    private boolean paramsValidation(Authentication authentication, UUID id) {
+        return authentication != null && authentication.getName() != null && id != null;
     }
 }

@@ -2,15 +2,9 @@ package com.quetoquenana.userservice.config;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import com.quetoquenana.userservice.exception.AuthenticationException;
-import com.quetoquenana.userservice.model.AppRoleUser;
-import com.quetoquenana.userservice.model.Application;
-import com.quetoquenana.userservice.repository.AppRoleUserRepository;
-import com.quetoquenana.userservice.repository.ApplicationRepository;
-import com.quetoquenana.userservice.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,20 +13,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.core.*;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -41,9 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.quetoquenana.userservice.util.Constants.Headers.APP_NAME;
-import static com.quetoquenana.userservice.util.Constants.OAuth2.TOKEN_CLAIM_ROLES;
-import static com.quetoquenana.userservice.util.Constants.OAuth2.TOKEN_CLAIM_SUB;
+import static com.quetoquenana.userservice.util.Constants.JWTClaims.KEY_ROLES;
+import static com.quetoquenana.userservice.util.Constants.JWTClaims.KEY_SUB;
 import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_PREFIX;
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -56,10 +42,6 @@ public class SecurityConfig {
 
     private final CorsConfigProperties corsConfigProperties;
     private final RsaKeyProperties rsaKeyProperties;
-
-    private final ApplicationRepository applicationRepository;
-    private final AppRoleUserRepository appRoleUserRepository;
-    private final UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain basicAuthChain(HttpSecurity http) throws Exception {
@@ -83,23 +65,45 @@ public class SecurityConfig {
                         .requestMatchers("/api/util/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/api/auth/forgot-password", "/api/auth/refresh").permitAll()
+                        .requestMatchers("/.well-known/jwks.json").permitAll()
                         .anyRequest().authenticated()
                 )
-                // enable basic auth so Spring decodes credentials automatically
                 .httpBasic(withDefaults())
-                // ensure we use JWT Bearer auth for protected endpoints
                 .oauth2ResourceServer(o -> o.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
         return http.build();
     }
 
     @Bean
-    public JwtDecoder jwtDecoder() {
+    public JwtDecoder jwtDecoder(
+            @Value("${security.jwt.issuer}") String expectedIssuer,
+            @Value("${security.jwt.aud}") String expectedAudience
+    ) {
         try {
-            log.debug("Creating JwtDecoder using public key configured as: {}", rsaKeyProperties.publicKey());
-            return NimbusJwtDecoder.withPublicKey(rsaKeyProperties.publicKey()).build();
+            NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(rsaKeyProperties.publicKey()).build();
+
+            // Validate issuer (iss) using default validator, and optionally validate audience if configured
+            OAuth2TokenValidator<Jwt> issuerValidator = JwtValidators.createDefaultWithIssuer(expectedIssuer);
+            OAuth2TokenValidator<Jwt> audienceValidator = audienceValidator(expectedAudience);
+            OAuth2TokenValidator<Jwt> timestampValidator = new JwtTimestampValidator();
+
+            DelegatingOAuth2TokenValidator<Jwt> combined = new DelegatingOAuth2TokenValidator<>(
+                    issuerValidator,
+                    audienceValidator,
+                    timestampValidator
+            );
+            decoder.setJwtValidator(combined);
+
+            return decoder;
         } catch (Exception e) {
             throw new IllegalStateException("Failed to create JwtDecoder. Check security.rsa.public-key property and format of the public key.", e);
         }
+    }
+
+    public OAuth2TokenValidator<Jwt> audienceValidator(String audience) {
+        return new JwtClaimValidator<List<String>>(
+                OAuth2TokenIntrospectionClaimNames.AUD,
+                aud -> aud.contains(audience)
+        );
     }
 
     @Bean
@@ -109,14 +113,14 @@ public class SecurityConfig {
 
     private JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        authoritiesConverter.setAuthoritiesClaimName(TOKEN_CLAIM_ROLES);
+        authoritiesConverter.setAuthoritiesClaimName(KEY_ROLES);
         // we will prefix authorities with ROLE_ so that hasRole('X') checks work
         authoritiesConverter.setAuthorityPrefix(ROLE_PREFIX);
 
         JwtAuthenticationConverter jwtAuthConverter = new JwtAuthenticationConverter();
         jwtAuthConverter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
 
-        jwtAuthConverter.setPrincipalClaimName(TOKEN_CLAIM_SUB);
+        jwtAuthConverter.setPrincipalClaimName(KEY_SUB);
         return jwtAuthConverter;
     }
 

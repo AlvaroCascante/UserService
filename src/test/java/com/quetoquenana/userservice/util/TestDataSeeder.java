@@ -30,7 +30,7 @@ public class TestDataSeeder {
                     Application app = Application.builder()
                             .name(applicationName)
                             .description("Test application")
-                            .isActive(true)
+                            .active(true)
                             .build();
                     app.setCreatedAt(LocalDateTime.now());
                     app.setCreatedBy(username);

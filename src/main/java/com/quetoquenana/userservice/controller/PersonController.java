@@ -92,7 +92,6 @@ public class PersonController {
         log.info("PUT /api/persons/{} called with payload: {}", id, request);
         Person entity = personService.update(id, request);
         return ResponseEntity.ok(new ApiResponse(entity));
-
     }
 
     @DeleteMapping("/{id}")
