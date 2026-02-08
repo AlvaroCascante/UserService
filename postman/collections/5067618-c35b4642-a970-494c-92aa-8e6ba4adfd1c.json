@@ -659,9 +659,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/auth/login",
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/auth/login",
 							"host": [
-								"{{HOST}}"
+								"{{HOST_USER_SERVICE}}"
 							],
 							"path": [
 								"{{path}}",
