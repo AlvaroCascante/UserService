@@ -62,3 +62,5 @@ src/main/java/com/quetoquenana/userservice/service/impl/UtilServiceImpl.java
 
 # Local environment variables (do not commit secrets)
 railway-conf.env
+
+**/pedalpal-qtn-firebase-adminsdk-fbsvc-3defde500c.json

@@ -121,13 +121,13 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
     @Override
     @Transactional
-    public AppRoleUser addUser(UUID applicationId, AppRoleUserCreateRequest request) {
+    public AppRoleUser addUser(UUID applicationId, AppRoleUserCreateRequest request, String roleName) {
         // validate application exists
         applicationRepository.findById(applicationId)
                 .orElseThrow(RecordNotFoundException::new);
 
         // find matching app role for the application
-        AppRole role = appRoleRepository.findByApplicationIdAndRoleName(applicationId, request.getRoleName())
+        AppRole role = appRoleRepository.findByApplicationIdAndRoleName(applicationId, roleName)
                 .orElseThrow(RecordNotFoundException::new);
 
         // Step 1: see if a User with the username already exists. If yes, reuse it.

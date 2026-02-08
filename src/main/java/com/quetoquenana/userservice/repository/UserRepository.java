@@ -17,4 +17,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByUsernameIgnoreCase(String username);
 
     List<User> findByPersonId(UUID personId);
+
+    // find by external provider and external id (case-insensitive)
+    Optional<User> findByExternalProviderIgnoreCaseAndExternalIdIgnoreCase(String externalProvider, String externalId);
 }

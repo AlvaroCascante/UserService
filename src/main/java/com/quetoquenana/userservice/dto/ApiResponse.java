@@ -1,4 +1,4 @@
-package com.quetoquenana.userservice.model;
+package com.quetoquenana.userservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;

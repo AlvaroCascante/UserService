@@ -1,6 +1,7 @@
 package com.quetoquenana.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.quetoquenana.userservice.dto.ApiBaseResponseView;
 import com.quetoquenana.userservice.dto.ApplicationCreateRequest;
 import com.quetoquenana.userservice.dto.ApplicationUpdateRequest;
 import jakarta.persistence.*;

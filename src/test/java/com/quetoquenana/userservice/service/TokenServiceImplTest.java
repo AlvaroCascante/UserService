@@ -21,11 +21,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Collection;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -37,6 +33,7 @@ class TokenServiceImplTest {
     UserService userService;
     UserDetailsService userDetailsService;
     TokenServiceImpl tokenService;
+    com.quetoquenana.userservice.repository.RefreshTokenRepository refreshTokenRepository;
 
     @BeforeEach
     void setup() {
@@ -48,7 +45,9 @@ class TokenServiceImplTest {
         // default: no active applications
         when(applicationService.findActive()).thenReturn(List.of());
 
-        tokenService = new TokenServiceImpl(applicationService, userService, userDetailsService, jwtEncoder, jwtDecoder, 3600L, 86400L, "https://auth.example", "");
+        refreshTokenRepository = Mockito.mock(com.quetoquenana.userservice.repository.RefreshTokenRepository.class);
+
+        tokenService = new TokenServiceImpl(applicationService, userService, userDetailsService, jwtEncoder, jwtDecoder, refreshTokenRepository, 3600L, 86400L, "https://auth.example", "");
     }
 
     private Jwt buildJwt(Map<String, Object> claims, List<String> aud) {
@@ -113,12 +112,24 @@ class TokenServiceImplTest {
         when(jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(jwt);
 
         User user = new User();
+        user.setId(UUID.randomUUID());
         user.setUsername("user");
         user.setUserStatus(UserStatus.ACTIVE);
         when(userService.findByUsername("user")).thenReturn(Optional.of(user));
 
         UserDetails ud = new org.springframework.security.core.userdetails.User("user", "pass", Set.of(new SimpleGrantedAuthority("ROLE_USER")));
         when(userDetailsService.loadUserByUsername("user")).thenReturn(ud);
+
+        // mock stored refresh token lookup
+        com.quetoquenana.userservice.model.RefreshToken stored = com.quetoquenana.userservice.model.RefreshToken.builder()
+                .token("dummy")
+                .user(user)
+                .revoked(false)
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(86400))
+                .clientApp("app1")
+                .build();
+        when(refreshTokenRepository.findByToken(ArgumentMatchers.anyString())).thenReturn(Optional.of(stored));
 
         // mock encoder to return something predictable (ensure headers are present)
         when(jwtEncoder.encode(ArgumentMatchers.any())).thenReturn(org.springframework.security.oauth2.jwt.Jwt.withTokenValue("t").header("alg","none").header("typ","JWT").claim("x","y").build());
@@ -163,6 +174,7 @@ class TokenServiceImplTest {
         when(auth.getAuthorities()).thenReturn((Collection) Set.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("USER")));
 
         User user = new User();
+        user.setId(UUID.randomUUID());
         user.setUsername("user");
         user.setUserStatus(UserStatus.ACTIVE);
         when(userService.findByUsername("user")).thenReturn(Optional.of(user));
@@ -174,11 +186,11 @@ class TokenServiceImplTest {
         tokenService.createTokens(auth);
 
         // The first encode call is for access token; get captured claims
-        JwtEncoderParameters params = captor.getAllValues().get(0);
+        JwtEncoderParameters params = captor.getAllValues().getFirst();
         JwtClaimsSet claims = params.getClaims();
         Object rolesObj = claims.getClaim("roles");
         assertNotNull(rolesObj);
-        assertTrue(rolesObj instanceof List);
+        assertInstanceOf(List.class, rolesObj);
         List<?> roles = (List<?>) rolesObj;
         assertTrue(roles.contains("ADMIN"));
         assertTrue(roles.contains("USER"));

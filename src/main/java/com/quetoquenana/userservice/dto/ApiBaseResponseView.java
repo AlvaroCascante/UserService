@@ -1,4 +1,4 @@
-package com.quetoquenana.userservice.model;
+package com.quetoquenana.userservice.dto;
 
 public class ApiBaseResponseView {
     public static class Always {}

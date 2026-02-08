@@ -1,6 +1,7 @@
 package com.quetoquenana.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.quetoquenana.userservice.dto.ApiBaseResponseView;
 import com.quetoquenana.userservice.dto.PersonCreateRequest;
 import com.quetoquenana.userservice.dto.PersonUpdateRequest;
 import jakarta.persistence.*;
@@ -102,14 +103,13 @@ public class Person extends Auditable {
     public void updateFromRequest(PersonUpdateRequest request, String username) {
         if (request.getName() != null) this.setName(request.getName());
         if (request.getLastname() != null) this.setLastname(request.getLastname());
-        if (request.getIsActive() != null) this.setIsActive(request.getIsActive());
 
         this.setUpdatedAt(LocalDateTime.now());
         this.setUpdatedBy(username);
     }
 
-    public void activate(String username) {
-        this.setIsActive(true);
+    public void updateStatus(String username, boolean status) {
+        this.setIsActive(status);
         this.setUpdatedAt(LocalDateTime.now());
         this.setUpdatedBy(username);
     }

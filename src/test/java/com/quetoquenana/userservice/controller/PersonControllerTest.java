@@ -6,7 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.quetoquenana.userservice.dto.PersonUpdateRequest;
 import com.quetoquenana.userservice.exception.ImmutableFieldModificationException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
-import com.quetoquenana.userservice.model.ApiResponse;
+import com.quetoquenana.userservice.dto.ApiResponse;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.service.PersonService;
 import com.quetoquenana.userservice.util.TestEntityFactory;

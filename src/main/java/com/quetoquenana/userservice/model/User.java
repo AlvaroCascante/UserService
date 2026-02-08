@@ -1,12 +1,11 @@
 package com.quetoquenana.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.quetoquenana.userservice.dto.ApiBaseResponseView;
 import com.quetoquenana.userservice.dto.UserCreateRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -26,6 +25,11 @@ public class User extends Auditable {
     @JsonView(UserList.class)
     private UUID id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_id", nullable = false)
+    @JsonView({UserDetail.class, Application.ApplicationDetail.class})
+    private Person person;
+
     @Column(name = "username", nullable = false, unique = true, length = 100)
     @JsonView({UserList.class, Application.ApplicationDetail.class})
     private String username;
@@ -34,10 +38,13 @@ public class User extends Auditable {
     @JsonView(ApiBaseResponseView.NoShow.class)
     private String passwordHash;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "person_id", nullable = false)
-    @JsonView({UserDetail.class, Application.ApplicationDetail.class})
-    private Person person;
+    @Column(name = "external_id", length = 100)
+    @JsonView({UserList.class, Application.ApplicationDetail.class})
+    private String externalId;
+
+    @Column(name = "external_provider", length = 100)
+    @JsonView({UserList.class, Application.ApplicationDetail.class})
+    private String externalProvider;
 
     @Column(name = "nickname", length = 50)
     @JsonView({UserList.class, Application.ApplicationDetail.class})
@@ -46,7 +53,6 @@ public class User extends Auditable {
     @Enumerated(EnumType.STRING)
     @Column(name = "user_status", nullable = false)
     @JsonView(UserList.class)
-    @JdbcType(value = PostgreSQLEnumJdbcType.class)
     private UserStatus userStatus;
 
     // JSON Views

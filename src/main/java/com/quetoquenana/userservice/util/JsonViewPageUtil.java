@@ -1,7 +1,7 @@
 package com.quetoquenana.userservice.util;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.quetoquenana.userservice.model.ApiBaseResponseView;
+import com.quetoquenana.userservice.dto.ApiBaseResponseView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;

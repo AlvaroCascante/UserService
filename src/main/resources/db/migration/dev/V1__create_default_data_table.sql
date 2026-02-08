@@ -1,7 +1,7 @@
 -- Migration V10: create default_data table
 
 CREATE TABLE default_data (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(50) NOT NULL,
     description VARCHAR(100),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,

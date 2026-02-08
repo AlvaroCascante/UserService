@@ -4,8 +4,11 @@ import com.quetoquenana.userservice.dto.ChangePasswordRequest;
 import com.quetoquenana.userservice.dto.RefreshRequest;
 import com.quetoquenana.userservice.dto.ResetUserRequest;
 import com.quetoquenana.userservice.dto.TokenResponse;
+import com.quetoquenana.userservice.dto.FirebaseAuthResponse;
 import com.quetoquenana.userservice.service.SecurityService;
 import com.quetoquenana.userservice.service.TokenService;
+import com.quetoquenana.userservice.service.FirebaseTokenVerifier;
+import com.quetoquenana.userservice.service.AuthUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import static com.quetoquenana.userservice.util.Constants.Headers.APP_NAME;
+import static com.quetoquenana.userservice.util.Constants.Headers.AUTHORIZATION;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -23,6 +27,8 @@ public class AuthController {
 
     private final SecurityService securityService;
     private final TokenService tokenService;
+    private final FirebaseTokenVerifier firebaseTokenVerifier;
+    private final AuthUserService authUserService;
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(
@@ -33,6 +39,40 @@ public class AuthController {
         securityService.login(authentication);
         TokenResponse tokens = tokenService.createTokens(authentication);
         return ResponseEntity.ok(tokens);
+    }
+
+    @PostMapping("/firebase")
+    public ResponseEntity<FirebaseAuthResponse> firebaseLogin(
+            @RequestHeader(value = AUTHORIZATION) String authorization,
+            @RequestHeader(value = APP_NAME) String applicationName
+    ) {
+        // extract bearer token
+        if (authorization == null || !authorization.toLowerCase().startsWith("bearer ")) {
+            throw new IllegalArgumentException("Missing or invalid Authorization header");
+        }
+        String idToken = authorization.substring(7).trim();
+        if (idToken.isEmpty()) {
+            throw new IllegalArgumentException("Missing Firebase ID token in Authorization header");
+        }
+
+        // verify token with Firebase
+        var decoded = firebaseTokenVerifier.verify(idToken);
+
+        // resolve or create user from firebase token
+        var result = authUserService.resolveOrCreateFromFirebase(decoded);
+
+        // create tokens for the user using the provided application name as audience
+        var tokenResponse = tokenService.createTokensForUser(result.getUser(), applicationName);
+
+        var resp = new FirebaseAuthResponse(
+                tokenResponse.getAccessToken(),
+                tokenResponse.getRefreshToken(),
+                tokenResponse.getExpiresIn(),
+                new FirebaseAuthResponse.UserInfo(result.getUser().getId(), decoded.getEmail(), Boolean.TRUE.equals(decoded.isEmailVerified()), decoded.getName()),
+                result.isNewUser()
+        );
+
+        return ResponseEntity.ok(resp);
     }
 
     @PostMapping("/reset")

@@ -3,8 +3,10 @@ package com.quetoquenana.userservice.service.impl;
 import com.quetoquenana.userservice.dto.TokenResponse;
 import com.quetoquenana.userservice.exception.AuthenticationException;
 import com.quetoquenana.userservice.model.Application;
+import com.quetoquenana.userservice.model.RefreshToken;
 import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.model.UserStatus;
+import com.quetoquenana.userservice.repository.RefreshTokenRepository;
 import com.quetoquenana.userservice.service.ApplicationService;
 import com.quetoquenana.userservice.service.TokenService;
 import com.quetoquenana.userservice.service.UserService;
@@ -21,6 +23,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,6 +37,7 @@ public class TokenServiceImpl implements TokenService {
     private final UserDetailsService userDetailsService;
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final long accessTokenSeconds;
     private final long refreshTokenSeconds;
     private final String issuer;
@@ -42,6 +46,7 @@ public class TokenServiceImpl implements TokenService {
     public TokenServiceImpl(ApplicationService applicationService, UserService userService, UserDetailsService userDetailsService,
                             JwtEncoder jwtEncoder,
                             JwtDecoder jwtDecoder,
+                            RefreshTokenRepository refreshTokenRepository,
                             @Value("${security.jwt.access-token-seconds:604800}") long accessTokenSeconds,
                             @Value("${security.jwt.refresh-token-seconds:604800}") long refreshTokenSeconds,
                             @Value("${security.jwt.issuer}") String issuer,
@@ -51,6 +56,7 @@ public class TokenServiceImpl implements TokenService {
         this.userDetailsService = userDetailsService;
         this.jwtEncoder = jwtEncoder;
         this.jwtDecoder = jwtDecoder;
+        this.refreshTokenRepository = refreshTokenRepository;
         this.accessTokenSeconds = accessTokenSeconds;
         this.refreshTokenSeconds = refreshTokenSeconds;
         this.issuer = issuer;
@@ -67,6 +73,12 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public TokenResponse refresh(String refreshToken) {
+        // first check stored refresh token
+        Optional<RefreshToken> stored = refreshTokenRepository.findByToken(refreshToken);
+        if (stored.isEmpty() || stored.get().isRevoked() || stored.get().getExpiresAt() == null || stored.get().getExpiresAt().isBefore(Instant.now())) {
+            throw new AuthenticationException("error.authentication.invalid.refresh.token");
+        }
+
         // validate and decode the refresh token
         Jwt jwt = jwtDecoder.decode(refreshToken);
 
@@ -86,6 +98,41 @@ public class TokenServiceImpl implements TokenService {
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
 
         return getTokenResponse(user, getRoles(userDetails.getAuthorities()));
+    }
+
+    @Override
+    public TokenResponse createTokensForUser(com.quetoquenana.userservice.model.User user, String applicationName) {
+        // Load roles for user via UserDetailsService
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+        List<String> roles = getRoles(userDetails.getAuthorities());
+
+        // Build tokens using audience set to the provided applicationName if present, otherwise fall back to configured audience list
+        Instant now = Instant.now();
+        List<String> audienceList;
+        if (applicationName != null && !applicationName.isBlank()) {
+            audienceList = List.of(applicationName);
+        } else {
+            audienceList = getAudienceList();
+        }
+
+        JwtClaimsSet claims = buildCommonClaims(now, user, TYPE_AUTH, accessTokenSeconds, audienceList, roles);
+        String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+
+        JwtClaimsSet refreshClaims = buildCommonClaims(now, user, TYPE_REFRESH, refreshTokenSeconds, audienceList, roles);
+        String newRefreshToken = jwtEncoder.encode(JwtEncoderParameters.from(refreshClaims)).getTokenValue();
+
+        // persist refresh token
+        RefreshToken rt = RefreshToken.builder()
+                .token(newRefreshToken)
+                .user(user)
+                .clientApp(applicationName)
+                .issuedAt(now)
+                .expiresAt(now.plus(refreshTokenSeconds, ChronoUnit.SECONDS))
+                .revoked(false)
+                .build();
+        refreshTokenRepository.save(rt);
+
+        return new TokenResponse(accessToken, newRefreshToken, accessTokenSeconds);
     }
 
     @NonNull

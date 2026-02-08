@@ -5,8 +5,6 @@ import com.quetoquenana.userservice.dto.AddressCreateRequest;
 import com.quetoquenana.userservice.dto.AddressUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.UUID;
 
@@ -50,7 +48,6 @@ public class Address {
     @Enumerated(EnumType.STRING)
     @Column(name = "address_type", nullable = false)
     @JsonView(Person.PersonDetail.class)
-    @JdbcType(value = PostgreSQLEnumJdbcType.class)
     private AddressType addressType;
 
     public static Address fromCreateRequest(AddressCreateRequest request) {

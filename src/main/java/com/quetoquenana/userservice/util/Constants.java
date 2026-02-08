@@ -56,6 +56,8 @@ public class Constants {
         public static final String ROLE_PREFIX = "ROLE_";
         public static final String ROLE_SYSTEM = "ROLE_SYSTEM";
         public static final String ROLE_ADMIN = "ROLE_ADMIN";
+        public static final String ROLE_NAME_ADMIN = "ADMIN";
+        public static final String ROLE_NAME_USER = "USER";
         public static final String ROLE_USER = "ROLE_USER";
     }
 }
