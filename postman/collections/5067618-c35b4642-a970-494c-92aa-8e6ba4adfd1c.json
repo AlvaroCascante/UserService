@@ -736,13 +736,13 @@
 							"type": "basic",
 							"basic": [
 								{
-									"key": "username",
-									"value": "ajcr81@gmail.com",
+									"key": "password",
+									"value": "{{system_pass}}",
 									"type": "string"
 								},
 								{
-									"key": "password",
-									"value": "{{user_pass}}",
+									"key": "username",
+									"value": "system",
 									"type": "string"
 								}
 							]
@@ -755,16 +755,25 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"newPassword\": \"SYSTEM2026\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/auth/refresh",
+							"raw": "{{HOST_USER_SERVICE}}/userservice/api/auth/reset",
 							"host": [
-								"{{HOST}}"
+								"{{HOST_USER_SERVICE}}"
 							],
 							"path": [
-								"{{path}}",
+								"userservice",
 								"api",
 								"auth",
-								"refresh"
+								"reset"
 							]
 						}
 					},
