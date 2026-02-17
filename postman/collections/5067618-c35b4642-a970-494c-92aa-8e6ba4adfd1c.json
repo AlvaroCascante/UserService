@@ -955,13 +955,7 @@
 							"type": "noauth"
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "X-Application-Name",
-								"value": "UserService",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{HOST_USER_SERVICE}}/{{path}}/.well-known/jwks.json",
 							"host": [
