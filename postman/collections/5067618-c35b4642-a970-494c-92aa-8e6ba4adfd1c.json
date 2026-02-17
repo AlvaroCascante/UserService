@@ -480,7 +480,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"user\": {\n        \"username\": \"quetoquenana+m@gmail.com\",\n        \"nickname\": \"Mechanic User\",\n        \"person\": {\n            \"idNumber\": \"711080683\",\n            \"name\": \"Que\",\n            \"lastname\": \"Toque Nana\"\n        }\n    },\n    \"roleName\": \"MECHANIC\"\n}",
+							"raw": "{\n    \"user\": {\n        \"username\": \"quetoquenana+a@gmail.com\",\n        \"nickname\": \"Admin User\",\n        \"person\": {\n            \"idNumber\": \"711080683\",\n            \"name\": \"Que\",\n            \"lastname\": \"Toque Nana\"\n        }\n    },\n    \"roleName\": \"ADMIn\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -488,9 +488,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/applications/:id/user",
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/applications/:id/user",
 							"host": [
-								"{{HOST}}"
+								"{{HOST_USER_SERVICE}}"
 							],
 							"path": [
 								"{{path}}",
@@ -542,20 +542,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/applications/:id/user",
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/applications/:id/user/customer",
 							"host": [
-								"{{HOST}}"
+								"{{HOST_USER_SERVICE}}"
 							],
 							"path": [
 								"{{path}}",
 								"api",
 								"applications",
 								":id",
-								"user"
+								"user",
+								"customer"
 							],
 							"variable": [
 								{
-									"id": "b70863fd-2b46-4dc6-ab87-bbd489ce211a",
 									"key": "id",
 									"value": "{{application_id}}"
 								}
