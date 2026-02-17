@@ -18,7 +18,7 @@ public class JwkConfig {
         RSAKey rsaKey = new RSAKey.Builder(rsaKeys.publicKey())
                 .privateKey(rsaKeys.privateKey())
                 .keyID(rsaKeys.currentKeyId())
-                .algorithm(JWSAlgorithm.RS256)
+                //.algorithm(JWSAlgorithm.RS256)
                 .keyUse(KeyUse.SIGNATURE)
                 .build();
 
