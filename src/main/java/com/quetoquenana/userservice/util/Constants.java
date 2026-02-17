@@ -32,7 +32,6 @@ public class Constants {
 
     public static class Headers {
         public static final String APP_NAME = "X-Application-Name";
-        public static final String CONTENT_TYPE = "Content-Type";
         public static final String AUTHORIZATION = "Authorization";
     }
 
