@@ -28,7 +28,6 @@ public class AuthUserServiceImpl implements AuthUserService {
         String uid = decoded.getUid();
         String email = decoded.getEmail();
         String name = decoded.getName();
-        boolean emailVerified = Boolean.TRUE.equals(decoded.isEmailVerified());
 
         // try to find existing user by external provider/id
         Optional<User> existing = userRepository.findByExternalProviderIgnoreCaseAndExternalIdIgnoreCase("firebase", uid);
@@ -53,7 +52,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         UserCreateRequest userReq = new UserCreateRequest();
         userReq.setUsername(email != null ? email : uid);
         userReq.setPerson(personReq);
-        userReq.setNickname(name != null ? name : null);
+        userReq.setNickname(name);
 
         try {
             User created = userService.save(userReq);

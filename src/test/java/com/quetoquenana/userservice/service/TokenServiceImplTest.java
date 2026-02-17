@@ -4,6 +4,7 @@ import com.quetoquenana.userservice.dto.TokenResponse;
 import com.quetoquenana.userservice.exception.AuthenticationException;
 import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.model.UserStatus;
+import com.quetoquenana.userservice.repository.RefreshTokenRepository;
 import com.quetoquenana.userservice.service.impl.TokenServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,6 @@ class TokenServiceImplTest {
     UserService userService;
     UserDetailsService userDetailsService;
     TokenServiceImpl tokenService;
-    com.quetoquenana.userservice.repository.RefreshTokenRepository refreshTokenRepository;
 
     @BeforeEach
     void setup() {
@@ -45,7 +45,7 @@ class TokenServiceImplTest {
         // default: no active applications
         when(applicationService.findActive()).thenReturn(List.of());
 
-        refreshTokenRepository = Mockito.mock(com.quetoquenana.userservice.repository.RefreshTokenRepository.class);
+        RefreshTokenRepository refreshTokenRepository = Mockito.mock(com.quetoquenana.userservice.repository.RefreshTokenRepository.class);
 
         tokenService = new TokenServiceImpl(applicationService, userService, userDetailsService, jwtEncoder, jwtDecoder, refreshTokenRepository, 3600L, 86400L, "https://auth.example", "");
     }
@@ -120,18 +120,6 @@ class TokenServiceImplTest {
         UserDetails ud = new org.springframework.security.core.userdetails.User("user", "pass", Set.of(new SimpleGrantedAuthority("ROLE_USER")));
         when(userDetailsService.loadUserByUsername("user")).thenReturn(ud);
 
-        // mock stored refresh token lookup
-        com.quetoquenana.userservice.model.RefreshToken stored = com.quetoquenana.userservice.model.RefreshToken.builder()
-                .token("dummy")
-                .user(user)
-                .revoked(false)
-                .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(86400))
-                .clientApp("app1")
-                .build();
-        when(refreshTokenRepository.findByToken(ArgumentMatchers.anyString())).thenReturn(Optional.of(stored));
-
-        // mock encoder to return something predictable (ensure headers are present)
         when(jwtEncoder.encode(ArgumentMatchers.any())).thenReturn(org.springframework.security.oauth2.jwt.Jwt.withTokenValue("t").header("alg","none").header("typ","JWT").claim("x","y").build());
 
         TokenResponse resp = tokenService.refresh("dummy");

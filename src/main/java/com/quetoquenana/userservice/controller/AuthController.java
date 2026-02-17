@@ -68,7 +68,7 @@ public class AuthController {
                 tokenResponse.getAccessToken(),
                 tokenResponse.getRefreshToken(),
                 tokenResponse.getExpiresIn(),
-                new FirebaseAuthResponse.UserInfo(result.getUser().getId(), decoded.getEmail(), Boolean.TRUE.equals(decoded.isEmailVerified()), decoded.getName()),
+                new FirebaseAuthResponse.UserInfo(result.getUser().getId(), decoded.getEmail(), decoded.isEmailVerified(), decoded.getName()),
                 result.isNewUser()
         );
 
