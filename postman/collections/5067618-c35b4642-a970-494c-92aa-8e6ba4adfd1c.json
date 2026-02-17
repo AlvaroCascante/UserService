@@ -963,9 +963,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/.well-known/jwks.json",
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/.well-known/jwks.json",
 							"host": [
-								"{{HOST}}"
+								"{{HOST_USER_SERVICE}}"
 							],
 							"path": [
 								"{{path}}",
