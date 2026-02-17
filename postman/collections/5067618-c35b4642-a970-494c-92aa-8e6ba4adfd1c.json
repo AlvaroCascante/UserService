@@ -510,6 +510,61 @@
 					"response": []
 				},
 				{
+					"name": "AddUserCustomer",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae3391c6-46ba-4e32-9349-809da0571879",
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-87c78c16-1837-4413-8c1c-b95ef4fddfc0",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user\": {\n        \"username\": \"quetoquenana+m@gmail.com\",\n        \"nickname\": \"Mechanic User\",\n        \"person\": {\n            \"idNumber\": \"711080683\",\n            \"name\": \"Que\",\n            \"lastname\": \"Toque Nana\"\n        }\n    },\n    \"roleName\": \"MECHANIC\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/{{path}}/api/applications/:id/user",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"applications",
+								":id",
+								"user"
+							],
+							"variable": [
+								{
+									"id": "b70863fd-2b46-4dc6-ab87-bbd489ce211a",
+									"key": "id",
+									"value": "{{application_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "DeleteRole",
 					"event": [
 						{
