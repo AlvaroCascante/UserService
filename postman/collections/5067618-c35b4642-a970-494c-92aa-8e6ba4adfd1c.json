@@ -291,9 +291,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/applications",
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/applications",
 							"host": [
-								"{{HOST}}"
+								"{{HOST_USER_SERVICE}}"
 							],
 							"path": [
 								"{{path}}",
