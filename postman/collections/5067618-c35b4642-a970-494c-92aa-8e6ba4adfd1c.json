@@ -969,6 +969,48 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "JWKS Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5924420f-b835-4379-99e8-2da4f6f49892",
+								"exec": [
+									"var jsonData = pm.response.json(); // Fixed to use pm.response",
+									"pm.environment.set(\"system_token\", jsonData.accessToken);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-9df0072b-9f0f-4c3a-9422-3110ce4798a2",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/.well-known/jwks.json",
+							"host": [
+								"{{HOST_USER_SERVICE}}"
+							],
+							"path": [
+								"{{path}}",
+								".well-known",
+								"jwks.json"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "5067618-9f7a01ce-6942-4f0c-b7ea-32cbf99d1d2a",
