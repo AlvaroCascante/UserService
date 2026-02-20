@@ -2420,9 +2420,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/actuator",
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/actuator",
 							"host": [
-								"{{HOST}}"
+								"{{HOST_USER_SERVICE}}"
 							],
 							"path": [
 								"{{path}}",
@@ -2471,9 +2471,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/actuator/health",
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/actuator/health",
 							"host": [
-								"{{HOST}}"
+								"{{HOST_USER_SERVICE}}"
 							],
 							"path": [
 								"{{path}}",
