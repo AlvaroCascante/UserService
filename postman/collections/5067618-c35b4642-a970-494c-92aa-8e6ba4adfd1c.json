@@ -169,9 +169,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/applications/:id",
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/applications/:id",
 							"host": [
-								"{{HOST}}"
+								"{{HOST_USER_SERVICE}}"
 							],
 							"path": [
 								"{{path}}",
