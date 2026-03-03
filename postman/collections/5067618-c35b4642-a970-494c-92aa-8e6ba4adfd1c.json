@@ -480,7 +480,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"user\": {\n        \"username\": \"quetoquenana+a@gmail.com\",\n        \"nickname\": \"Admin User\",\n        \"person\": {\n            \"idNumber\": \"711080683\",\n            \"name\": \"Que\",\n            \"lastname\": \"Toque Nana\"\n        }\n    },\n    \"roleName\": \"ADMIn\"\n}",
+							"raw": "{\n    \"user\": {\n        \"username\": \"quetoquenana+a@gmail.com\",\n        \"nickname\": \"Admin User\",\n        \"person\": {\n            \"idNumber\": \"711080683\",\n            \"name\": \"Que\",\n            \"lastname\": \"Toque Nana\"\n        }\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -488,7 +488,8 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/applications/:id/user",
+							"raw": "https://{{HOST_USER_SERVICE}}/{{path}}/api/applications/:id/user",
+							"protocol": "https",
 							"host": [
 								"{{HOST_USER_SERVICE}}"
 							],
