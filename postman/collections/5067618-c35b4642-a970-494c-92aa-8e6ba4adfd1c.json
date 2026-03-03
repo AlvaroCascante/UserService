@@ -714,7 +714,8 @@
 							}
 						],
 						"url": {
-							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/auth/login",
+							"raw": "https://{{HOST_USER_SERVICE}}/{{path}}/api/auth/login",
+							"protocol": "https",
 							"host": [
 								"{{HOST_USER_SERVICE}}"
 							],
