@@ -6,7 +6,6 @@ import com.quetoquenana.userservice.model.RefreshToken;
 import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.model.UserStatus;
 import com.quetoquenana.userservice.repository.RefreshTokenRepository;
-import com.quetoquenana.userservice.service.ApplicationService;
 import com.quetoquenana.userservice.service.TokenService;
 import com.quetoquenana.userservice.service.UserService;
 import org.jspecify.annotations.NonNull;
@@ -17,8 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -28,7 +25,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.quetoquenana.userservice.util.Constants.Headers.APP_NAME;
 import static com.quetoquenana.userservice.util.Constants.JWTClaims.*;
 
 @Service
@@ -215,14 +211,4 @@ public class TokenServiceImpl implements TokenService {
             throw new AuthenticationException("error.authentication.invalid.refresh.token");
         }
     }
-
-    private String getAppNameFromRequest() {
-        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attrs != null) {
-            return attrs.getRequest().getHeader(APP_NAME);
-        }
-        throw new AuthenticationException("error.authentication.application.header");
-    }
-
-
 }

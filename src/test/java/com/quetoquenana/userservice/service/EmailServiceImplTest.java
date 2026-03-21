@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Locale;
 
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class EmailServiceImplTest {

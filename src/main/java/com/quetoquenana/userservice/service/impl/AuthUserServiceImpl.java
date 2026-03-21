@@ -2,10 +2,8 @@ package com.quetoquenana.userservice.service.impl;
 
 import com.google.firebase.auth.FirebaseToken;
 import com.quetoquenana.userservice.command.CreateUserCommand;
-import com.quetoquenana.userservice.dto.UserCompleteRequest;
 import com.quetoquenana.userservice.dto.UserCreateFromFirebaseRequest;
 import com.quetoquenana.userservice.dto.UserCreateFromFirebaseResponse;
-import com.quetoquenana.userservice.exception.AuthenticationException;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.EmailConflictException;
 import com.quetoquenana.userservice.model.AppRoleUser;
@@ -20,7 +18,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Map;
 
-import static com.quetoquenana.userservice.util.Constants.Headers.APP_NAME;
 import static com.quetoquenana.userservice.util.Constants.Headers.AUTHORIZATION;
 import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_NAME_USER;
 

@@ -3,8 +3,6 @@ package com.quetoquenana.userservice.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.quetoquenana.userservice.dto.*;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
-import com.quetoquenana.userservice.model.AppRoleUser;
-import com.quetoquenana.userservice.model.Application;
 import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.service.UserService;
 import com.quetoquenana.userservice.util.JsonViewPageUtil;
@@ -13,18 +11,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.UUID;
 
 import static com.quetoquenana.userservice.util.Constants.Pagination.PAGE;
 import static com.quetoquenana.userservice.util.Constants.Pagination.PAGE_SIZE;
-import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_NAME_USER;
 
 @RestController
 @RequestMapping("/api/users")

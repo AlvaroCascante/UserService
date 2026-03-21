@@ -1,13 +1,11 @@
 package com.quetoquenana.userservice.service;
 
 import com.quetoquenana.userservice.command.CreateUserCommand;
-import com.quetoquenana.userservice.dto.UserCompleteRequest;
 import com.quetoquenana.userservice.dto.UserCreateRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.model.UserProvider;
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;

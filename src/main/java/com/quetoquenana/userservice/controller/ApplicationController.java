@@ -22,7 +22,6 @@ import java.util.UUID;
 
 import static com.quetoquenana.userservice.util.Constants.Pagination.PAGE;
 import static com.quetoquenana.userservice.util.Constants.Pagination.PAGE_SIZE;
-import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_NAME_ADMIN;
 
 @RestController
 @RequestMapping("/api/applications")

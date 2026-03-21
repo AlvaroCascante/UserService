@@ -127,8 +127,9 @@ public class ControllerExceptionAdvice {
 
     @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
     public ResponseEntity<ApiResponse> handleAccessDenied(Exception ex) {
+        log.error("AccessDenied: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new ApiResponse("FORBIDDEN -- " + ex.getMessage(), HttpStatus.FORBIDDEN.value()));
+                .body(new ApiResponse("FORBIDDEN -- ", HttpStatus.FORBIDDEN.value()));
     }
 
     @ExceptionHandler(Exception.class)

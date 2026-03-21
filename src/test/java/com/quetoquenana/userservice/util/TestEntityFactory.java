@@ -72,12 +72,12 @@ public class TestEntityFactory {
         return person;
     }
 
-    public static PersonCreateRequest getPersonCreateRequest(String idNumber, Boolean isActive) {
+    public static PersonCreateRequest getPersonCreateRequest(String idNumber) {
         return new PersonCreateRequest(idNumber, "John", "White");
     }
 
     public static UserCreateRequest getUserCreateRequest() {
-        return new UserCreateRequest(DEFAULT_USERNAME, getPersonCreateRequest(DEFAULT_ID_NUMBER, true), "nick");
+        return new UserCreateRequest(DEFAULT_USERNAME, getPersonCreateRequest(DEFAULT_ID_NUMBER), "nick");
     }
 
     public static PersonUpdateRequest getPersonUpdateRequest(Boolean isActive) {

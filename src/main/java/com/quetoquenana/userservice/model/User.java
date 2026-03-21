@@ -45,6 +45,7 @@ public class User extends Auditable {
 
     @Column(name = "provider", length = 50)
     @JsonView({UserList.class, Application.ApplicationDetail.class})
+    @Enumerated(EnumType.STRING)
     private UserProvider provider;
 
     @Column(name = "nickname", length = 50)

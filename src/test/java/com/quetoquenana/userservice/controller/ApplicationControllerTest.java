@@ -6,7 +6,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.quetoquenana.userservice.dto.*;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
-import com.quetoquenana.userservice.dto.ApiResponse;
 import com.quetoquenana.userservice.model.AppRole;
 import com.quetoquenana.userservice.model.Application;
 import com.quetoquenana.userservice.service.ApplicationService;

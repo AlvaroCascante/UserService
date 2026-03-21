@@ -1,7 +1,6 @@
 package com.quetoquenana.userservice.service;
 
 import com.quetoquenana.userservice.dto.ChangePasswordRequest;
-import com.quetoquenana.userservice.dto.ResetUserRequest;
 import org.springframework.security.core.Authentication;
 
 import java.util.UUID;
