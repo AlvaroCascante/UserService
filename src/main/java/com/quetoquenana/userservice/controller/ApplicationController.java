@@ -124,7 +124,7 @@ public class ApplicationController {
             @Valid @RequestBody AppRoleUserCreateRequest request
     ) {
         log.info("POST /api/applications/{}/user called with payload: {}", id, request);
-        AppRoleUser entity = applicationService.addUser(id, request, ROLE_NAME_ADMIN);
+        AppRoleUser entity = applicationService.addUser(id, request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse(Collections.singletonMap("appRoleUser", entity)));
     }

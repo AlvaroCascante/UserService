@@ -27,7 +27,7 @@ public interface ApplicationService {
 
     AppRole addRole(UUID applicationId, AppRoleCreateRequest request);
 
-    AppRoleUser addUser(UUID applicationId, AppRoleUserCreateRequest request, String roleName);
+    AppRoleUser addUser(UUID applicationId, AppRoleUserCreateRequest request);
 
     AppRoleUser addUser(CreateUserCommand request);
 
