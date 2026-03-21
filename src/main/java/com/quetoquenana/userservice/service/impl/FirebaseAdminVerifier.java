@@ -7,6 +7,7 @@ import com.google.firebase.auth.UserRecord;
 import com.quetoquenana.userservice.exception.InvalidFirebaseTokenException;
 import com.quetoquenana.userservice.service.FirebaseTokenVerifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -23,6 +24,7 @@ import java.util.Map;
  * - maxAuthAgeSeconds (FIREBASE_MAX_AUTH_AGE_SECONDS): if >0, require token.auth_time is recent enough
  */
 @Component
+@ConditionalOnProperty(name = "firebase.enabled", havingValue = "true", matchIfMissing = true)
 public class FirebaseAdminVerifier implements FirebaseTokenVerifier {
 
     private final FirebaseAuth firebaseAuth;

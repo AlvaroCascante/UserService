@@ -1,6 +1,7 @@
 package com.quetoquenana.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.quetoquenana.userservice.command.PersonCreateCommand;
 import com.quetoquenana.userservice.dto.ApiBaseResponseView;
 import com.quetoquenana.userservice.dto.PersonCreateRequest;
 import com.quetoquenana.userservice.dto.PersonUpdateRequest;
@@ -91,11 +92,21 @@ public class Person extends Auditable {
         address.setPerson(this);
     }
 
+
     public static Person fromCreateRequest(PersonCreateRequest request) {
         return Person.builder()
-            .idNumber(request.getIdNumber())
-            .name(request.getName())
-            .lastname(request.getLastname())
+                .idNumber(request.getIdNumber())
+                .name(request.getName())
+                .lastname(request.getLastname())
+                .isActive(true)
+                .build();
+    }
+
+    public static Person fromCreateCommand(PersonCreateCommand command) {
+        return Person.builder()
+            .idNumber(command.getIdNumber())
+            .name(command.getName())
+            .lastname(command.getLastname())
             .isActive(true)
             .build();
     }

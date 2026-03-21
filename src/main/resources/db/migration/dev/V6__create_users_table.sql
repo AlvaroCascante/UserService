@@ -3,12 +3,11 @@
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     person_id UUID REFERENCES persons(id) ON DELETE CASCADE,
-
     username VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255),
 
     external_id       VARCHAR(100),
-    external_provider VARCHAR(100),
+    provider VARCHAR(50),
 
     nickname VARCHAR(50),
     user_status VARCHAR(50) NOT NULL,

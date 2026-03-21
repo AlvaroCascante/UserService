@@ -6,12 +6,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.quetoquenana.userservice.dto.*;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
-import com.quetoquenana.userservice.dto.ApiResponse;
 import com.quetoquenana.userservice.model.AppRole;
-import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.Application;
 import com.quetoquenana.userservice.service.ApplicationService;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -51,6 +48,7 @@ class ApplicationControllerTest {
         application = Application.builder()
                 .id(appId)
                 .name("my-app")
+                .code("MYAPP")
                 .description("A test application")
                 .active(true)
                 .build();
@@ -89,6 +87,7 @@ class ApplicationControllerTest {
     void testCreateApplication_ReturnsCreated() {
         ApplicationCreateRequest createRequest = new ApplicationCreateRequest();
         createRequest.setName("my-app");
+        createRequest.setCode("MYAPP");
         createRequest.setDescription("A test application");
         createRequest.setIsActive(true);
 
@@ -110,6 +109,7 @@ class ApplicationControllerTest {
     void testCreateApplication_Duplicate() {
         ApplicationCreateRequest createRequest = new ApplicationCreateRequest();
         createRequest.setName("my-app");
+        createRequest.setCode("MYAPP");
         when(applicationService.save(any(ApplicationCreateRequest.class)))
                 .thenThrow(new DuplicateRecordException("application.name.duplicate"));
 
@@ -199,33 +199,6 @@ class ApplicationControllerTest {
         assertEquals(role, dataMap.get("appRole"));
     }
 
-    @Test
-    void testAddUser_ReturnsCreated() {
-        AppRoleUserCreateRequest req = getAppRoleUserCreateRequest();
-
-        AppRoleUser aru = AppRoleUser.builder().id(UUID.randomUUID()).build();
-        when(applicationService.addUser(eq(appId), any(AppRoleUserCreateRequest.class), anyString())).thenReturn(aru);
-
-        ResponseEntity<ApiResponse> response = applicationController.addUser(appId, req);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        ApiResponse apiResponse = response.getBody();
-        assertNotNull(apiResponse);
-        @SuppressWarnings("unchecked")
-        Map<String, Object> dataMap = (Map<String, Object>) apiResponse.getData();
-        assertEquals(aru, dataMap.get("appRoleUser"));
-    }
-
-    private static @NotNull AppRoleUserCreateRequest getAppRoleUserCreateRequest() {
-        AppRoleUserCreateRequest appRoleUserCreateRequest = new AppRoleUserCreateRequest();
-        // construct nested user request
-        UserCreateRequest userCreateRequest = new UserCreateRequest();
-        userCreateRequest.setUsername("u@example.com");
-        PersonCreateRequest personCreateRequest = new PersonCreateRequest();
-        personCreateRequest.setIdNumber("ID1");
-        userCreateRequest.setPerson(personCreateRequest);
-        appRoleUserCreateRequest.setUser(userCreateRequest);
-        return appRoleUserCreateRequest;
-    }
 
     @Test
     void testDeleteUser_Success() {

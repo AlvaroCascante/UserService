@@ -1,5 +1,6 @@
 package com.quetoquenana.userservice.service;
 
+import com.quetoquenana.userservice.command.PersonCreateCommand;
 import com.quetoquenana.userservice.dto.PersonCreateRequest;
 import com.quetoquenana.userservice.dto.PersonUpdateRequest;
 import com.quetoquenana.userservice.model.Person;
@@ -23,9 +24,11 @@ public interface PersonService {
 
     Person save(PersonCreateRequest request);
 
+    Person save(PersonCreateCommand request);
+
     Person update(UUID id, PersonUpdateRequest request);
 
-    Person updateStatus(UUID id, boolean status);
+    void updateStatus(UUID id, boolean status);
 
     Person getById(UUID id);
 

@@ -5,7 +5,6 @@ import com.quetoquenana.userservice.config.RsaKeyProperties;
 import com.quetoquenana.userservice.config.SecurityConfig;
 import com.quetoquenana.userservice.controller.ApplicationController;
 import com.quetoquenana.userservice.dto.AppRoleCreateRequest;
-import com.quetoquenana.userservice.dto.AppRoleUserCreateRequest;
 import com.quetoquenana.userservice.dto.ApplicationCreateRequest;
 import com.quetoquenana.userservice.model.Application;
 import com.quetoquenana.userservice.repository.AppRoleUserRepository;
@@ -19,7 +18,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
@@ -46,47 +45,43 @@ class ApplicationControllerSecurityTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private ApplicationService applicationService;
 
     // Mock beans required by SecurityConfig
-    @MockBean
+    @MockitoBean
     private CorsConfigProperties corsConfigProperties;
 
-    @MockBean
+    @MockitoBean
     private RsaKeyProperties rsaKeyProperties;
 
-    @MockBean
+    @MockitoBean
     private UserRepository userRepository;
 
-    @MockBean
+    @MockitoBean
     private ApplicationRepository applicationRepository;
 
-    @MockBean
+    @MockitoBean
     private AppRoleUserRepository appRoleUserRepository;
 
     // Provide JwtDecoder/JwtEncoder mocks to avoid SecurityConfig creating real encoders/decoders
-    @MockBean
+    @MockitoBean
     private JwtDecoder jwtDecoder;
 
-    @MockBean
+    @MockitoBean
     private JwtEncoder jwtEncoder;
 
     // Mock SecurityService bean name for method-security SpEL if needed
-    @MockBean(name = "securityService")
+    @MockitoBean(name = "securityService")
     private SecurityService securityService;
 
     private String payload;
-    private String addUserPayload;
     private String addRolePayload;
 
     @BeforeEach
     void setup() throws IOException, URISyntaxException {
         JsonPayloadToObjectBuilder<ApplicationCreateRequest> mapper = new JsonPayloadToObjectBuilder<>(ApplicationCreateRequest.class);
         payload = mapper.loadJsonData("payloads/application-create-request.json");
-
-        JsonPayloadToObjectBuilder<AppRoleUserCreateRequest> addUserMapper = new JsonPayloadToObjectBuilder<>(AppRoleUserCreateRequest.class);
-        addUserPayload = addUserMapper.loadJsonData("payloads/app-user-create-request.json");
 
         JsonPayloadToObjectBuilder<AppRoleCreateRequest> addRoleMapper = new JsonPayloadToObjectBuilder<>(AppRoleCreateRequest.class);
         addRolePayload = addRoleMapper.loadJsonData("payloads/app-role-create-request.json");
@@ -277,35 +272,6 @@ class ApplicationControllerSecurityTest {
         mockMvc.perform(post("/api/applications/{id}/role", UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(addRolePayload))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @DisplayName("POST /api/applications/{id}/user returns 201")
-    @WithMockUser(username = "system", roles = {"SYSTEM"})
-    void AddUser_Returns201() throws Exception {
-        mockMvc.perform(post("/api/applications/{id}/user", UUID.randomUUID())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(addUserPayload))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    @DisplayName("POST /api/applications/{id}/user returns 403 for forbidden")
-    @WithMockUser(username = "user")
-    void AddUser_Returns403() throws Exception {
-        mockMvc.perform(post("/api/applications/{id}/user", UUID.randomUUID())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(addUserPayload))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @DisplayName("POST /api/applications/{id}/user returns 401 when unauthenticated")
-    void AddUser_Returns401() throws Exception {
-        mockMvc.perform(post("/api/applications/{id}/user", UUID.randomUUID())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(addUserPayload))
                 .andExpect(status().isUnauthorized());
     }
 

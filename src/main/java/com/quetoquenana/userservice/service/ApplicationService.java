@@ -1,9 +1,7 @@
 package com.quetoquenana.userservice.service;
 
-import com.quetoquenana.userservice.dto.AppRoleCreateRequest;
-import com.quetoquenana.userservice.dto.ApplicationCreateRequest;
-import com.quetoquenana.userservice.dto.ApplicationUpdateRequest;
-import com.quetoquenana.userservice.dto.AppRoleUserCreateRequest;
+import com.quetoquenana.userservice.command.CreateUserCommand;
+import com.quetoquenana.userservice.dto.*;
 import com.quetoquenana.userservice.model.AppRole;
 import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.Application;
@@ -29,7 +27,9 @@ public interface ApplicationService {
 
     AppRole addRole(UUID applicationId, AppRoleCreateRequest request);
 
-    AppRoleUser addUser(UUID applicationId, AppRoleUserCreateRequest request, String roleName);
+    AppRoleUser addUser(UUID applicationId, AppRoleUserCreateRequest request);
+
+    AppRoleUser addUser(CreateUserCommand request);
 
     void removeUser(UUID applicationId, String username);
 

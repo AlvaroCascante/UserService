@@ -1,15 +1,14 @@
 package com.quetoquenana.userservice.service.impl;
 
-import com.quetoquenana.userservice.dto.UserEmailInfo;
+import com.quetoquenana.userservice.command.CreateUserCommand;
+import com.quetoquenana.userservice.command.PersonCreateCommand;
 import com.quetoquenana.userservice.dto.UserCreateRequest;
+import com.quetoquenana.userservice.dto.UserEmailInfo;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.exception.AuthenticationException;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
-import com.quetoquenana.userservice.model.AppRoleUser;
-import com.quetoquenana.userservice.model.Person;
-import com.quetoquenana.userservice.model.User;
-import com.quetoquenana.userservice.model.UserStatus;
+import com.quetoquenana.userservice.model.*;
 import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.UserRepository;
 import com.quetoquenana.userservice.service.CurrentUserService;
@@ -19,13 +18,13 @@ import com.quetoquenana.userservice.service.UserService;
 import com.quetoquenana.userservice.util.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -51,6 +50,7 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
     private final Executor emailExecutor;
 
+
     @Transactional
     @Override
     public User save(UserCreateRequest request) {
@@ -61,21 +61,21 @@ public class UserServiceImpl implements UserService {
 
         // Create or get person
         Person person = personService.findByIdNumber(request.getPerson().getIdNumber())
-            .map(found -> {
-                // Ensure person is active
-                if (!found.getIsActive()) {
-                    found.setIsActive(true);
-                    personService.updateStatus(found.getId(), true);
-                }
-                return found;
-            })
-            .orElseGet(() ->
-                personService.save(request.getPerson())
-            );
+                .map(found -> {
+                    // Ensure person is active
+                    if (!found.getIsActive()) {
+                        found.setIsActive(true);
+                        personService.updateStatus(found.getId(), true);
+                    }
+                    return found;
+                })
+                .orElseGet(() ->
+                        personService.save(request.getPerson())
+                );
 
         String plain = PasswordUtil.generateRandomPassword();
         User user = User.fromCreateRequest(
-            request, passwordEncoder.encode(plain), UserStatus.RESET, personService.getById(person.getId())
+                request, passwordEncoder.encode(plain), UserStatus.RESET, personService.getById(person.getId())
         );
 
         user.setCreatedAt(LocalDateTime.now());
@@ -107,6 +107,79 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+    public User save(CreateUserCommand command) {
+        // Check username uniqueness (case-insensitive)
+        if (userRepository.existsByUsernameIgnoreCase(command.getEmail())) {
+            throw new DuplicateRecordException("user.username.duplicate");
+        }
+
+        // Create or get person
+        Person person = personService.findByIdNumber(command.getIdNumber())
+            .map(found -> {
+                // Ensure person is active
+                if (!found.getIsActive()) {
+                    found.setIsActive(true);
+                    personService.updateStatus(found.getId(), true);
+                }
+                return found;
+            })
+            .orElseGet(() ->
+                personService.save(PersonCreateCommand.builder()
+                    .name(command.getName())
+                    .lastname(command.getLastname())
+                    .idNumber(command.getIdNumber())
+                    .build())
+            );
+
+
+        String plain = null;
+        switch(command.getProvider()) {
+            case GOOGLE, PASSWORD -> {}
+            case LOCAL_EMAIL -> plain = PasswordUtil.generateRandomPassword();
+        }
+
+        User user = User.from(
+                command,
+                passwordEncoder.encode(plain),
+                UserStatus.RESET,
+                personService.getById(person.getId())
+            );
+
+        user.setCreatedAt(LocalDateTime.now());
+        user.setCreatedBy(currentUserService.getCurrentUsername());
+
+        userRepository.save(user);
+
+        switch(command.getProvider()) {
+            case GOOGLE, PASSWORD -> {}
+            case LOCAL_EMAIL -> sendNewUserEmailAsync(person, command.getEmail(), plain);
+        }
+        return user;
+    }
+
+    private void sendNewUserEmailAsync(Person person , String email, String plain) {
+        // capture locale here (request thread) so it's preserved for the async task
+        Locale locale = LocaleContextHolder.getLocale();
+        UserEmailInfo emailInfo = UserEmailInfo.builder()
+                .personLastname(person.getLastname())
+                .personName(person.getName())
+                .username(email)
+                .build();
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    sendNewUserEmailAsync(emailInfo, plain, locale);
+                }
+            });
+        } else {
+            log.warn("No transaction synchronization active");
+        }
+    }
+
+    @Transactional
+    @Override
     public void resetUser(Authentication authentication, String username) {
         User user = userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(AuthenticationException::new);
@@ -134,6 +207,11 @@ public class UserServiceImpl implements UserService {
         } else {
             sendPasswordEmailAsync(emailInfo, plain, locale);
         }
+    }
+
+    @Override
+    public Optional<User> findByProviderAndExternalId(UserProvider provider, String firebaseUid) {
+        return userRepository.findByProviderAndExternalId(provider, firebaseUid);
     }
 
     @Transactional

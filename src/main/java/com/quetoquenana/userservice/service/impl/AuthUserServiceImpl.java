@@ -1,70 +1,99 @@
 package com.quetoquenana.userservice.service.impl;
 
 import com.google.firebase.auth.FirebaseToken;
-import com.quetoquenana.userservice.dto.PersonCreateRequest;
-import com.quetoquenana.userservice.dto.UserCreateRequest;
+import com.quetoquenana.userservice.command.CreateUserCommand;
+import com.quetoquenana.userservice.dto.UserCreateFromFirebaseRequest;
+import com.quetoquenana.userservice.dto.UserCreateFromFirebaseResponse;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
-import com.quetoquenana.userservice.model.User;
-import com.quetoquenana.userservice.repository.UserRepository;
-import com.quetoquenana.userservice.service.AuthUserService;
-import com.quetoquenana.userservice.service.PersonService;
-import com.quetoquenana.userservice.service.UserService;
 import com.quetoquenana.userservice.exception.EmailConflictException;
+import com.quetoquenana.userservice.model.AppRoleUser;
+import com.quetoquenana.userservice.model.UserProvider;
+import com.quetoquenana.userservice.service.ApplicationService;
+import com.quetoquenana.userservice.service.AuthUserService;
+import com.quetoquenana.userservice.service.FirebaseTokenVerifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Optional;
+import java.util.Map;
+
+import static com.quetoquenana.userservice.util.Constants.Headers.AUTHORIZATION;
+import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_NAME_USER;
 
 @Service
 @RequiredArgsConstructor
 public class AuthUserServiceImpl implements AuthUserService {
 
-    private final UserRepository userRepository;
-    private final UserService userService;
-    private final PersonService personService;
+    private final ApplicationService  applicationService;
+    private final FirebaseTokenVerifier firebaseTokenVerifier;
 
     @Override
-    public ResolveResult resolveOrCreateFromFirebase(FirebaseToken decoded) {
-        String uid = decoded.getUid();
-        String email = decoded.getEmail();
-        String name = decoded.getName();
+    public UserCreateFromFirebaseResponse createFromFirebase(
+            UserCreateFromFirebaseRequest request,
+            String appCode
+    ) {
+        FirebaseToken decoded = firebaseTokenVerifier.verify(getToken());
+        String signInProvider = getSignInProvider(decoded);
 
-        // try to find existing user by external provider/id
-        Optional<User> existing = userRepository.findByExternalProviderIgnoreCaseAndExternalIdIgnoreCase("firebase", uid);
-        if (existing.isPresent()) {
-            return new ResolveResult(existing.get(), false);
-        }
-
-        // Create minimal person + user using existing services
-        PersonCreateRequest personReq = new PersonCreateRequest();
-        // idNumber is required by PersonCreateRequest - use uid as fallback
-        personReq.setIdNumber(uid);
-        // try to split name into first/lastname
-        if (name != null && name.contains(" ")) {
-            String[] parts = name.split(" ", 2);
-            personReq.setName(parts[0]);
-            personReq.setLastname(parts[1]);
-        } else {
-            personReq.setName(email != null ? email : uid);
-            personReq.setLastname("");
-        }
-
-        UserCreateRequest userReq = new UserCreateRequest();
-        userReq.setUsername(email != null ? email : uid);
-        userReq.setPerson(personReq);
-        userReq.setNickname(name);
+        CreateUserCommand createUserCommand = CreateUserCommand.builder()
+                .idNumber(request.getPerson().getIdNumber())
+                .name(request.getPerson().getName())
+                .lastname(request.getPerson().getLastname())
+                .firebaseUid(decoded.getUid())
+                .email(decoded.getEmail())
+                .emailVerified(decoded.isEmailVerified())
+                .nickname(decoded.getName())
+                .provider(UserProvider.fromSignInProvider(signInProvider))
+                .roleName(ROLE_NAME_USER)
+                .applicationCode(appCode)
+                .build();
 
         try {
-            User created = userService.save(userReq);
-            // set externalProvider/externalId on user and persist directly via repository
-            created.setExternalProvider("firebase");
-            created.setExternalId(uid);
-            userRepository.save(created);
-            return new ResolveResult(created, true);
+            AppRoleUser appRoleUser = applicationService.addUser(createUserCommand);
+            return new UserCreateFromFirebaseResponse(
+                    appRoleUser.getUser().getPerson().getIdNumber(),
+                    appRoleUser.getUser().getPerson().getName(),
+                    appRoleUser.getUser().getPerson().getLastname(),
+                    appRoleUser.getUser().getUsername(),
+                    appRoleUser.getUser().getNickname(),
+                    appRoleUser.getRole().getApplication().getName(),
+                    appRoleUser.getRole().getApplication().getCode()
+            );
         } catch (DuplicateRecordException dre) {
             // username/email already exists
             throw new EmailConflictException("email.already.in.use");
         }
+    }
+
+    private String getSignInProvider(FirebaseToken decoded) {
+        Map<String, Object> firebaseClaims = (Map<String, Object>) decoded.getClaims().get("firebase");
+        return firebaseClaims != null
+                ? (String) firebaseClaims.get("sign_in_provider")
+                : "unknown";
+    }
+
+    private String getToken() {
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs != null) {
+            String authorization = attrs.getRequest().getHeader(AUTHORIZATION);
+
+            if (authorization == null || authorization.isBlank()) {
+                throw new IllegalArgumentException("Missing Authorization header");
+            }
+
+            if (!authorization.startsWith("Bearer ")) {
+                throw new IllegalArgumentException("Invalid Authorization header format");
+            }
+
+            String token = authorization.substring(7).trim();
+
+            if (token.isEmpty()) {
+                throw new IllegalArgumentException("Missing token after Bearer");
+            }
+            return token;
+        }
+        throw new IllegalArgumentException("Missing Authorization header");
     }
 }
 

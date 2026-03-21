@@ -1,23 +1,20 @@
 package com.quetoquenana.userservice.controller;
 
-import com.quetoquenana.userservice.dto.ChangePasswordRequest;
-import com.quetoquenana.userservice.dto.RefreshRequest;
-import com.quetoquenana.userservice.dto.ResetUserRequest;
-import com.quetoquenana.userservice.dto.TokenResponse;
-import com.quetoquenana.userservice.dto.FirebaseAuthResponse;
-import com.quetoquenana.userservice.service.SecurityService;
-import com.quetoquenana.userservice.service.TokenService;
-import com.quetoquenana.userservice.service.FirebaseTokenVerifier;
-import com.quetoquenana.userservice.service.AuthUserService;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.quetoquenana.userservice.dto.*;
+import com.quetoquenana.userservice.model.Application;
+import com.quetoquenana.userservice.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+
 import static com.quetoquenana.userservice.util.Constants.Headers.APP_NAME;
-import static com.quetoquenana.userservice.util.Constants.Headers.AUTHORIZATION;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,52 +24,17 @@ public class AuthController {
 
     private final SecurityService securityService;
     private final TokenService tokenService;
-    private final FirebaseTokenVerifier firebaseTokenVerifier;
     private final AuthUserService authUserService;
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(
             Authentication authentication,
-            @RequestHeader(value = APP_NAME) String applicationName
+            @RequestHeader(value = APP_NAME) String appCode
     ) {
-        log.info("Login attempt for user {} to application {}", authentication.getName(), applicationName);
+        log.info("Login attempt for user {} to application {}", authentication.getName(), appCode);
         securityService.login(authentication);
-        TokenResponse tokens = tokenService.createTokens(authentication);
+        TokenResponse tokens = tokenService.createTokens(authentication, appCode);
         return ResponseEntity.ok(tokens);
-    }
-
-    @PostMapping("/firebase")
-    public ResponseEntity<FirebaseAuthResponse> firebaseLogin(
-            @RequestHeader(value = AUTHORIZATION) String authorization,
-            @RequestHeader(value = APP_NAME) String applicationName
-    ) {
-        // extract bearer token
-        if (authorization == null || !authorization.toLowerCase().startsWith("bearer ")) {
-            throw new IllegalArgumentException("Missing or invalid Authorization header");
-        }
-        String idToken = authorization.substring(7).trim();
-        if (idToken.isEmpty()) {
-            throw new IllegalArgumentException("Missing Firebase ID token in Authorization header");
-        }
-
-        // verify token with Firebase
-        var decoded = firebaseTokenVerifier.verify(idToken);
-
-        // resolve or create user from firebase token
-        var result = authUserService.resolveOrCreateFromFirebase(decoded);
-
-        // create tokens for the user using the provided application name as audience
-        var tokenResponse = tokenService.createTokensForUser(result.getUser(), applicationName);
-
-        var resp = new FirebaseAuthResponse(
-                tokenResponse.getAccessToken(),
-                tokenResponse.getRefreshToken(),
-                tokenResponse.getExpiresIn(),
-                new FirebaseAuthResponse.UserInfo(result.getUser().getId(), decoded.getEmail(), decoded.isEmailVerified(), decoded.getName()),
-                result.isNewUser()
-        );
-
-        return ResponseEntity.ok(resp);
     }
 
     @PostMapping("/reset")
@@ -86,8 +48,11 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refresh(@Valid @RequestBody RefreshRequest request) {
-        TokenResponse tokens = tokenService.refresh(request.getRefreshToken());
+    public ResponseEntity<TokenResponse> refresh(
+            @Valid @RequestBody RefreshRequest request,
+            @RequestHeader(value = APP_NAME) String appCode
+    ) {
+        TokenResponse tokens = tokenService.refresh(request.getRefreshToken(), appCode);
         return ResponseEntity.ok(tokens);
     }
 
@@ -96,5 +61,26 @@ public class AuthController {
         log.info("ForgotPassword requested for user: {}", request.getUsername());
         securityService.forgotPassword(request.getUsername());
         return ResponseEntity.noContent().build();
+    }
+
+
+    @PostMapping("/firebase-registration")
+    @JsonView(Application.ApplicationDetail.class)
+    public ResponseEntity<ApiResponse> completeRegistrationFromFirebase(
+            @Valid @RequestBody UserCreateFromFirebaseRequest request,
+            @RequestHeader(value = APP_NAME) String appCode
+    ) {
+        log.info("POST /api/users/customer called with payload: {}", request);
+        UserCreateFromFirebaseResponse user = authUserService.createFromFirebase(request, appCode);
+
+        TokenResponse tokenResponse = tokenService.createTokensForUser(user.username(), appCode);
+
+        CompleteRegistrationResponse response = new CompleteRegistrationResponse(
+                tokenResponse,
+                user
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse(Collections.singletonMap("registration", response)));
     }
 }

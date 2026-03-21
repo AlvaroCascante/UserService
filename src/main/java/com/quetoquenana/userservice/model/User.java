@@ -1,6 +1,7 @@
 package com.quetoquenana.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.quetoquenana.userservice.command.CreateUserCommand;
 import com.quetoquenana.userservice.dto.ApiBaseResponseView;
 import com.quetoquenana.userservice.dto.UserCreateRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
@@ -34,7 +35,7 @@ public class User extends Auditable {
     @JsonView({UserList.class, Application.ApplicationDetail.class})
     private String username;
 
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password_hash")
     @JsonView(ApiBaseResponseView.NoShow.class)
     private String passwordHash;
 
@@ -42,9 +43,10 @@ public class User extends Auditable {
     @JsonView({UserList.class, Application.ApplicationDetail.class})
     private String externalId;
 
-    @Column(name = "external_provider", length = 100)
+    @Column(name = "provider", length = 50)
     @JsonView({UserList.class, Application.ApplicationDetail.class})
-    private String externalProvider;
+    @Enumerated(EnumType.STRING)
+    private UserProvider provider;
 
     @Column(name = "nickname", length = 50)
     @JsonView({UserList.class, Application.ApplicationDetail.class})
@@ -58,7 +60,6 @@ public class User extends Auditable {
     // JSON Views
     public static class UserList extends ApiBaseResponseView.Always {}
     public static class UserDetail extends User.UserList {}
-
 
     public boolean accountLocked() {
         return switch (this.userStatus) {
@@ -78,6 +79,23 @@ public class User extends Auditable {
                 .passwordHash(passwordHash)
                 .person(person)
                 .nickname(request.getNickname())
+                .userStatus(status)
+                .build();
+    }
+
+    public static User from(
+            CreateUserCommand command,
+            String passwordHash,
+            UserStatus status,
+            Person person
+    ) {
+        return User.builder()
+                .person(person)
+                .username(command.getEmail())
+                .passwordHash(passwordHash)
+                .externalId(command.getFirebaseUid())
+                .provider(command.getProvider())
+                .nickname(command.getNickname())
                 .userStatus(status)
                 .build();
     }

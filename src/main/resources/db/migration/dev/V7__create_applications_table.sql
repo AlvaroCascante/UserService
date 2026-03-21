@@ -2,6 +2,7 @@
 CREATE TABLE applications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL UNIQUE,
+    code VARCHAR(10) NOT NULL UNIQUE,
     description VARCHAR(255),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
 
@@ -14,3 +15,4 @@ CREATE TABLE applications (
 
 -- Indexes
 CREATE UNIQUE INDEX IF NOT EXISTS idx_applications_name ON applications(name);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_applications_code ON applications(code);

@@ -1,6 +1,7 @@
 -- V5__create_addresses_table.sql
 CREATE TABLE addresses (
-    id UUID PRIMARY KEY UNIQUE REFERENCES persons(id) ON DELETE CASCADE,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    person_id UUID NOT NULL REFERENCES persons(id) ON DELETE CASCADE,
     address VARCHAR(100) NOT NULL,
     country VARCHAR(100) NOT NULL,
     city VARCHAR(100) NOT NULL,

@@ -29,6 +29,7 @@ public class TestDataSeeder {
                 .orElseGet(() -> {
                     Application app = Application.builder()
                             .name(applicationName)
+                            .code(applicationName.replaceAll("[^A-Za-z0-9]", "").toUpperCase().substring(0, Math.min(applicationName.replaceAll("[^A-Za-z0-9]", "").length(), 10)))
                             .description("Test application")
                             .active(true)
                             .build();

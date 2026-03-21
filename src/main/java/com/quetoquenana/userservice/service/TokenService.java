@@ -4,7 +4,7 @@ import com.quetoquenana.userservice.dto.TokenResponse;
 import org.springframework.security.core.Authentication;
 
 public interface TokenService {
-    TokenResponse createTokens(Authentication authentication);
-    TokenResponse refresh(String refreshToken);
-    TokenResponse createTokensForUser(com.quetoquenana.userservice.model.User user, String applicationName);
+    TokenResponse createTokens(Authentication authentication, String appCode);
+    TokenResponse refresh(String refreshToken, String appCode);
+    TokenResponse createTokensForUser(String username, String appCode);
 }
