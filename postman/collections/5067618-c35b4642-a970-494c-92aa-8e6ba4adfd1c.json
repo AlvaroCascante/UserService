@@ -434,9 +434,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/applications/:id/role",
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/applications/:id/role",
 							"host": [
-								"{{HOST}}"
+								"{{HOST_USER_SERVICE}}"
 							],
 							"path": [
 								"{{path}}",
