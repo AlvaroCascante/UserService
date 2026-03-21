@@ -695,13 +695,13 @@
 							"type": "basic",
 							"basic": [
 								{
-									"key": "password",
-									"value": "{{system_pass}}",
+									"key": "username",
+									"value": "SYSTEM",
 									"type": "string"
 								},
 								{
-									"key": "username",
-									"value": "system",
+									"key": "password",
+									"value": "{{system_pass}}",
 									"type": "string"
 								}
 							]
@@ -715,8 +715,7 @@
 							}
 						],
 						"url": {
-							"raw": "https://{{HOST_USER_SERVICE}}/{{path}}/api/auth/login",
-							"protocol": "https",
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/auth/login",
 							"host": [
 								"{{HOST_USER_SERVICE}}"
 							],
