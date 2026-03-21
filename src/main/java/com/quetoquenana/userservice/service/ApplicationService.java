@@ -29,7 +29,7 @@ public interface ApplicationService {
 
     AppRole addRole(UUID applicationId, AppRoleCreateRequest request);
 
-    AppRoleUser addUser(UUID applicationId, AppRoleUserCreateRequest request);
+    AppRoleUser addUser(UUID applicationId, AppRoleUserCreateRequest request, String roleName);
 
     void removeUser(UUID applicationId, String username);
 

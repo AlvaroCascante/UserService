@@ -1,10 +1,7 @@
 package com.quetoquenana.userservice.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.quetoquenana.userservice.dto.AppRoleCreateRequest;
-import com.quetoquenana.userservice.dto.AppRoleUserCreateRequest;
-import com.quetoquenana.userservice.dto.ApplicationCreateRequest;
-import com.quetoquenana.userservice.dto.ApplicationUpdateRequest;
+import com.quetoquenana.userservice.dto.*;
 import com.quetoquenana.userservice.model.Application;
 import com.quetoquenana.userservice.model.UserStatus;
 import com.quetoquenana.userservice.repository.*;
@@ -242,17 +239,16 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
                 .andExpect(status().isCreated());
 
         AppRoleUserCreateRequest req = new AppRoleUserCreateRequest();
-        req.setRoleName("USER");
-        var userReq = new com.quetoquenana.userservice.dto.UserCreateRequest();
+        var userReq = new UserCreateRequest();
         userReq.setUsername("integ-u-" + UUID.randomUUID() + "@example.com");
-        var personReq = new com.quetoquenana.userservice.dto.PersonCreateRequest();
+        var personReq = new PersonCreateRequest();
         personReq.setIdNumber("ID-" + UUID.randomUUID());
         personReq.setName("Integ");
         personReq.setLastname("User");
         userReq.setPerson(personReq);
         req.setUser(userReq);
 
-        mockMvc.perform(post("/api/applications/" + app.getId() + "/user")
+        mockMvc.perform(post("/api/applications/" + app.getId() + "/user/customer")
                         .header("X-Application-Name", "user-service")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
@@ -280,7 +276,6 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
                 .andExpect(status().isCreated());
 
         AppRoleUserCreateRequest createReq = new AppRoleUserCreateRequest();
-        createReq.setRoleName("USER");
         var userReq = new com.quetoquenana.userservice.dto.UserCreateRequest();
         String username = "del-user-" + UUID.randomUUID() + "@example.com";
         userReq.setUsername(username);
@@ -291,7 +286,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
         userReq.setPerson(personReq);
         createReq.setUser(userReq);
 
-        mockMvc.perform(post("/api/applications/" + app.getId() + "/user")
+        mockMvc.perform(post("/api/applications/" + app.getId() + "/user/customer")
                         .header("X-Application-Name", "user-service")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createReq)))

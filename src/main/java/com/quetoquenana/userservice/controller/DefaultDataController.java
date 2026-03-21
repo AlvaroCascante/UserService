@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.quetoquenana.userservice.dto.DefaultDataCreateRequest;
 import com.quetoquenana.userservice.dto.DefaultDataUpdateRequest;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
-import com.quetoquenana.userservice.model.ApiResponse;
+import com.quetoquenana.userservice.dto.ApiResponse;
 import com.quetoquenana.userservice.model.DefaultData;
 import com.quetoquenana.userservice.service.DefaultDataService;
 import com.quetoquenana.userservice.util.JsonViewPageUtil;

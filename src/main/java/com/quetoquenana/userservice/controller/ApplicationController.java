@@ -6,7 +6,7 @@ import com.quetoquenana.userservice.dto.AppRoleUserCreateRequest;
 import com.quetoquenana.userservice.dto.ApplicationCreateRequest;
 import com.quetoquenana.userservice.dto.ApplicationUpdateRequest;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
-import com.quetoquenana.userservice.model.ApiResponse;
+import com.quetoquenana.userservice.dto.ApiResponse;
 import com.quetoquenana.userservice.model.AppRole;
 import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.Application;
@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static com.quetoquenana.userservice.util.Constants.Pagination.*;
+import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_NAME_ADMIN;
+import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_NAME_USER;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -120,13 +122,26 @@ public class ApplicationController {
 
     @PostMapping("/{id}/user")
     @JsonView(Application.ApplicationDetail.class)
-    @PreAuthorize("hasRole('SYSTEM')")
+    @PreAuthorize("hasRole('SYSTEM') or hasRole('ADMIN')") // SYSTEM or ADMIN can add users to application
     public ResponseEntity<ApiResponse> addUser(
             @PathVariable UUID id,
             @Valid @RequestBody AppRoleUserCreateRequest request
     ) {
         log.info("POST /api/applications/{}/user called with payload: {}", id, request);
-        AppRoleUser entity = applicationService.addUser(id, request);
+        AppRoleUser entity = applicationService.addUser(id, request, ROLE_NAME_ADMIN);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse(Collections.singletonMap("appRoleUser", entity)));
+    }
+
+    @PostMapping("/{id}/user/customer")
+    @JsonView(Application.ApplicationDetail.class)
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ApiResponse> addUserCustomer(
+            @PathVariable UUID id,
+            @Valid @RequestBody AppRoleUserCreateRequest request
+    ) {
+        log.info("POST /api/applications/{}/user/customer called with payload: {}", id, request);
+        AppRoleUser entity = applicationService.addUser(id, request, ROLE_NAME_USER);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse(Collections.singletonMap("appRoleUser", entity)));
     }

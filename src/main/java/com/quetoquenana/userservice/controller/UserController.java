@@ -5,7 +5,7 @@ import com.quetoquenana.userservice.dto.ChangePasswordRequest;
 import com.quetoquenana.userservice.dto.ResetUserRequest;
 import com.quetoquenana.userservice.dto.UserUpdateRequest;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
-import com.quetoquenana.userservice.model.ApiResponse;
+import com.quetoquenana.userservice.dto.ApiResponse;
 import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.service.UserService;
 import com.quetoquenana.userservice.util.JsonViewPageUtil;

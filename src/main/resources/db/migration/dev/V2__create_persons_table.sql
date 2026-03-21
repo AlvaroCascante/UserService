@@ -1,6 +1,6 @@
 -- Migration for creating the persons table
 CREATE TABLE persons (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     id_number VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(50) NOT NULL,
     lastname VARCHAR(50) NOT NULL,

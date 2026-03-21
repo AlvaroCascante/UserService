@@ -59,14 +59,10 @@ public class PersonServiceImpl implements PersonService {
         String username = currentUserService.getCurrentUsername();
         return personRepository.findByIdNumber(request.getIdNumber())
             .map(found -> {
-                if (found.getIsActive()) {
-                    throw new DuplicateRecordException("person.id.number.duplicate.active");
-                } else {
-                    found.setIsActive(true);
-                    found.setUpdatedAt(LocalDateTime.now());
-                    found.setUpdatedBy(username);
-                    return personRepository.save(found);
-                }
+                found.setIsActive(true);
+                found.setUpdatedAt(LocalDateTime.now());
+                found.setUpdatedBy(username);
+                return personRepository.save(found);
             })
             .orElseGet(() -> {
                 Person person = Person.fromCreateRequest(request);
@@ -80,22 +76,24 @@ public class PersonServiceImpl implements PersonService {
     @Transactional
     public Person update(UUID id, PersonUpdateRequest request) {
         Person existing = personRepository.findById(id)
-            .orElseThrow(RecordNotFoundException::new);
+                .orElseThrow(RecordNotFoundException::new);
         existing.updateFromRequest(request, currentUserService.getCurrentUsername());
         return personRepository.save(existing);
     }
 
     @Override
-    public Person getReference(UUID id) {
-        return personRepository.getReferenceById(id);
+    @Transactional
+    public Person updateStatus(UUID id, boolean status) {
+        Person existing = personRepository.findById(id)
+                .orElseThrow(RecordNotFoundException::new);
+        existing.updateStatus(currentUserService.getCurrentUsername(), status);
+        return personRepository.save(existing);
     }
 
     @Override
-    public void activateById(UUID id) {
-        Person existingPerson = personRepository.findById(id)
+    public Person getById(UUID id) {
+        return personRepository.findByIdAndIsActive(id, true)
                 .orElseThrow(RecordNotFoundException::new);
-        existingPerson.activate(currentUserService.getCurrentUsername());
-        personRepository.save(existingPerson);
     }
 
     @Override

@@ -2,7 +2,7 @@
 -- Adds roles scoped to an application
 
 CREATE TABLE app_roles (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     application_id UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
     role_name VARCHAR(50) NOT NULL,
     description VARCHAR(100),

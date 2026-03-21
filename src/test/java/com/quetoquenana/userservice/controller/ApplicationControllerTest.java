@@ -6,10 +6,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.quetoquenana.userservice.dto.*;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
-import com.quetoquenana.userservice.model.ApiResponse;
-import com.quetoquenana.userservice.model.Application;
+import com.quetoquenana.userservice.dto.ApiResponse;
 import com.quetoquenana.userservice.model.AppRole;
 import com.quetoquenana.userservice.model.AppRoleUser;
+import com.quetoquenana.userservice.model.Application;
 import com.quetoquenana.userservice.service.ApplicationService;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,11 +22,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -202,7 +204,7 @@ class ApplicationControllerTest {
         AppRoleUserCreateRequest req = getAppRoleUserCreateRequest();
 
         AppRoleUser aru = AppRoleUser.builder().id(UUID.randomUUID()).build();
-        when(applicationService.addUser(eq(appId), any(AppRoleUserCreateRequest.class))).thenReturn(aru);
+        when(applicationService.addUser(eq(appId), any(AppRoleUserCreateRequest.class), anyString())).thenReturn(aru);
 
         ResponseEntity<ApiResponse> response = applicationController.addUser(appId, req);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -222,7 +224,6 @@ class ApplicationControllerTest {
         personCreateRequest.setIdNumber("ID1");
         userCreateRequest.setPerson(personCreateRequest);
         appRoleUserCreateRequest.setUser(userCreateRequest);
-        appRoleUserCreateRequest.setRoleName("ADMIN");
         return appRoleUserCreateRequest;
     }
 

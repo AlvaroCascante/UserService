@@ -2,7 +2,7 @@
 -- Mapping table that assigns a single role to a user for a specific application
 
 CREATE TABLE app_roles_users (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id),
     app_role_id UUID REFERENCES app_roles(id) ON DELETE CASCADE,
 

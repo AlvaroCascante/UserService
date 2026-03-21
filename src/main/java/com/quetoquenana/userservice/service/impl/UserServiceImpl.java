@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
                 // Ensure person is active
                 if (!found.getIsActive()) {
                     found.setIsActive(true);
-                    personService.activateById(found.getId());
+                    personService.updateStatus(found.getId(), true);
                 }
                 return found;
             })
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
 
         String plain = PasswordUtil.generateRandomPassword();
         User user = User.fromCreateRequest(
-            request, passwordEncoder.encode(plain), UserStatus.RESET, personService.getReference(person.getId())
+            request, passwordEncoder.encode(plain), UserStatus.RESET, personService.getById(person.getId())
         );
 
         user.setCreatedAt(LocalDateTime.now());

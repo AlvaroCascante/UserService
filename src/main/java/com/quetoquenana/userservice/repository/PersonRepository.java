@@ -13,4 +13,5 @@ public interface PersonRepository extends JpaRepository<Person, UUID> {
     //TODO manage status methods
     Optional<Person> findByIdNumber(String idNumber);
     List<Person> findByIsActive(boolean isActive);
+    Optional<Person> findByIdAndIsActive(UUID id, boolean isActive);
 }

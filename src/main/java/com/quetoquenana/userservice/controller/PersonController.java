@@ -3,7 +3,7 @@ package com.quetoquenana.userservice.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.quetoquenana.userservice.dto.PersonUpdateRequest;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
-import com.quetoquenana.userservice.model.ApiResponse;
+import com.quetoquenana.userservice.dto.ApiResponse;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.service.PersonService;
 import com.quetoquenana.userservice.util.JsonViewPageUtil;

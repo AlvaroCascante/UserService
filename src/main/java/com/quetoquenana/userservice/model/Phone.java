@@ -24,23 +24,22 @@ public class Phone {
     @JsonView(Person.PersonDetail.class)
     private UUID id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_id", nullable = false)
+    private Person person;
+
     @Column(name = "phone_number", nullable = false, length = 50)
     @JsonView(Person.PersonDetail.class)
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false)
-    @JsonView(Person.PersonDetail.class)
-    @JdbcType(value = PostgreSQLEnumJdbcType.class)
+    @JsonView(Person.PersonDetail.class) @JdbcType(value = PostgreSQLEnumJdbcType.class)
     private PhoneCategory category;
 
     @Column(name = "is_main", nullable = false)
     @JsonView(Person.PersonDetail.class)
     private Boolean isMain = false;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "person_id", nullable = false)
-    private Person person;
 
     public static Phone fromCreateRequest(PhoneCreateRequest request) {
         return Phone.builder()

@@ -1,6 +1,6 @@
 package com.quetoquenana.userservice.exception;
 
-import com.quetoquenana.userservice.model.ApiResponse;
+import com.quetoquenana.userservice.dto.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -97,5 +97,35 @@ public class ControllerExceptionAdvice {
         String message = messageSource.getMessage(ex.getMessageKey(), ex.getMessageArgs(), locale);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponse(message, HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @ExceptionHandler(InvalidFirebaseTokenException.class)
+    public ResponseEntity<ApiResponse> handleInvalidFirebaseToken(InvalidFirebaseTokenException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiResponse("INVALID_FIREBASE_TOKEN -- " + ex.getMessage(), HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @ExceptionHandler(FirebaseUserDisabledException.class)
+    public ResponseEntity<ApiResponse> handleFirebaseUserDisabled(FirebaseUserDisabledException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ApiResponse("FIREBASE_USER_DISABLED -- " + ex.getMessage(), HttpStatus.FORBIDDEN.value()));
+    }
+
+    @ExceptionHandler(EmailConflictException.class)
+    public ResponseEntity<ApiResponse> handleEmailConflict(EmailConflictException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ApiResponse("EMAIL_ALREADY_IN_USE -- " + ex.getMessage(), HttpStatus.CONFLICT.value()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse> handleBadRequest(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse("BAD_REQUEST -- " + ex.getMessage(), HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse> handleGeneral(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse("INTERNAL_ERROR -- " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()));
     }
 }
