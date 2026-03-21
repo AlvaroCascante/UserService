@@ -32,6 +32,10 @@ public class Application extends Auditable {
     @JsonView(ApplicationList.class)
     private String name;
 
+    @Column(name = "code", nullable = false, length = 10)
+    @JsonView(ApplicationList.class)
+    private String code;
+
     @Column(name = "description", length = 100)
     @JsonView(ApplicationDetail.class)
     private String description;
@@ -55,6 +59,7 @@ public class Application extends Auditable {
     public static Application fromCreateRequest(ApplicationCreateRequest request) {
         return Application.builder()
                 .name(request.getName())
+                .code(request.getCode())
                 .description(request.getDescription())
                 .active(Optional.ofNullable(request.getIsActive()).orElse(true))
                 .build();

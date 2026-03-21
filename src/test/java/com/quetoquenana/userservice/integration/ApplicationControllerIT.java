@@ -2,7 +2,11 @@ package com.quetoquenana.userservice.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.quetoquenana.userservice.dto.*;
+import com.quetoquenana.userservice.model.AppRole;
+import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.Application;
+import com.quetoquenana.userservice.model.Person;
+import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.model.UserStatus;
 import com.quetoquenana.userservice.repository.*;
 import com.quetoquenana.userservice.util.TestEntityFactory;
@@ -77,6 +81,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     void createApplication_asSystem_returnsCreated() throws Exception {
         ApplicationCreateRequest req = new ApplicationCreateRequest();
         req.setName("integ-app-create");
+        req.setCode("INTGAPP01");
         req.setDescription("integration create");
         req.setIsActive(true);
 
@@ -98,6 +103,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     void getApplicationById_asSystem_returnsOk() throws Exception {
         Application app = Application.builder()
                 .name("get-by-id-app")
+                .code("GETBYID01")
                 .description("d")
                 .active(true)
                 .build();
@@ -116,6 +122,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     void updateApplication_asSystem_returnsOk() throws Exception {
         Application app = Application.builder()
                 .name("to-update-app")
+                .code("UPDATE01")
                 .description("d")
                 .active(true)
                 .build();
@@ -147,6 +154,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     void deleteApplication_asSystem_setsInactive() throws Exception {
         Application app = Application.builder()
                 .name("to-delete-app")
+                .code("DELETE01")
                 .description("d")
                 .active(true)
                 .build();
@@ -165,10 +173,10 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(username = "system", roles = {"SYSTEM"})
     void getAllApplicationsPage_asSystem_returnsPage() throws Exception {
-        Application a1 = Application.builder().name("p1-app").description("d1").active(true).build();
+        Application a1 = Application.builder().name("p1-app").code("PAGEAPP01").description("d1").active(true).build();
         a1.setCreatedAt(LocalDateTime.now());
         a1.setCreatedBy("test");
-        Application a2 = Application.builder().name("p2-app").description("d2").active(true).build();
+        Application a2 = Application.builder().name("p2-app").code("PAGEAPP02").description("d2").active(true).build();
         a2.setCreatedAt(LocalDateTime.now());
         a2.setCreatedBy("test");
         applicationRepository.save(a1);
@@ -185,7 +193,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(username = "system", roles = {"SYSTEM"})
     void searchApplications_asSystem_returnsPage() throws Exception {
-        Application app = Application.builder().name("find-me-app").description("d").active(true).build();
+        Application app = Application.builder().name("find-me-app").code("FINDME01").description("d").active(true).build();
         app.setCreatedAt(LocalDateTime.now());
         app.setCreatedBy("test");
         applicationRepository.save(app);
@@ -203,7 +211,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(username = "system", roles = {"SYSTEM"})
     void addRole_asSystem_returnsCreated() throws Exception {
-        Application app = Application.builder().name("with-role-app").description("d").active(true).build();
+        Application app = Application.builder().name("with-role-app").code("ROLEAPP01").description("d").active(true).build();
         app.setCreatedAt(LocalDateTime.now());
         app.setCreatedBy("test");
         app = applicationRepository.save(app);
@@ -223,74 +231,40 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
 
     @Test
     @WithMockUser(username = "system", roles = {"SYSTEM"})
-    void addUser_asSystem_returnsCreated() throws Exception {
-        Application app = Application.builder().name("app-for-user").description("d").active(true).build();
-        app.setCreatedAt(LocalDateTime.now());
-        app.setCreatedBy("test");
-        app = applicationRepository.save(app);
-
-        // create role first so addUser can find it
-        AppRoleCreateRequest roleReq = new AppRoleCreateRequest();
-        roleReq.setRoleName("USER");
-        mockMvc.perform(post("/api/applications/" + app.getId() + "/role")
-                        .header("X-Application-Name", "user-service")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(roleReq)))
-                .andExpect(status().isCreated());
-
-        AppRoleUserCreateRequest req = new AppRoleUserCreateRequest();
-        var userReq = new UserCreateRequest();
-        userReq.setUsername("integ-u-" + UUID.randomUUID() + "@example.com");
-        var personReq = new PersonCreateRequest();
-        personReq.setIdNumber("ID-" + UUID.randomUUID());
-        personReq.setName("Integ");
-        personReq.setLastname("User");
-        userReq.setPerson(personReq);
-        req.setUser(userReq);
-
-        mockMvc.perform(post("/api/applications/" + app.getId() + "/user/customer")
-                        .header("X-Application-Name", "user-service")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.appRoleUser.id").exists());
-
-        assertThat(appRoleUserRepository.findAll()).isNotEmpty();
-    }
-
-    @Test
-    @WithMockUser(username = "system", roles = {"SYSTEM"})
     void deleteUser_asSystem_noContent() throws Exception {
-        Application app = Application.builder().name("app-for-delete").description("d").active(true).build();
+        Application app = Application.builder().name("app-for-delete").code("DELUSER01").description("d").active(true).build();
         app.setCreatedAt(LocalDateTime.now());
         app.setCreatedBy("test");
         app = applicationRepository.save(app);
 
-        // create role
-        AppRoleCreateRequest roleReq = new AppRoleCreateRequest();
-        roleReq.setRoleName("USER");
-        mockMvc.perform(post("/api/applications/" + app.getId() + "/role")
-                        .header("X-Application-Name", "user-service")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(roleReq)))
-                .andExpect(status().isCreated());
-
-        AppRoleUserCreateRequest createReq = new AppRoleUserCreateRequest();
-        var userReq = new com.quetoquenana.userservice.dto.UserCreateRequest();
         String username = "del-user-" + UUID.randomUUID() + "@example.com";
-        userReq.setUsername(username);
-        var personReq = new com.quetoquenana.userservice.dto.PersonCreateRequest();
-        personReq.setIdNumber("DEL-" + UUID.randomUUID());
-        personReq.setName("Integ");
-        personReq.setLastname("User");
-        userReq.setPerson(personReq);
-        createReq.setUser(userReq);
+        AppRole role = AppRole.builder()
+                .application(app)
+                .roleName("USER")
+                .description("role for deletion")
+                .build();
+        role.setCreatedAt(LocalDateTime.now());
+        role.setCreatedBy("test");
+        role = appRoleRepository.save(role);
 
-        mockMvc.perform(post("/api/applications/" + app.getId() + "/user/customer")
-                        .header("X-Application-Name", "user-service")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createReq)))
-                .andExpect(status().isCreated());
+        Person person = TestEntityFactory.createPerson("DEL-" + UUID.randomUUID(), true);
+        person = personRepository.save(person);
+
+        User user = User.builder()
+                .username(username)
+                .passwordHash(passwordEncoder.encode("password"))
+                .person(person)
+                .nickname("del-user")
+                .userStatus(UserStatus.ACTIVE)
+                .build();
+        user.setCreatedAt(LocalDateTime.now());
+        user.setCreatedBy("test");
+        user = userRepository.save(user);
+
+        AppRoleUser appRoleUser = AppRoleUser.of(user, role);
+        appRoleUser.setCreatedAt(LocalDateTime.now());
+        appRoleUser.setCreatedBy("test");
+        appRoleUserRepository.save(appRoleUser);
 
         mockMvc.perform(delete("/api/applications/" + app.getId() + "/user/" + username)
                         .header("X-Application-Name", "user-service"))
@@ -302,7 +276,7 @@ class ApplicationControllerIT extends AbstractIntegrationTest {
     @Test
     @WithMockUser(username = "system", roles = {"SYSTEM"})
     void deleteRole_asSystem_noContent() throws Exception {
-        Application app = Application.builder().name("app-role-del").description("d").active(true).build();
+        Application app = Application.builder().name("app-role-del").code("ROLEDEL01").description("d").active(true).build();
         app.setCreatedAt(LocalDateTime.now());
         app.setCreatedBy("test");
         app = applicationRepository.save(app);

@@ -73,19 +73,11 @@ public class TestEntityFactory {
     }
 
     public static PersonCreateRequest getPersonCreateRequest(String idNumber, Boolean isActive) {
-        PersonCreateRequest req = new PersonCreateRequest();
-        req.setIdNumber(idNumber);
-        req.setName("John");
-        req.setLastname("White");
-        return req;
+        return new PersonCreateRequest(idNumber, "John", "White");
     }
 
     public static UserCreateRequest getUserCreateRequest() {
-        UserCreateRequest req = new UserCreateRequest();
-        req.setUsername(DEFAULT_USERNAME);
-        req.setNickname("nick");
-        req.setPerson(getPersonCreateRequest(DEFAULT_ID_NUMBER, true));
-        return req;
+        return new UserCreateRequest(DEFAULT_USERNAME, getPersonCreateRequest(DEFAULT_ID_NUMBER, true), "nick");
     }
 
     public static PersonUpdateRequest getPersonUpdateRequest(Boolean isActive) {

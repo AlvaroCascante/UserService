@@ -16,12 +16,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
@@ -38,34 +38,34 @@ class UserControllerSecurityTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
     // Mock beans required by SecurityConfig
-    @MockBean
+    @MockitoBean
     private CorsConfigProperties corsConfigProperties;
 
-    @MockBean
+    @MockitoBean
     private RsaKeyProperties rsaKeyProperties;
 
-    @MockBean
+    @MockitoBean
     private UserRepository userRepository;
 
-    @MockBean
+    @MockitoBean
     private ApplicationRepository applicationRepository;
 
-    @MockBean
+    @MockitoBean
     private AppRoleUserRepository appRoleUserRepository;
 
     // Provide JwtDecoder/JwtEncoder mocks to avoid SecurityConfig creating real encoders/decoders
-    @MockBean
+    @MockitoBean
     private JwtDecoder jwtDecoder;
 
-    @MockBean
+    @MockitoBean
     private JwtEncoder jwtEncoder;
 
     // Mock SecurityService bean name for method-security SpEL if needed
-    @MockBean(name = "securityService")
+    @MockitoBean(name = "securityService")
     private SecurityService securityService;
 
     private String payload;

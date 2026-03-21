@@ -1,9 +1,7 @@
 package com.quetoquenana.userservice.service.impl;
 
-import com.quetoquenana.userservice.dto.AppRoleCreateRequest;
-import com.quetoquenana.userservice.dto.AppRoleUserCreateRequest;
-import com.quetoquenana.userservice.dto.ApplicationCreateRequest;
-import com.quetoquenana.userservice.dto.ApplicationUpdateRequest;
+import com.quetoquenana.userservice.command.CreateUserCommand;
+import com.quetoquenana.userservice.dto.*;
 import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.*;
@@ -119,6 +117,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         // Persist role directly to ensure id/version are initialized
         return appRoleRepository.saveAndFlush(role);
     }
+
     @Override
     @Transactional
     public AppRoleUser addUser(UUID applicationId, AppRoleUserCreateRequest request, String roleName) {
@@ -133,6 +132,35 @@ public class ApplicationServiceImpl implements ApplicationService {
         // Step 1: see if a User with the username already exists. If yes, reuse it.
         User user = userService.findByUsername(request.getUser().getUsername())
                 .orElseGet(() -> userService.save(request.getUser()));
+
+        // check if mapping already exists for this user and application
+        List<AppRoleUser> existingMappings = appRoleUserRepository.findByUserIdAndRoleApplicationId(user.getId(), applicationId);
+        if (!existingMappings.isEmpty()) {
+            throw new DuplicateRecordException("application.role.user.duplicate");
+        }
+
+        // create match record
+        AppRoleUser appRoleUser = AppRoleUser.of(user, role);
+        appRoleUser.setCreatedAt(LocalDateTime.now());
+        appRoleUser.setCreatedBy(currentUserService.getCurrentUsername());
+        return appRoleUserRepository.save(appRoleUser);
+    }
+
+    @Override
+    @Transactional
+    public AppRoleUser addUser(CreateUserCommand command) {
+        // validate application exists
+        Application application = applicationRepository.findByCode(command.getApplicationCode())
+                .orElseThrow(RecordNotFoundException::new);
+        UUID applicationId = application.getId();
+
+        // find matching app role for the application
+        AppRole role = appRoleRepository.findByApplicationIdAndRoleName(applicationId, command.getRoleName())
+                .orElseThrow(RecordNotFoundException::new);
+
+        // Step 1: see if a User with the username already exists. If yes, reuse it.
+        User user = userService.findByUsername(command.getEmail())
+                .orElseGet(() -> userService.save(command));
 
         // check if mapping already exists for this user and application
         List<AppRoleUser> existingMappings = appRoleUserRepository.findByUserIdAndRoleApplicationId(user.getId(), applicationId);

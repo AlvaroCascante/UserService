@@ -2,6 +2,7 @@ package com.quetoquenana.userservice.service;
 
 import com.quetoquenana.userservice.dto.TokenResponse;
 import com.quetoquenana.userservice.exception.AuthenticationException;
+import com.quetoquenana.userservice.model.RefreshToken;
 import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.model.UserStatus;
 import com.quetoquenana.userservice.repository.RefreshTokenRepository;
@@ -12,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,14 +27,19 @@ import java.time.Instant;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 class TokenServiceImplTest {
+
+    private static final String APP_CODE = "app1";
+    private static final String REFRESH_TOKEN = "dummy";
 
     JwtDecoder jwtDecoder;
     JwtEncoder jwtEncoder;
     UserService userService;
     UserDetailsService userDetailsService;
+    RefreshTokenRepository refreshTokenRepository;
     TokenServiceImpl tokenService;
 
     @BeforeEach
@@ -41,13 +48,26 @@ class TokenServiceImplTest {
         jwtEncoder = Mockito.mock(JwtEncoder.class);
         userService = Mockito.mock(UserService.class);
         userDetailsService = Mockito.mock(UserDetailsService.class);
-        ApplicationService applicationService = Mockito.mock(ApplicationService.class);
-        // default: no active applications
-        when(applicationService.findActive()).thenReturn(List.of());
+        refreshTokenRepository = Mockito.mock(com.quetoquenana.userservice.repository.RefreshTokenRepository.class);
 
-        RefreshTokenRepository refreshTokenRepository = Mockito.mock(com.quetoquenana.userservice.repository.RefreshTokenRepository.class);
+        tokenService = new TokenServiceImpl(
+                userService, 
+                userDetailsService, 
+                jwtEncoder, 
+                jwtDecoder, 
+                refreshTokenRepository, 
+                3600L, 
+                86400L, 
+                "https://auth.example"
+        );
+    }
 
-        tokenService = new TokenServiceImpl(applicationService, userService, userDetailsService, jwtEncoder, jwtDecoder, refreshTokenRepository, 3600L, 86400L, "https://auth.example", "");
+    private RefreshToken buildStoredRefreshToken() {
+        return RefreshToken.builder()
+                .token(REFRESH_TOKEN)
+                .expiresAt(Instant.now().plusSeconds(3600))
+                .revoked(false)
+                .build();
     }
 
     private Jwt buildJwt(Map<String, Object> claims, List<String> aud) {
@@ -72,43 +92,49 @@ class TokenServiceImplTest {
         // so we'll mock decoder to return jwt but validator checks issuer from jwt.getIssuer();
         Jwt jwtWithNoIssuer = new Jwt(jwt.getTokenValue(), jwt.getIssuedAt(), jwt.getExpiresAt(), jwt.getHeaders(), jwt.getClaims());
 
+        when(refreshTokenRepository.findByToken(REFRESH_TOKEN)).thenReturn(Optional.of(buildStoredRefreshToken()));
         when(jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(jwtWithNoIssuer);
 
-        AuthenticationException ex = assertThrows(AuthenticationException.class, () -> tokenService.refresh("dummy"));
+        AuthenticationException ex = assertThrows(AuthenticationException.class, () -> tokenService.refresh(REFRESH_TOKEN, APP_CODE));
         assertTrue(ex.getMessage().contains("invalid.refresh.token") || ex.getMessage().contains("error.authentication"));
     }
 
     @Test
     void refresh_shouldThrow_whenMissingSubject() {
         Jwt jwt = buildJwt(Map.of("type", "refresh", "roles", List.of("USER")), List.of("app1"));
+        when(refreshTokenRepository.findByToken(REFRESH_TOKEN)).thenReturn(Optional.of(buildStoredRefreshToken()));
         when(jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(jwt);
-        assertThrows(AuthenticationException.class, () -> tokenService.refresh("dummy"));
+        assertThrows(AuthenticationException.class, () -> tokenService.refresh(REFRESH_TOKEN, APP_CODE));
     }
 
     @Test
     void refresh_shouldThrow_whenMissingType() {
         Jwt jwt = buildJwt(Map.of("sub", "user", "roles", List.of("USER")), List.of("app1"));
+        when(refreshTokenRepository.findByToken(REFRESH_TOKEN)).thenReturn(Optional.of(buildStoredRefreshToken()));
         when(jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(jwt);
-        assertThrows(AuthenticationException.class, () -> tokenService.refresh("dummy"));
+        assertThrows(AuthenticationException.class, () -> tokenService.refresh(REFRESH_TOKEN, APP_CODE));
     }
 
     @Test
     void refresh_shouldThrow_whenMissingAudience() {
         Jwt jwt = buildJwt(Map.of("sub", "user", "type", "refresh", "roles", List.of("USER")), null);
+        when(refreshTokenRepository.findByToken(REFRESH_TOKEN)).thenReturn(Optional.of(buildStoredRefreshToken()));
         when(jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(jwt);
-        assertThrows(AuthenticationException.class, () -> tokenService.refresh("dummy"));
+        assertThrows(AuthenticationException.class, () -> tokenService.refresh(REFRESH_TOKEN, APP_CODE));
     }
 
     @Test
     void refresh_shouldThrow_whenMissingRoles() {
         Jwt jwt = buildJwt(Map.of("sub", "user", "type", "refresh"), List.of("app1"));
+        when(refreshTokenRepository.findByToken(REFRESH_TOKEN)).thenReturn(Optional.of(buildStoredRefreshToken()));
         when(jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(jwt);
-        assertThrows(AuthenticationException.class, () -> tokenService.refresh("dummy"));
+        assertThrows(AuthenticationException.class, () -> tokenService.refresh(REFRESH_TOKEN, APP_CODE));
     }
 
     @Test
     void refresh_happyPath() {
         Jwt jwt = buildJwt(Map.of("sub", "user", "type", "refresh", "roles", List.of("USER")), List.of("app1"));
+        when(refreshTokenRepository.findByToken(REFRESH_TOKEN)).thenReturn(Optional.of(buildStoredRefreshToken()));
         when(jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(jwt);
 
         User user = new User();
@@ -122,27 +148,30 @@ class TokenServiceImplTest {
 
         when(jwtEncoder.encode(ArgumentMatchers.any())).thenReturn(org.springframework.security.oauth2.jwt.Jwt.withTokenValue("t").header("alg","none").header("typ","JWT").claim("x","y").build());
 
-        TokenResponse resp = tokenService.refresh("dummy");
+        TokenResponse resp = tokenService.refresh(REFRESH_TOKEN, APP_CODE);
         assertNotNull(resp.getAccessToken());
         assertNotNull(resp.getRefreshToken());
     }
 
     @Test
     void refresh_shouldThrow_whenJwtDecoderReturnsNull() {
+        when(refreshTokenRepository.findByToken(REFRESH_TOKEN)).thenReturn(Optional.of(buildStoredRefreshToken()));
         when(jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(null);
-        assertThrows(AuthenticationException.class, () -> tokenService.refresh("dummy"));
+        assertThrows(AuthenticationException.class, () -> tokenService.refresh(REFRESH_TOKEN, APP_CODE));
     }
 
     @Test
     void refresh_shouldThrow_whenTypeIsNotRefresh() {
         Jwt jwt = buildJwt(Map.of("sub", "user", "type", "auth", "roles", List.of("USER")), List.of("app1"));
+        when(refreshTokenRepository.findByToken(REFRESH_TOKEN)).thenReturn(Optional.of(buildStoredRefreshToken()));
         when(jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(jwt);
-        assertThrows(AuthenticationException.class, () -> tokenService.refresh("dummy"));
+        assertThrows(AuthenticationException.class, () -> tokenService.refresh(REFRESH_TOKEN, APP_CODE));
     }
 
     @Test
     void refresh_shouldThrow_whenUserNotActive() {
         Jwt jwt = buildJwt(Map.of("sub", "user", "type", "refresh", "roles", List.of("USER")), List.of("app1"));
+        when(refreshTokenRepository.findByToken(REFRESH_TOKEN)).thenReturn(Optional.of(buildStoredRefreshToken()));
         when(jwtDecoder.decode(ArgumentMatchers.anyString())).thenReturn(jwt);
 
         User user = new User();
@@ -150,7 +179,7 @@ class TokenServiceImplTest {
         user.setUserStatus(UserStatus.INACTIVE);
         when(userService.findByUsername("user")).thenReturn(Optional.of(user));
 
-        AuthenticationException ex = assertThrows(AuthenticationException.class, () -> tokenService.refresh("dummy"));
+        AuthenticationException ex = assertThrows(AuthenticationException.class, () -> tokenService.refresh(REFRESH_TOKEN, APP_CODE));
         assertTrue(ex.getMessage().contains("user.not.active") || ex.getMessage().contains("authentication"));
     }
 
@@ -159,7 +188,11 @@ class TokenServiceImplTest {
         // Prepare authentication with ROLE_ prefix and plain role
         Authentication auth = Mockito.mock(Authentication.class);
         when(auth.getName()).thenReturn("user");
-        when(auth.getAuthorities()).thenReturn((Collection) Set.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("USER")));
+        Collection<? extends GrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority("ROLE_ADMIN"),
+                new SimpleGrantedAuthority("USER")
+        );
+        doReturn(authorities).when(auth).getAuthorities();
 
         User user = new User();
         user.setId(UUID.randomUUID());
@@ -171,7 +204,7 @@ class TokenServiceImplTest {
         ArgumentCaptor<JwtEncoderParameters> captor = ArgumentCaptor.forClass(JwtEncoderParameters.class);
         when(jwtEncoder.encode(captor.capture())).thenReturn(Jwt.withTokenValue("t").header("alg","none").header("typ","JWT").claim("x","y").build());
 
-        tokenService.createTokens(auth);
+        tokenService.createTokens(auth, APP_CODE);
 
         // The first encode call is for access token; get captured claims
         JwtEncoderParameters params = captor.getAllValues().getFirst();

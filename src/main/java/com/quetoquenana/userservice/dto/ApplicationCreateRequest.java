@@ -8,6 +8,9 @@ public class ApplicationCreateRequest {
     @NotBlank
     private String name;
 
+    @NotBlank
+    private String code;
+
     private String description;
 
     private Boolean isActive;

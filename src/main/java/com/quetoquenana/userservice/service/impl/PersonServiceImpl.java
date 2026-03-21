@@ -1,8 +1,8 @@
 package com.quetoquenana.userservice.service.impl;
 
+import com.quetoquenana.userservice.command.PersonCreateCommand;
 import com.quetoquenana.userservice.dto.PersonCreateRequest;
 import com.quetoquenana.userservice.dto.PersonUpdateRequest;
-import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.RecordNotFoundException;
 import com.quetoquenana.userservice.model.Person;
 import com.quetoquenana.userservice.repository.PersonRepository;
@@ -58,6 +58,25 @@ public class PersonServiceImpl implements PersonService {
     public Person save(PersonCreateRequest request) {
         String username = currentUserService.getCurrentUsername();
         return personRepository.findByIdNumber(request.getIdNumber())
+                .map(found -> {
+                    found.setIsActive(true);
+                    found.setUpdatedAt(LocalDateTime.now());
+                    found.setUpdatedBy(username);
+                    return personRepository.save(found);
+                })
+                .orElseGet(() -> {
+                    Person person = Person.fromCreateRequest(request);
+                    person.setCreatedAt(LocalDateTime.now());
+                    person.setCreatedBy(username);
+                    return personRepository.save(person);
+                });
+    }
+
+    @Override
+    @Transactional
+    public Person save(PersonCreateCommand command) {
+        String username = currentUserService.getCurrentUsername();
+        return personRepository.findByIdNumber(command.getIdNumber())
             .map(found -> {
                 found.setIsActive(true);
                 found.setUpdatedAt(LocalDateTime.now());
@@ -65,7 +84,7 @@ public class PersonServiceImpl implements PersonService {
                 return personRepository.save(found);
             })
             .orElseGet(() -> {
-                Person person = Person.fromCreateRequest(request);
+                Person person = Person.fromCreateCommand(command);
                 person.setCreatedAt(LocalDateTime.now());
                 person.setCreatedBy(username);
                 return personRepository.save(person);
@@ -83,11 +102,11 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     @Transactional
-    public Person updateStatus(UUID id, boolean status) {
+    public void updateStatus(UUID id, boolean status) {
         Person existing = personRepository.findById(id)
                 .orElseThrow(RecordNotFoundException::new);
         existing.updateStatus(currentUserService.getCurrentUsername(), status);
-        return personRepository.save(existing);
+        personRepository.save(existing);
     }
 
     @Override

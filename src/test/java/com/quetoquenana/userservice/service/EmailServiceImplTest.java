@@ -1,8 +1,9 @@
-package com.quetoquenana.userservice.service.impl;
+package com.quetoquenana.userservice.service;
 
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.quetoquenana.userservice.dto.UserEmailInfo;
+import com.quetoquenana.userservice.service.impl.EmailServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.MessageSource;

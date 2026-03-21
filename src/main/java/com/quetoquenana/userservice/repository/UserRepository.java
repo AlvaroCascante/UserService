@@ -1,6 +1,7 @@
 package com.quetoquenana.userservice.repository;
 
 import com.quetoquenana.userservice.model.User;
+import com.quetoquenana.userservice.model.UserProvider;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -19,5 +20,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findByPersonId(UUID personId);
 
     // find by external provider and external id (case-insensitive)
-    Optional<User> findByExternalProviderIgnoreCaseAndExternalIdIgnoreCase(String externalProvider, String externalId);
+    Optional<User> findByProviderAndExternalId(UserProvider provider, String externalId);
 }

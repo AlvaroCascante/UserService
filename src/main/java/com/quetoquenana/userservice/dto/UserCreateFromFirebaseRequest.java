@@ -1,16 +1,12 @@
 package com.quetoquenana.userservice.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UserCreateRequest {
-    @Email(message = "{user.email.invalid}")
-    private String username;
-
+public class UserCreateFromFirebaseRequest {
     @NotNull(message = "{validation.field.not.null}")
     private PersonCreateRequest person;
 
@@ -18,7 +14,7 @@ public class UserCreateRequest {
 
     @Override
     public String toString() {
-        return "UserCreateRequest(username=" + username
+        return "UserCreateRequest(username="
                 + ", person=" + person
                 + ", nickname=" + nickname
                 + ")";

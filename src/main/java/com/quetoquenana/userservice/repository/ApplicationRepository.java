@@ -20,5 +20,7 @@ public interface ApplicationRepository extends JpaRepository<Application, UUID> 
     boolean existsByNameIgnoreCase(String name);
 
     Page<Application> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    Optional<Application> findByCode(String applicationCode);
 }
 
