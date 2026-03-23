@@ -804,7 +804,12 @@
 						"header": [
 							{
 								"key": "X-Application-Name",
-								"value": "UserService",
+								"value": "USERSERVIC",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
 								"type": "text"
 							}
 						],
