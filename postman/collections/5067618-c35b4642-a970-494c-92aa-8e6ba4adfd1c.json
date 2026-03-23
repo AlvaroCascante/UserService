@@ -791,16 +791,11 @@
 					},
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "username",
-									"value": "SYSTEM",
-									"type": "string"
-								},
-								{
-									"key": "password",
-									"value": "{{system_pass}}",
+									"key": "token",
+									"value": "{{firebase_token}}",
 									"type": "string"
 								}
 							]
@@ -813,8 +808,17 @@
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"person\": {\n        \"idNumber\": \"911080683\",\n        \"name\": \"NameTest\",\n        \"lastname\": \"LastnameTest\"\n    },\n    \"nickname\": \"Teest\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/auth/login",
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/auth/firebase-registration",
 							"host": [
 								"{{HOST_USER_SERVICE}}"
 							],
@@ -822,7 +826,7 @@
 								"{{path}}",
 								"api",
 								"auth",
-								"login"
+								"firebase-registration"
 							]
 						}
 					},
