@@ -730,6 +730,105 @@
 					"response": []
 				},
 				{
+					"name": "Complete Registration",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5924420f-b835-4379-99e8-2da4f6f49892",
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"var accessToken = jsonData.accessToken;",
+									"",
+									"// Extract username from request authorization",
+									"var username = null;",
+									"",
+									"if (pm.request.auth) {",
+									"    var authType = pm.request.auth.type;",
+									"    ",
+									"    if (authType === 'basic') {",
+									"        // For Basic Auth, get the username parameter",
+									"        var basicAuth = pm.request.auth.parameters();",
+									"        if (basicAuth) {",
+									"            username = basicAuth.get('username');",
+									"        }",
+									"    } else if (authType === 'digest') {",
+									"        // For Digest Auth",
+									"        var digestAuth = pm.request.auth.parameters();",
+									"        if (digestAuth) {",
+									"            username = digestAuth.get('username');",
+									"        }",
+									"    } else if (authType === 'ntlm') {",
+									"        // For NTLM Auth",
+									"        var ntlmAuth = pm.request.auth.parameters();",
+									"        if (ntlmAuth) {",
+									"            username = ntlmAuth.get('username');",
+									"        }",
+									"    }",
+									"}",
+									"",
+									"// Print the username to the console",
+									"console.log(\"Username:\", username);",
+									"",
+									"// Set the appropriate token based on the username",
+									"if (username === 'system') {",
+									"    console.log(\"Updating system_token\");",
+									"    pm.environment.set(\"system_token\", accessToken);",
+									"} else {",
+									"    console.log(\"Updating user_token\");",
+									"    pm.environment.set(\"user_token\", accessToken);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "5067618-603f8982-ae2f-481e-8f69-05f292fa5db8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "SYSTEM",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "{{system_pass}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Application-Name",
+								"value": "UserService",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/auth/login",
+							"host": [
+								"{{HOST_USER_SERVICE}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Reset",
 					"event": [
 						{
@@ -968,6 +1067,18 @@
 								"jwks.json"
 							]
 						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"id": "5067618-04ac62c5-b090-4289-a775-80fbbc39361a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
 					},
 					"response": []
 				}
