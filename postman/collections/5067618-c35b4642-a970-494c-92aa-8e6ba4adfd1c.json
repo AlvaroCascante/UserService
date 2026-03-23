@@ -806,11 +806,6 @@
 								"key": "X-Application-Name",
 								"value": "USERSERVIC",
 								"type": "text"
-							},
-							{
-								"key": "",
-								"value": "",
-								"type": "text"
 							}
 						],
 						"body": {
