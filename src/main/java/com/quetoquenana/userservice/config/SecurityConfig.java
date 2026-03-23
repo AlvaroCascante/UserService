@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.core.*;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -43,8 +45,24 @@ public class SecurityConfig {
     private final CorsConfigProperties corsConfigProperties;
     private final RsaKeyProperties rsaKeyProperties;
 
+
     @Bean
-    public SecurityFilterChain basicAuthChain(HttpSecurity http) throws Exception {
+    BearerTokenResolver bearerTokenResolver() {
+        DefaultBearerTokenResolver delegate = new DefaultBearerTokenResolver();
+
+        return request -> {
+            String uri = request.getRequestURI();
+
+            if (uri != null && uri.endsWith("/api/auth/firebase-registration")) {
+                return null; // do not let Spring Security try to decode this bearer token
+            }
+
+            return delegate.resolve(request);
+        };
+    }
+
+    @Bean
+    SecurityFilterChain basicAuthChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/auth/login", "/api/auth/reset")
                 .authorizeHttpRequests(auth -> auth
@@ -57,14 +75,17 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // disable for API clients; enable if using browser forms
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/util/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/api/auth/forgot-password", "/api/auth/refresh").permitAll()
+                        .requestMatchers(
+                                "/api/auth/forgot-password",
+                                "/api/auth/refresh",
+                                "/api/auth/firebase-registration").permitAll()
                         .requestMatchers("/.well-known/jwks.json").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -74,7 +95,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(
+    JwtDecoder jwtDecoder(
             @Value("${security.jwt.issuer}") String expectedIssuer,
             @Value("${security.jwt.aud}") String expectedAudience
     ) {
@@ -99,29 +120,10 @@ public class SecurityConfig {
         }
     }
 
-    public OAuth2TokenValidator<Jwt> audienceValidator(String audience) {
-        return new JwtClaimValidator<List<String>>(
-                OAuth2TokenIntrospectionClaimNames.AUD,
-                aud -> aud.contains(audience)
-        );
-    }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    private JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        authoritiesConverter.setAuthoritiesClaimName(KEY_ROLES);
-        // we will prefix authorities with ROLE_ so that hasRole('X') checks work
-        authoritiesConverter.setAuthorityPrefix(ROLE_PREFIX);
-
-        JwtAuthenticationConverter jwtAuthConverter = new JwtAuthenticationConverter();
-        jwtAuthConverter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
-
-        jwtAuthConverter.setPrincipalClaimName(KEY_SUB);
-        return jwtAuthConverter;
     }
 
     @Bean
@@ -141,17 +143,37 @@ public class SecurityConfig {
         return source;
     }
 
+    @Bean
+    JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
+        return new NimbusJwtEncoder(jwkSource);
+    }
+
+    private OAuth2TokenValidator<Jwt> audienceValidator(String audience) {
+        return new JwtClaimValidator<List<String>>(
+                OAuth2TokenIntrospectionClaimNames.AUD,
+                aud -> aud.contains(audience)
+        );
+    }
+
+    private JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        authoritiesConverter.setAuthoritiesClaimName(KEY_ROLES);
+        // we will prefix authorities with ROLE_ so that hasRole('X') checks work
+        authoritiesConverter.setAuthorityPrefix(ROLE_PREFIX);
+
+        JwtAuthenticationConverter jwtAuthConverter = new JwtAuthenticationConverter();
+        jwtAuthConverter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+
+        jwtAuthConverter.setPrincipalClaimName(KEY_SUB);
+        return jwtAuthConverter;
+    }
+
     private List<String> splitToList(String value) {
         if (value == null || value.isBlank()) return List.of();
         return Arrays.stream(value.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
-    }
-
-    @Bean
-    JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
-        return new NimbusJwtEncoder(jwkSource);
     }
 
 }

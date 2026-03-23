@@ -70,7 +70,7 @@ public class AuthController {
             @Valid @RequestBody UserCreateFromFirebaseRequest request,
             @RequestHeader(value = APP_NAME) String appCode
     ) {
-        log.info("POST /api/users/customer called with payload: {}", request);
+        log.info("POST /api/auth/firebase-registration called with payload: {}", request);
         UserCreateFromFirebaseResponse user = authUserService.createFromFirebase(request, appCode);
 
         TokenResponse tokenResponse = tokenService.createTokensForUser(user.username(), appCode);

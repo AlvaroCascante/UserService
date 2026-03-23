@@ -8,27 +8,22 @@ import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.repository.AppRoleUserRepository;
 import com.quetoquenana.userservice.repository.ApplicationRepository;
 import com.quetoquenana.userservice.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
+import com.quetoquenana.userservice.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.quetoquenana.userservice.util.Constants.Headers.APP_NAME;
-
 @Service
 @RequiredArgsConstructor
 @Primary
-public class JpaUserDetailsServiceImpl implements UserDetailsService {
+public class JpaUserDetailsServiceImpl implements CustomUserDetailsService {
 
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
@@ -40,8 +35,17 @@ public class JpaUserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new AuthenticationException("error.authentication"));
 
-        Application application = applicationRepository.findByName(getAppNameFromRequest())
+        return new SecurityUser(user, null);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username, String appCode) throws UsernameNotFoundException {
+        SecurityUser securityUser = (SecurityUser)loadUserByUsername(username);
+        User user = securityUser.user();
+
+        Application application = applicationRepository.findByCode(appCode)
                 .orElseThrow(() -> new AuthenticationException("error.authentication.application"));
+
         if (!application.isActive()) {
             throw new AuthenticationException("error.authentication.application.inactive");
         }
@@ -52,15 +56,7 @@ public class JpaUserDetailsServiceImpl implements UserDetailsService {
                 .map(mapping -> new SimpleGrantedAuthority(mapping.getRole().getRoleName()))
                 .collect(Collectors.toList());
 
-        return new SecurityUser(user, authorities);
-    }
 
-    private String getAppNameFromRequest() {
-        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attrs != null) {
-            HttpServletRequest req = attrs.getRequest();
-            return req.getHeader(APP_NAME);
-        }
-        throw new AuthenticationException("error.authentication.application.header");
+        return new SecurityUser(user, authorities);
     }
 }

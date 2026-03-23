@@ -6,6 +6,7 @@ import com.quetoquenana.userservice.model.RefreshToken;
 import com.quetoquenana.userservice.model.User;
 import com.quetoquenana.userservice.model.UserStatus;
 import com.quetoquenana.userservice.repository.RefreshTokenRepository;
+import com.quetoquenana.userservice.service.CustomUserDetailsService;
 import com.quetoquenana.userservice.service.TokenService;
 import com.quetoquenana.userservice.service.UserService;
 import org.jspecify.annotations.NonNull;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ import static com.quetoquenana.userservice.util.Constants.JWTClaims.*;
 public class TokenServiceImpl implements TokenService {
 
     private final UserService userService;
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -39,7 +39,8 @@ public class TokenServiceImpl implements TokenService {
     private final long refreshTokenSeconds;
     private final String issuer;
 
-    public TokenServiceImpl(UserService userService, UserDetailsService userDetailsService,
+    public TokenServiceImpl(UserService userService,
+                            CustomUserDetailsService userDetailsService,
                             JwtEncoder jwtEncoder,
                             JwtDecoder jwtDecoder,
                             RefreshTokenRepository refreshTokenRepository,
@@ -98,7 +99,7 @@ public class TokenServiceImpl implements TokenService {
         User user = userService.findByUsername(username)
                 .orElseThrow(() -> new AuthenticationException("error.authentication"));
         // Load roles for user via UserDetailsService
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername(), appCode);
         List<String> roles = getRoles(userDetails.getAuthorities());
 
         // Build tokens using audience set to the provided applicationName if present, otherwise fall back to configured audience list

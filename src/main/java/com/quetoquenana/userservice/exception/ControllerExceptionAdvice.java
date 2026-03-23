@@ -103,6 +103,7 @@ public class ControllerExceptionAdvice {
 
     @ExceptionHandler(InvalidFirebaseTokenException.class)
     public ResponseEntity<ApiResponse> handleInvalidFirebaseToken(InvalidFirebaseTokenException ex) {
+        log.error("Invalid Firebase token: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ApiResponse("INVALID_FIREBASE_TOKEN -- " + ex.getMessage(), HttpStatus.BAD_REQUEST.value()));
     }

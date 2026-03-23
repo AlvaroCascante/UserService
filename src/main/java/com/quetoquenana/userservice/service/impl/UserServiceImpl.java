@@ -133,14 +133,18 @@ public class UserServiceImpl implements UserService {
 
 
         String plain = null;
+        String pass = null;
         switch(command.getProvider()) {
+            case LOCAL_EMAIL -> {
+                plain = PasswordUtil.generateRandomPassword();
+                pass = passwordEncoder.encode(plain);
+            }
             case GOOGLE, PASSWORD -> {}
-            case LOCAL_EMAIL -> plain = PasswordUtil.generateRandomPassword();
         }
 
         User user = User.from(
                 command,
-                passwordEncoder.encode(plain),
+                pass,
                 UserStatus.RESET,
                 personService.getById(person.getId())
             );
@@ -151,8 +155,8 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         switch(command.getProvider()) {
-            case GOOGLE, PASSWORD -> {}
             case LOCAL_EMAIL -> sendNewUserEmailAsync(person, command.getEmail(), plain);
+            case GOOGLE, PASSWORD -> {}
         }
         return user;
     }
