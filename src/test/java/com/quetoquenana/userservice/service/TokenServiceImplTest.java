@@ -38,7 +38,7 @@ class TokenServiceImplTest {
     JwtDecoder jwtDecoder;
     JwtEncoder jwtEncoder;
     UserService userService;
-    UserDetailsService userDetailsService;
+    CustomUserDetailsService userDetailsService;
     RefreshTokenRepository refreshTokenRepository;
     TokenServiceImpl tokenService;
 
@@ -47,7 +47,7 @@ class TokenServiceImplTest {
         jwtDecoder = Mockito.mock(JwtDecoder.class);
         jwtEncoder = Mockito.mock(JwtEncoder.class);
         userService = Mockito.mock(UserService.class);
-        userDetailsService = Mockito.mock(UserDetailsService.class);
+        userDetailsService = Mockito.mock(CustomUserDetailsService.class);
         refreshTokenRepository = Mockito.mock(com.quetoquenana.userservice.repository.RefreshTokenRepository.class);
 
         tokenService = new TokenServiceImpl(

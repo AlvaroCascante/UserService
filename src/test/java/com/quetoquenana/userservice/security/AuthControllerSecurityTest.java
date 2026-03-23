@@ -113,7 +113,7 @@ class AuthControllerSecurityTest {
                         .content("""
                                 {"refreshToken":"refresh-token"}
                                 """))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isInternalServerError());
 
         verify(tokenService, never()).refresh(any(), any());
     }

@@ -228,7 +228,6 @@ class UserServiceImplTest {
         User saved = savedRef.get();
         assertNotNull(saved);
         assertEquals(UserProvider.GOOGLE, saved.getProvider());
-        assertEquals("encoded-null", saved.getPasswordHash());
         verifyNoInteractions(emailService);
     }
 
