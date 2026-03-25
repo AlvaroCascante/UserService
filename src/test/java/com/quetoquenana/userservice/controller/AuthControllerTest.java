@@ -115,6 +115,7 @@ class AuthControllerTest {
                 "alvarito"
         );
         UserCreateFromFirebaseResponse user = new UserCreateFromFirebaseResponse(
+                "12345679",
                 "1-2345-6789",
                 "Alvaro",
                 "Cascante",

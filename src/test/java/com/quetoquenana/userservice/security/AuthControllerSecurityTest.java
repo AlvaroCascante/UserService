@@ -179,6 +179,7 @@ class AuthControllerSecurityTest {
     @WithMockUser(username = "firebase-user@example.com")
     void firebaseRegistration_Authenticated_Returns201() throws Exception {
         when(authUserService.createFromFirebase(any(), eq("USR"))).thenReturn(new UserCreateFromFirebaseResponse(
+                "123456879",
                 "1-2345-6789",
                 "Alvaro",
                 "Cascante",
