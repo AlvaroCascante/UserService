@@ -43,7 +43,7 @@ public class AuthUserServiceImpl implements AuthUserService {
                 .firebaseUid(decoded.getUid())
                 .email(decoded.getEmail())
                 .emailVerified(decoded.isEmailVerified())
-                .nickname(decoded.getName())
+                .nickname(request.getNickname() == null? decoded.getName() : request.getNickname())
                 .provider(UserProvider.fromSignInProvider(signInProvider))
                 .roleName(ROLE_NAME_USER)
                 .applicationCode(appCode)
@@ -52,6 +52,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         try {
             AppRoleUser appRoleUser = applicationService.addUser(createUserCommand);
             return new UserCreateFromFirebaseResponse(
+                    appRoleUser.getUser().getId().toString(),
                     appRoleUser.getUser().getPerson().getIdNumber(),
                     appRoleUser.getUser().getPerson().getName(),
                     appRoleUser.getUser().getPerson().getLastname(),
