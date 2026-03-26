@@ -804,7 +804,7 @@
 						"header": [
 							{
 								"key": "X-Application-Name",
-								"value": "USERSERVIC",
+								"value": "PEDPAL",
 								"type": "text"
 							}
 						],
