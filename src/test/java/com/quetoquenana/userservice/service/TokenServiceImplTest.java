@@ -144,8 +144,7 @@ class TokenServiceImplTest {
         when(userService.findByUsername("user")).thenReturn(Optional.of(user));
 
         UserDetails ud = new org.springframework.security.core.userdetails.User("user", "pass", Set.of(new SimpleGrantedAuthority("ROLE_USER")));
-        when(userDetailsService.loadUserByUsername("user")).thenReturn(ud);
-
+        when(userDetailsService.loadUserByUsername("user", APP_CODE)).thenReturn(ud);
         when(jwtEncoder.encode(ArgumentMatchers.any())).thenReturn(org.springframework.security.oauth2.jwt.Jwt.withTokenValue("t").header("alg","none").header("typ","JWT").claim("x","y").build());
 
         TokenResponse resp = tokenService.refresh(REFRESH_TOKEN, APP_CODE);
@@ -198,7 +197,9 @@ class TokenServiceImplTest {
         user.setId(UUID.randomUUID());
         user.setUsername("user");
         user.setUserStatus(UserStatus.ACTIVE);
+        UserDetails ud = new org.springframework.security.core.userdetails.User("user", "pass", Set.of(new SimpleGrantedAuthority("ROLE_USER")));
         when(userService.findByUsername("user")).thenReturn(Optional.of(user));
+        when(userDetailsService.loadUserByUsername("user", APP_CODE)).thenReturn(ud);
 
         // capture the JwtEncoderParameters passed to encoder
         ArgumentCaptor<JwtEncoderParameters> captor = ArgumentCaptor.forClass(JwtEncoderParameters.class);
@@ -213,7 +214,6 @@ class TokenServiceImplTest {
         assertNotNull(rolesObj);
         assertInstanceOf(List.class, rolesObj);
         List<?> roles = (List<?>) rolesObj;
-        assertTrue(roles.contains("ADMIN"));
         assertTrue(roles.contains("USER"));
     }
 }

@@ -62,7 +62,9 @@ public class TokenServiceImpl implements TokenService {
         User user = userService.findByUsername(authentication.getName())
                 .orElseThrow(() -> new AuthenticationException("error.authentication"));
 
-        return getTokenResponse(user, appCode, getRoles(authentication.getAuthorities()));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername(), appCode);
+
+        return getTokenResponse(user, appCode, getRoles(userDetails.getAuthorities()));
     }
 
     @Override
@@ -89,7 +91,7 @@ public class TokenServiceImpl implements TokenService {
         if (!user.getUserStatus().equals(UserStatus.ACTIVE)) {
             throw new AuthenticationException("error.authentication.user.not.active");
         }
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername(), appCode);
 
         return getTokenResponse(user, appCode, getRoles(userDetails.getAuthorities()));
     }
