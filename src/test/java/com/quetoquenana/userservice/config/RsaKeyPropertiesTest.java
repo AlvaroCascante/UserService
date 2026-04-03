@@ -20,7 +20,7 @@ class RsaKeyPropertiesTest {
         RSAPublicKey pub = (RSAPublicKey) kp.getPublic();
         RSAPrivateKey priv = (RSAPrivateKey) kp.getPrivate();
 
-        RsaKeyProperties props = new RsaKeyProperties(pub, priv, "test-key-id-");
+        RsaKeyProperties props = new RsaKeyProperties(pub, priv, "test-key-id-", "s");
 
         assertThat(props.publicKey()).isNotNull();
         assertThat(props.privateKey()).isNotNull();
