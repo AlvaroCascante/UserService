@@ -2452,7 +2452,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"stringToEncode\":\"UZ*59+<mB=n?\"\n}",
+							"raw": "{\n    \"stringToEncode\":\"123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2460,9 +2460,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}/{{path}}/api/util/encode",
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/util/encode",
 							"host": [
-								"{{HOST}}"
+								"{{HOST_USER_SERVICE}}"
 							],
 							"path": [
 								"{{path}}",
