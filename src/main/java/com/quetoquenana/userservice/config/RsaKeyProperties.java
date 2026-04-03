@@ -12,7 +12,8 @@ import static com.quetoquenana.userservice.util.Constants.Dates.YEAR_MONTH;
 public record RsaKeyProperties(
         RSAPublicKey publicKey,
         RSAPrivateKey privateKey,
-        String keyId
+        String keyId,
+        String keySuffix
 ) {
 
     /**
@@ -20,6 +21,6 @@ public record RsaKeyProperties(
      * Example: if keyId == "user-service-key-id-" and today is 2025-12-25 -> "user-service-key-id-2025-12"
      */
     public String currentKeyId() {
-        return keyId + LocalDate.now().format(YEAR_MONTH);
+        return keyId + keySuffix;
     }
 }

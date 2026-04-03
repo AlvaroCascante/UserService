@@ -34,6 +34,7 @@ public class StartupLogger implements ApplicationRunner {
 
     private static String[] getKeys() {
         return new String[]{
+                    "security.rsa.key-suffix",
                     "spring.datasource.url",
                     "spring.datasource.username",
                     "app.support.email"
