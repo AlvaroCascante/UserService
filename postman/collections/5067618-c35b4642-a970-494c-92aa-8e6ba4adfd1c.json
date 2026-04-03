@@ -480,7 +480,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"user\": {\n        \"username\": \"quetoquenana+u@gmail.com\",\n        \"nickname\": \"Customer User\",\n        \"person\": {\n            \"idNumber\": \"211080683\",\n            \"name\": \"QueToqueNana\",\n            \"lastname\": \"Cutomer\"\n        }\n    },\n    \"roleName\": \"USER\"\n}",
+							"raw": "{\n    \"user\": {\n        \"username\": \"quetoquenana+a@gmail.com\",\n        \"nickname\": \"Admin User\",\n        \"person\": {\n            \"idNumber\": \"211080683\",\n            \"name\": \"QueToqueNana\",\n            \"lastname\": \"Admin\"\n        }\n    },\n    \"roleName\": \"ADMIN\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
