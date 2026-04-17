@@ -1075,7 +1075,25 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [
+							{
+								"key": "X-Application-Name",
+								"value": "PEDPAL",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{HOST_USER_SERVICE}}/{{path}}/api/auth/firebase-login",
+							"host": [
+								"{{HOST_USER_SERVICE}}"
+							],
+							"path": [
+								"{{path}}",
+								"api",
+								"auth",
+								"firebase-login"
+							]
+						}
 					},
 					"response": []
 				}
