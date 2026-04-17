@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_NAME_USER;
+
 @Service
 @RequiredArgsConstructor
 public class ApplicationServiceImpl implements ApplicationService {
@@ -173,6 +175,28 @@ public class ApplicationServiceImpl implements ApplicationService {
         appRoleUser.setCreatedAt(LocalDateTime.now());
         appRoleUser.setCreatedBy(currentUserService.getCurrentUsername());
         return appRoleUserRepository.save(appRoleUser);
+    }
+
+    @Override
+    public AppRoleUser getUser(String applicationCode, String externalId) {
+        Application application = applicationRepository.findByCode(applicationCode)
+                .orElseThrow(RecordNotFoundException::new);
+        UUID applicationId = application.getId();
+
+        // find matching app role for the application
+        AppRole role = appRoleRepository.findByApplicationIdAndRoleName(applicationId, ROLE_NAME_USER)
+                .orElseThrow(RecordNotFoundException::new);
+
+        // Step 1: see if a User with the username already exists. If yes, reuse it.
+        User user = userService.findByExternalId(externalId)
+                .orElseThrow(RecordNotFoundException::new);
+
+        // check if mapping already exists for this user and application
+        List<AppRoleUser> existingMappings = appRoleUserRepository.findByUserIdAndRoleApplicationId(user.getId(), applicationId);
+        if (!existingMappings.isEmpty()) {
+            throw new RecordNotFoundException("user.not.found");
+        }
+        return AppRoleUser.of(user, role);
     }
 
     @Override

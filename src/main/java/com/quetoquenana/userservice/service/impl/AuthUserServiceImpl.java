@@ -67,6 +67,22 @@ public class AuthUserServiceImpl implements AuthUserService {
         }
     }
 
+    @Override
+    public UserCreateFromFirebaseResponse getFirebaseSession(String appCode) {
+        FirebaseToken decoded = firebaseTokenVerifier.verify(getToken());
+        AppRoleUser appRoleUser = applicationService.getUser(appCode, decoded.getUid());
+        return new UserCreateFromFirebaseResponse(
+                appRoleUser.getUser().getId().toString(),
+                appRoleUser.getUser().getPerson().getIdNumber(),
+                appRoleUser.getUser().getPerson().getName(),
+                appRoleUser.getUser().getPerson().getLastname(),
+                appRoleUser.getUser().getUsername(),
+                appRoleUser.getUser().getNickname(),
+                appRoleUser.getRole().getApplication().getName(),
+                appRoleUser.getRole().getApplication().getCode()
+        );
+    }
+
     private String getSignInProvider(FirebaseToken decoded) {
         Map<String, Object> firebaseClaims = (Map<String, Object>) decoded.getClaims().get("firebase");
         return firebaseClaims != null

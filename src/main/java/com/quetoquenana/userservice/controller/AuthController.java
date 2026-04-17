@@ -63,7 +63,6 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-
     @PostMapping("/firebase-registration")
     @JsonView(Application.ApplicationDetail.class)
     public ResponseEntity<ApiResponse> completeRegistrationFromFirebase(
@@ -72,6 +71,26 @@ public class AuthController {
     ) {
         log.info("POST /api/auth/firebase-registration called with payload: {}", request);
         UserCreateFromFirebaseResponse user = authUserService.createFromFirebase(request, appCode);
+
+        TokenResponse tokenResponse = tokenService.createTokensForUser(user.username(), appCode);
+
+        CompleteRegistrationResponse response = new CompleteRegistrationResponse(
+                tokenResponse,
+                user
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse(Collections.singletonMap("registration", response)));
+    }
+
+
+    @GetMapping("/firebase-login")
+    @JsonView(Application.ApplicationDetail.class)
+    public ResponseEntity<ApiResponse> checkForFirebaseSession(
+            @RequestHeader(value = APP_NAME) String appCode
+    ) {
+        log.info("POST /api/auth/firebase-login");
+        UserCreateFromFirebaseResponse user = authUserService.getFirebaseSession(appCode);
 
         TokenResponse tokenResponse = tokenService.createTokensForUser(user.username(), appCode);
 

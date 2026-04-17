@@ -151,5 +151,45 @@ class AuthControllerTest {
         verify(authUserService).createFromFirebase(request, "USR");
         verify(tokenService).createTokensForUser(user.username(), "USR");
     }
+
+    @Test
+    void checkForFirebaseSession_shouldReturnCreatedWrappedResponse() {
+        UserCreateFromFirebaseResponse user = new UserCreateFromFirebaseResponse(
+                "12345679",
+                "1-2345-6789",
+                "Alvaro",
+                "Cascante",
+                "alvaro@example.com",
+                "alvarito",
+                "User Service",
+                "USR"
+        );
+        TokenResponse tokens = new TokenResponse("access-token", "refresh-token", 3600L);
+
+        when(authUserService.getFirebaseSession("USR")).thenReturn(user);
+        when(tokenService.createTokensForUser("alvaro@example.com", "USR")).thenReturn(tokens);
+
+        ResponseEntity<ApiResponse> response = authController.checkForFirebaseSession("USR");
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        ApiResponse apiResponse = response.getBody();
+        assertNotNull(apiResponse);
+        assertEquals("Success", apiResponse.getMessage());
+        assertEquals(0, apiResponse.getErrorCode());
+        assertInstanceOf(Map.class, apiResponse.getData());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> data = (Map<String, Object>) apiResponse.getData();
+        Object registrationObject = data.get("registration");
+        assertNotNull(registrationObject);
+        assertInstanceOf(CompleteRegistrationResponse.class, registrationObject);
+
+        CompleteRegistrationResponse registration = (CompleteRegistrationResponse) registrationObject;
+        assertSame(tokens, registration.getTokenResponse());
+        assertSame(user, registration.getUser());
+
+        verify(authUserService).getFirebaseSession("USR");
+        verify(tokenService).createTokensForUser(user.username(), "USR");
+    }
 }
 

@@ -16,7 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -215,5 +214,61 @@ class TokenServiceImplTest {
         assertInstanceOf(List.class, rolesObj);
         List<?> roles = (List<?>) rolesObj;
         assertTrue(roles.contains("USER"));
+    }
+
+    @Test
+    void createTokensForUser_shouldEncodePersistAndReturnTokens() {
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        user.setUsername("firebase-user@example.com");
+        user.setUserStatus(UserStatus.ACTIVE);
+
+        when(userService.findByUsername("firebase-user@example.com")).thenReturn(Optional.of(user));
+
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                "firebase-user@example.com",
+                "pass",
+                Set.of(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+        when(userDetailsService.loadUserByUsername("firebase-user@example.com", APP_CODE)).thenReturn(userDetails);
+
+        ArgumentCaptor<JwtEncoderParameters> jwtCaptor = ArgumentCaptor.forClass(JwtEncoderParameters.class);
+        when(jwtEncoder.encode(jwtCaptor.capture()))
+                .thenReturn(
+                        Jwt.withTokenValue("access-token").header("alg", "none").header("typ", "JWT").claim("x", "y").build(),
+                        Jwt.withTokenValue("refresh-token").header("alg", "none").header("typ", "JWT").claim("x", "y").build()
+                );
+
+        ArgumentCaptor<RefreshToken> refreshCaptor = ArgumentCaptor.forClass(RefreshToken.class);
+        when(refreshTokenRepository.save(refreshCaptor.capture())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        TokenResponse response = tokenService.createTokensForUser("firebase-user@example.com", APP_CODE);
+
+        assertEquals("access-token", response.getAccessToken());
+        assertEquals("refresh-token", response.getRefreshToken());
+        assertEquals(3600L, response.getExpiresIn());
+
+        Mockito.verify(userService).findByUsername("firebase-user@example.com");
+        Mockito.verify(userDetailsService).loadUserByUsername("firebase-user@example.com", APP_CODE);
+        Mockito.verify(refreshTokenRepository).save(Mockito.any(RefreshToken.class));
+
+        RefreshToken savedRefreshToken = refreshCaptor.getValue();
+        assertEquals("refresh-token", savedRefreshToken.getToken());
+        assertEquals(APP_CODE, savedRefreshToken.getClientApp());
+        assertEquals(user, savedRefreshToken.getUser());
+        assertFalse(savedRefreshToken.isRevoked());
+
+        JwtClaimsSet accessClaims = jwtCaptor.getAllValues().get(0).getClaims();
+        JwtClaimsSet refreshClaims = jwtCaptor.getAllValues().get(1).getClaims();
+
+        assertEquals("firebase-user@example.com", accessClaims.getSubject());
+        assertEquals(List.of(APP_CODE), accessClaims.getAudience());
+        assertEquals("auth", accessClaims.getClaim("type"));
+        assertEquals(List.of("USER"), accessClaims.getClaim("roles"));
+
+        assertEquals("firebase-user@example.com", refreshClaims.getSubject());
+        assertEquals(List.of(APP_CODE), refreshClaims.getAudience());
+        assertEquals("refresh", refreshClaims.getClaim("type"));
+        assertEquals(List.of("USER"), refreshClaims.getClaim("roles"));
     }
 }

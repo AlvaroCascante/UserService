@@ -31,6 +31,8 @@ public interface ApplicationService {
 
     AppRoleUser addUser(CreateUserCommand request);
 
+    AppRoleUser getUser(String applicationCode, String externalId);
+
     void removeUser(UUID applicationId, String username);
 
     void deleteRole(UUID applicationId, UUID roleId);

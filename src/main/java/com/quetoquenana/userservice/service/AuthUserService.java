@@ -5,5 +5,6 @@ import com.quetoquenana.userservice.dto.UserCreateFromFirebaseResponse;
 
 public interface AuthUserService {
     UserCreateFromFirebaseResponse createFromFirebase(UserCreateFromFirebaseRequest request, String appCode);
+    UserCreateFromFirebaseResponse getFirebaseSession(String appCode);
 }
 

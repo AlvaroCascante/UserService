@@ -31,6 +31,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -208,6 +209,48 @@ class AuthControllerSecurityTest {
                 .andExpect(jsonPath("$.errorCode").value(0));
 
         verify(authUserService).createFromFirebase(any(), eq("USR"));
+        verify(tokenService).createTokensForUser("firebase-user@example.com", "USR");
+    }
+
+    @Test
+    @DisplayName("GET /api/auth/firebase-login returns 401 when unauthenticated")
+    void firebaseLogin_Unauthenticated_Returns401() throws Exception {
+        mockMvc.perform(get("/api/auth/firebase-login")
+                        .header(APP_NAME, "USR"))
+                .andExpect(status().isUnauthorized());
+
+        verify(authUserService, never()).getFirebaseSession(any());
+        verify(tokenService, never()).createTokensForUser(any(), any());
+    }
+
+    @Test
+    @DisplayName("GET /api/auth/firebase-login returns 201 for authenticated user")
+    @WithMockUser(username = "firebase-user@example.com")
+    void firebaseLogin_Authenticated_Returns201() throws Exception {
+        when(authUserService.getFirebaseSession("USR")).thenReturn(new UserCreateFromFirebaseResponse(
+                "123456879",
+                "1-2345-6789",
+                "Alvaro",
+                "Cascante",
+                "firebase-user@example.com",
+                "alvarito",
+                "User Service",
+                "USR"
+        ));
+        when(tokenService.createTokensForUser("firebase-user@example.com", "USR"))
+                .thenReturn(new TokenResponse("access", "refresh", 3600L));
+
+        mockMvc.perform(get("/api/auth/firebase-login")
+                        .header(APP_NAME, "USR"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value("Success"))
+                .andExpect(jsonPath("$.errorCode").value(0))
+                .andExpect(jsonPath("$.data.registration.user.username").value("firebase-user@example.com"))
+                .andExpect(jsonPath("$.data.registration.tokenResponse.accessToken").value("access"))
+                .andExpect(jsonPath("$.data.registration.tokenResponse.refreshToken").value("refresh"))
+                .andExpect(jsonPath("$.data.registration.tokenResponse.expiresIn").value(3600));
+
+        verify(authUserService).getFirebaseSession("USR");
         verify(tokenService).createTokensForUser("firebase-user@example.com", "USR");
     }
 }

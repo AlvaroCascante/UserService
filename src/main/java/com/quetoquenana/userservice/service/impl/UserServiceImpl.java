@@ -273,6 +273,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsernameIgnoreCase(username);
     }
 
+    @Override
+    public Optional<User> findByExternalId(String externalId) {
+        return userRepository.findByExternalId(externalId);
+    }
+
     // --- async email helpers ---
     private void sendNewUserEmailAsync(UserEmailInfo user, String plain, Locale locale) {
         CompletableFuture.runAsync(() -> {

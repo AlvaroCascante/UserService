@@ -26,6 +26,8 @@ public interface UserService {
 
     Optional<User> findByUsername(String username);
 
+    Optional<User> findByExternalId(String externalId);
+
     User save(UserCreateRequest request);
 
     User save(CreateUserCommand request);
