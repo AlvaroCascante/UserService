@@ -1068,12 +1068,22 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "Firebase Login Check",
 					"id": "5067618-04ac62c5-b090-4289-a775-80fbbc39361a",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{firebase_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [
 							{
