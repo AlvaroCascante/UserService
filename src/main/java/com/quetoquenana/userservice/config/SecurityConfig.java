@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -53,7 +54,7 @@ public class SecurityConfig {
         return request -> {
             String uri = request.getRequestURI();
 
-            if (uri != null && uri.endsWith("/api/auth/firebase-registration")) {
+            if (uri != null && uri.contains("/api/auth/firebase-")) {
                 return null; // do not let Spring Security try to decode this bearer token
             }
 
@@ -62,11 +63,12 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(1)
     SecurityFilterChain basicAuthChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/auth/login", "/api/auth/reset")
                 .authorizeHttpRequests(auth -> auth
-                    .anyRequest().authenticated()
+                        .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
@@ -75,6 +77,7 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(2)
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // disable for API clients; enable if using browser forms
@@ -85,6 +88,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/forgot-password",
                                 "/api/auth/refresh",
+                                "/api/auth/firebase-login",
                                 "/api/auth/firebase-registration").permitAll()
                         .requestMatchers("/.well-known/jwks.json").permitAll()
                         .anyRequest().authenticated()

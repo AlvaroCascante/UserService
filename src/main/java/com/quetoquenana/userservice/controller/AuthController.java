@@ -89,7 +89,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse> checkForFirebaseSession(
             @RequestHeader(value = APP_NAME) String appCode
     ) {
-        log.info("POST /api/auth/firebase-login");
+        log.info("GET /api/auth/firebase-login");
         UserCreateFromFirebaseResponse user = authUserService.getFirebaseSession(appCode);
 
         TokenResponse tokenResponse = tokenService.createTokensForUser(user.username(), appCode);
