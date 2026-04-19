@@ -4,6 +4,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
+import com.nimbusds.jwt.SignedJWT;
 import com.quetoquenana.userservice.exception.InvalidFirebaseTokenException;
 import com.quetoquenana.userservice.service.FirebaseTokenVerifier;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +43,17 @@ public class FirebaseAdminVerifier implements FirebaseTokenVerifier {
             @Value("${FIREBASE_EXPECTED_AUD:}") String expectedAudience,
             @Value("${FIREBASE_MAX_AUTH_AGE_SECONDS:0}") long maxAuthAgeSeconds
     ) {
-        this.firebaseAuth = FirebaseAuth.getInstance();
+        this(FirebaseAuth.getInstance(), checkRevoked, requireEmailVerified, expectedAudience, maxAuthAgeSeconds);
+    }
+
+    FirebaseAdminVerifier(
+            FirebaseAuth firebaseAuth,
+            boolean checkRevoked,
+            boolean requireEmailVerified,
+            String expectedAudience,
+            long maxAuthAgeSeconds
+    ) {
+        this.firebaseAuth = firebaseAuth;
         this.checkRevoked = checkRevoked;
         this.requireEmailVerified = requireEmailVerified;
         this.expectedAudience = expectedAudience;
@@ -52,8 +64,11 @@ public class FirebaseAdminVerifier implements FirebaseTokenVerifier {
     public FirebaseToken verify(String idToken) {
         log.debug("Verifying Firebase token with options: checkRevoked={}, requireEmailVerified={}, expectedAudience={}, maxAuthAgeSeconds={}",
                 checkRevoked, requireEmailVerified, expectedAudience, maxAuthAgeSeconds);
+
+        String normalizedToken = normalizeAndValidateRawIdToken(idToken);
+
         try {
-            FirebaseToken decoded = firebaseAuth.verifyIdToken(idToken);
+            FirebaseToken decoded = firebaseAuth.verifyIdToken(normalizedToken);
             if (decoded == null || decoded.getUid() == null || decoded.getUid().isBlank()) {
                 throw new InvalidFirebaseTokenException("invalid.firebase.token.missing.uid");
             }
@@ -123,6 +138,29 @@ public class FirebaseAdminVerifier implements FirebaseTokenVerifier {
         } catch (FirebaseAuthException e) {
             log.error("FirebaseAuthException: ", e);
             throw new InvalidFirebaseTokenException("invalid.firebase.token", e);
+        }
+    }
+
+    private String normalizeAndValidateRawIdToken(String idToken) {
+        if (idToken == null || idToken.isBlank()) {
+            throw new InvalidFirebaseTokenException("Firebase ID token is missing. Send the raw Firebase ID token in the Authorization Bearer header.");
+        }
+
+        String trimmedToken = idToken.trim();
+
+        try {
+            SignedJWT signedJwt = SignedJWT.parse(trimmedToken);
+            if (signedJwt.getHeader().getKeyID() == null || signedJwt.getHeader().getKeyID().isBlank()) {
+                throw new InvalidFirebaseTokenException(
+                        "Firebase ID token is missing the 'kid' header. Send the raw Firebase ID token from the client SDK, not decoded claims JSON, a custom token, or another JWT type."
+                );
+            }
+            return trimmedToken;
+        } catch (ParseException e) {
+            throw new InvalidFirebaseTokenException(
+                    "Expected a raw Firebase ID token JWT in the Authorization Bearer header, but received a non-JWT or malformed token.",
+                    e
+            );
         }
     }
 }
