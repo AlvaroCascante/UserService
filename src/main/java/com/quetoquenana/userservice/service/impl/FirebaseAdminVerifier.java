@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import com.quetoquenana.userservice.exception.InvalidFirebaseTokenException;
 import com.quetoquenana.userservice.service.FirebaseTokenVerifier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,7 @@ import java.util.Map;
  */
 @Component
 @ConditionalOnProperty(name = "firebase.enabled", havingValue = "true", matchIfMissing = true)
+@Slf4j
 public class FirebaseAdminVerifier implements FirebaseTokenVerifier {
 
     private final FirebaseAuth firebaseAuth;
@@ -48,12 +50,14 @@ public class FirebaseAdminVerifier implements FirebaseTokenVerifier {
 
     @Override
     public FirebaseToken verify(String idToken) {
+        log.debug("Verifying Firebase token with options: checkRevoked={}, requireEmailVerified={}, expectedAudience={}, maxAuthAgeSeconds={}",
+                checkRevoked, requireEmailVerified, expectedAudience, maxAuthAgeSeconds);
         try {
             FirebaseToken decoded = firebaseAuth.verifyIdToken(idToken);
-
             if (decoded == null || decoded.getUid() == null || decoded.getUid().isBlank()) {
                 throw new InvalidFirebaseTokenException("invalid.firebase.token.missing.uid");
             }
+            log.debug("Decoded Firebase token: uid={}, claims={}", decoded.getUid(), decoded.getClaims());
 
             Map<String, Object> claims = decoded.getClaims();
 
@@ -61,6 +65,7 @@ public class FirebaseAdminVerifier implements FirebaseTokenVerifier {
             if (checkRevoked) {
                 try {
                     UserRecord userRecord = firebaseAuth.getUser(decoded.getUid());
+                    log.debug("Fetched user record for revocation check: uid={}, tokensValidAfter={}", userRecord.getUid(), userRecord.getTokensValidAfterTimestamp());
                     long tokensValidAfter = userRecord.getTokensValidAfterTimestamp();
                     // normalize tokensValidAfter: some SDKs return millis, some seconds. Convert to seconds if appears to be millis
                     long tokensValidAfterSec = tokensValidAfter > 1_000_000_000_000L ? tokensValidAfter / 1000L : tokensValidAfter;
@@ -116,6 +121,7 @@ public class FirebaseAdminVerifier implements FirebaseTokenVerifier {
             return decoded;
 
         } catch (FirebaseAuthException e) {
+            log.error("FirebaseAuthException: ", e);
             throw new InvalidFirebaseTokenException("invalid.firebase.token", e);
         }
     }
