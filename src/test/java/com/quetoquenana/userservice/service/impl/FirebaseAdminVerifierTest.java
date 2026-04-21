@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseToken;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jwt.PlainJWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.quetoquenana.userservice.exception.InvalidFirebaseTokenException;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.when;
 class FirebaseAdminVerifierTest {
 
     private final FirebaseAuth firebaseAuth = mock(FirebaseAuth.class);
-    private final FirebaseAdminVerifier verifier = new FirebaseAdminVerifier(firebaseAuth, false, false, "", 0);
+    private final FirebaseAdminVerifier verifier = new FirebaseAdminVerifier(firebaseAuth, false, false, "", 0, "");
 
     @Test
     @DisplayName("verify rejects non-JWT payloads with a clear message")
@@ -49,6 +50,19 @@ class FirebaseAdminVerifierTest {
     }
 
     @Test
+    @DisplayName("verify rejects emulator-style unsigned tokens when emulator mode is disabled")
+    void verify_rejectsUnsignedEmulatorTokenOutsideEmulatorMode() {
+        String emulatorToken = emulatorJwt();
+
+        InvalidFirebaseTokenException ex = assertThrows(
+                InvalidFirebaseTokenException.class,
+                () -> verifier.verify(emulatorToken)
+        );
+
+        assertTrue(ex.getMessage().contains("FIREBASE_AUTH_EMULATOR_HOST is not configured"));
+    }
+
+    @Test
     @DisplayName("verify delegates to Firebase Admin when the token shape matches an ID token")
     void verify_delegatesToFirebaseAdminForJwtWithKid() throws Exception {
         String tokenWithKid = unsignedJwt("firebase-key-1");
@@ -60,6 +74,21 @@ class FirebaseAdminVerifierTest {
 
         assertEquals(decoded, result);
         verify(firebaseAuth).verifyIdToken(tokenWithKid);
+    }
+
+    @Test
+    @DisplayName("verify allows emulator tokens when emulator mode is enabled")
+    void verify_allowsUnsignedEmulatorTokenWhenEmulatorEnabled() throws Exception {
+        FirebaseAdminVerifier emulatorVerifier = new FirebaseAdminVerifier(firebaseAuth, false, false, "", 0, "localhost:9099");
+        String emulatorToken = emulatorJwt();
+        FirebaseToken decoded = mock(FirebaseToken.class);
+        when(decoded.getUid()).thenReturn("Ako3Vt678p3yqC7BAZsDeJvkFme3");
+        when(firebaseAuth.verifyIdToken(emulatorToken)).thenReturn(decoded);
+
+        FirebaseToken result = emulatorVerifier.verify(emulatorToken);
+
+        assertEquals(decoded, result);
+        verify(firebaseAuth).verifyIdToken(emulatorToken);
     }
 
     private static String unsignedJwt(String kid) {
@@ -81,6 +110,20 @@ class FirebaseAdminVerifierTest {
         String encodedSignature = Base64URL.encode("signature").toString();
 
         return encodedHeader + "." + encodedClaims + "." + encodedSignature;
+    }
+
+    private static String emulatorJwt() {
+        JWTClaimsSet claims = new JWTClaimsSet.Builder()
+                .issuer("https://securetoken.google.com/pedalpal-qtn")
+                .audience("pedalpal-qtn")
+                .subject("Ako3Vt678p3yqC7BAZsDeJvkFme3")
+                .claim("email", "test@gmail.com")
+                .claim("email_verified", true)
+                .issueTime(java.util.Date.from(Instant.now()))
+                .expirationTime(java.util.Date.from(Instant.now().plusSeconds(3600)))
+                .build();
+
+        return new PlainJWT(claims).serialize();
     }
 }
 
