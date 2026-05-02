@@ -1,6 +1,7 @@
 package com.quetoquenana.userservice.command;
 
 import com.quetoquenana.userservice.model.UserProvider;
+import com.quetoquenana.userservice.model.UserStatus;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,4 +18,5 @@ public class CreateUserCommand {
     private UserProvider provider;
     private String roleName;
     private String applicationCode;
+    private UserStatus userStatus;
 }

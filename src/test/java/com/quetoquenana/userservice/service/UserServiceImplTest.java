@@ -200,7 +200,7 @@ class UserServiceImplTest {
         assertEquals(command.getFirebaseUid(), saved.getExternalId());
         assertEquals(command.getNickname(), saved.getNickname());
         assertEquals(UserProvider.LOCAL_EMAIL, saved.getProvider());
-        assertEquals(UserStatus.RESET, saved.getUserStatus());
+        assertEquals(UserStatus.ACTIVE, saved.getUserStatus());
         assertEquals("system", saved.getCreatedBy());
 
         ArgumentCaptor<PersonCreateCommand> personCommandCaptor = ArgumentCaptor.forClass(PersonCreateCommand.class);
@@ -391,6 +391,7 @@ class UserServiceImplTest {
                 .provider(provider)
                 .roleName("USER")
                 .applicationCode("USR")
+                .userStatus(UserStatus.ACTIVE)
                 .build();
     }
 

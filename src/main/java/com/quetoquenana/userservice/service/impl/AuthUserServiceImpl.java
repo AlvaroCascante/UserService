@@ -8,6 +8,7 @@ import com.quetoquenana.userservice.exception.DuplicateRecordException;
 import com.quetoquenana.userservice.exception.EmailConflictException;
 import com.quetoquenana.userservice.model.AppRoleUser;
 import com.quetoquenana.userservice.model.UserProvider;
+import com.quetoquenana.userservice.model.UserStatus;
 import com.quetoquenana.userservice.service.ApplicationService;
 import com.quetoquenana.userservice.service.AuthUserService;
 import com.quetoquenana.userservice.service.FirebaseTokenVerifier;
@@ -47,6 +48,7 @@ public class AuthUserServiceImpl implements AuthUserService {
                 .provider(UserProvider.fromSignInProvider(signInProvider))
                 .roleName(ROLE_NAME_USER)
                 .applicationCode(appCode)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
 
         try {

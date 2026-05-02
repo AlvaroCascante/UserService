@@ -86,7 +86,6 @@ public class User extends Auditable {
     public static User from(
             CreateUserCommand command,
             String passwordHash,
-            UserStatus status,
             Person person
     ) {
         return User.builder()
@@ -96,7 +95,7 @@ public class User extends Auditable {
                 .externalId(command.getFirebaseUid())
                 .provider(command.getProvider())
                 .nickname(command.getNickname())
-                .userStatus(status)
+                .userStatus(command.getUserStatus())
                 .build();
     }
 

@@ -75,7 +75,11 @@ public class UserServiceImpl implements UserService {
 
         String plain = PasswordUtil.generateRandomPassword();
         User user = User.fromCreateRequest(
-                request, passwordEncoder.encode(plain), UserStatus.RESET, personService.getById(person.getId())
+                request,
+                passwordEncoder.encode(plain),
+                UserStatus.RESET,
+                personService.getById(person.getId()
+                )
         );
 
         user.setCreatedAt(LocalDateTime.now());
@@ -145,7 +149,6 @@ public class UserServiceImpl implements UserService {
         User user = User.from(
                 command,
                 pass,
-                UserStatus.RESET,
                 personService.getById(person.getId())
             );
 

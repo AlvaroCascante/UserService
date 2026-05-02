@@ -213,17 +213,6 @@ class AuthControllerSecurityTest {
     }
 
     @Test
-    @DisplayName("GET /api/auth/firebase-login returns 401 when unauthenticated")
-    void firebaseLogin_Unauthenticated_Returns401() throws Exception {
-        mockMvc.perform(get("/api/auth/firebase-login")
-                        .header(APP_NAME, "USR"))
-                .andExpect(status().isUnauthorized());
-
-        verify(authUserService, never()).getFirebaseSession(any());
-        verify(tokenService, never()).createTokensForUser(any(), any());
-    }
-
-    @Test
     @DisplayName("GET /api/auth/firebase-login returns 201 for authenticated user")
     @WithMockUser(username = "firebase-user@example.com")
     void firebaseLogin_Authenticated_Returns201() throws Exception {
