@@ -50,7 +50,7 @@ Thumbs.db
 
 mvnw
 mvnw.cmd
-
+src/main/resources/db/scripts/
 src/main/resources/keys/
 src/main/resources/db/utils
 src/test/resources/keys/
