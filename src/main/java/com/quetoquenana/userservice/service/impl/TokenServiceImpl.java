@@ -14,7 +14,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -33,24 +36,23 @@ public class TokenServiceImpl implements TokenService {
     private final UserService userService;
     private final CustomUserDetailsService userDetailsService;
     private final JwtEncoder jwtEncoder;
-    private final JwtDecoder jwtDecoder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final long accessTokenSeconds;
     private final long refreshTokenSeconds;
     private final String issuer;
 
-    public TokenServiceImpl(UserService userService,
-                            CustomUserDetailsService userDetailsService,
-                            JwtEncoder jwtEncoder,
-                            JwtDecoder jwtDecoder,
-                            RefreshTokenRepository refreshTokenRepository,
-                            @Value("${security.jwt.access-token-seconds:604800}") long accessTokenSeconds,
-                            @Value("${security.jwt.refresh-token-seconds:604800}") long refreshTokenSeconds,
-                            @Value("${security.jwt.issuer}") String issuer) {
+    public TokenServiceImpl(
+            UserService userService,
+            CustomUserDetailsService userDetailsService,
+            JwtEncoder jwtEncoder,
+            RefreshTokenRepository refreshTokenRepository,
+            @Value("${security.jwt.access-token-seconds:60}") long accessTokenSeconds,
+            @Value("${security.jwt.refresh-token-seconds:604800}") long refreshTokenSeconds,
+            @Value("${security.jwt.issuer}") String issuer
+    ) {
         this.userService = userService;
         this.userDetailsService = userDetailsService;
         this.jwtEncoder = jwtEncoder;
-        this.jwtDecoder = jwtDecoder;
         this.refreshTokenRepository = refreshTokenRepository;
         this.accessTokenSeconds = accessTokenSeconds;
         this.refreshTokenSeconds = refreshTokenSeconds;
@@ -67,25 +69,45 @@ public class TokenServiceImpl implements TokenService {
         return getTokenResponse(user, appCode, getRoles(userDetails.getAuthorities()));
     }
 
+    @NonNull
+    private TokenResponse getTokenResponse(User user, String appCode, List<String> roles) {
+        Instant now = Instant.now();
+        List<String> audienceList = List.of(appCode);
+
+        JwtClaimsSet claims = buildCommonClaims(now, user, TYPE_AUTH, accessTokenSeconds, audienceList, roles);
+        String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+
+        JwtClaimsSet refreshClaims = buildCommonClaims(now, user, TYPE_REFRESH, refreshTokenSeconds, audienceList, roles);
+        String newRefreshToken = jwtEncoder.encode(JwtEncoderParameters.from(refreshClaims)).getTokenValue();
+
+        persistRefreshToken(user, appCode, newRefreshToken, now);
+
+        return new TokenResponse(accessToken, newRefreshToken, accessTokenSeconds);
+    }
+
     @Override
-    public TokenResponse refresh(String refreshToken, String appCode) {
+    public TokenResponse refresh(Authentication authentication, String appCode) {
+        if (!(authentication instanceof JwtAuthenticationToken jwtAuthenticationToken)) {
+            throw new AuthenticationException("error.authentication.invalid.refresh.token");
+        }
+
+        String refreshToken = jwtAuthenticationToken.getToken().getTokenValue();
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new AuthenticationException("error.authentication.invalid.refresh.token");
+        }
+
         // first check stored refresh token
         Optional<RefreshToken> stored = refreshTokenRepository.findByToken(refreshToken);
         if (stored.isEmpty() || stored.get().isRevoked() || stored.get().getExpiresAt() == null || stored.get().getExpiresAt().isBefore(Instant.now())) {
             throw new AuthenticationException("error.authentication.invalid.refresh.token");
         }
 
-        // validate and decode the refresh token
-        Jwt jwt = jwtDecoder.decode(refreshToken);
-
-        // validate presence of required claims for refresh tokens
-        validateRequiredClaims(jwt);
-
-        if (!TYPE_REFRESH.equals(jwt.getClaimAsString(KEY_TYPE))) {
+        String subject = jwtAuthenticationToken.getName();
+        if (subject == null || subject.isBlank()) {
             throw new AuthenticationException("error.authentication.invalid.refresh.token");
         }
 
-        User user = userService.findByUsername(jwt.getSubject())
+        User user = userService.findByUsername(subject)
                 .orElseThrow(() -> new AuthenticationException("error.authentication"));
 
         if (!user.getUserStatus().equals(UserStatus.ACTIVE)) {
@@ -100,48 +122,21 @@ public class TokenServiceImpl implements TokenService {
     public TokenResponse createTokensForUser(String username, String appCode) {
         User user = userService.findByUsername(username)
                 .orElseThrow(() -> new AuthenticationException("error.authentication"));
-        // Load roles for user via UserDetailsService
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername(), appCode);
-        List<String> roles = getRoles(userDetails.getAuthorities());
+        return getTokenResponse(user, appCode, getRoles(userDetails.getAuthorities()));
+    }
 
-        // Build tokens using audience set to the provided applicationName if present, otherwise fall back to configured audience list
-        Instant now = Instant.now();
-        List<String> audienceList = List.of(appCode);
-
-        JwtClaimsSet claims = buildCommonClaims(now, user, TYPE_AUTH, accessTokenSeconds, audienceList, roles);
-        String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-
-        JwtClaimsSet refreshClaims = buildCommonClaims(now, user, TYPE_REFRESH, refreshTokenSeconds, audienceList, roles);
-        String newRefreshToken = jwtEncoder.encode(JwtEncoderParameters.from(refreshClaims)).getTokenValue();
-
-        // persist refresh token
+    private void persistRefreshToken(User user, String appCode, String refreshToken, Instant issuedAt) {
         RefreshToken rt = RefreshToken.builder()
-                .token(newRefreshToken)
+                .token(refreshToken)
                 .user(user)
                 .clientApp(appCode)
-                .issuedAt(now)
-                .expiresAt(now.plus(refreshTokenSeconds, ChronoUnit.SECONDS))
+                .issuedAt(issuedAt)
+                .expiresAt(issuedAt.plus(refreshTokenSeconds, ChronoUnit.SECONDS))
                 .revoked(false)
                 .build();
         refreshTokenRepository.save(rt);
-
-        return new TokenResponse(accessToken, newRefreshToken, accessTokenSeconds);
     }
-
-    @NonNull
-    private TokenResponse getTokenResponse(User user, String appCode, List<String> roles) {
-        Instant now = Instant.now();
-        List<String> audienceList = List.of(appCode);
-
-        JwtClaimsSet claims = buildCommonClaims(now, user, TYPE_AUTH, accessTokenSeconds, audienceList, roles);
-        String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-
-        JwtClaimsSet refreshClaims = buildCommonClaims(now, user, TYPE_REFRESH, refreshTokenSeconds, audienceList, roles);
-        String newRefreshToken = jwtEncoder.encode(JwtEncoderParameters.from(refreshClaims)).getTokenValue();
-
-        return new TokenResponse(accessToken, newRefreshToken, accessTokenSeconds);
-    }
-
 
     private static List<String> getRoles(Collection<? extends GrantedAuthority> authorities) {
         // Roles normalization
@@ -159,59 +154,29 @@ public class TokenServiceImpl implements TokenService {
             List<String> audienceList,
             List<String> roles
     ) {
-
+        if (TYPE_AUTH.equals(type)) {
+            return JwtClaimsSet.builder()
+                    .subject(user.getUsername())
+                    .issuer(issuer)
+                    .audience(audienceList)
+                    .issuedAt(now)
+                    .notBefore(now)
+                    .expiresAt(now.plus(tokenSeconds, ChronoUnit.SECONDS))
+                    .id(UUID.randomUUID().toString())
+                    .claim(KEY_NAME, user.getFullName())
+                    .claim(KEY_ROLES, roles)
+                    .claim(KEY_TYPE, type)
+                    .claim(KEY_USER_ID, user.getId().toString())
+                    .build();
+        }
         return JwtClaimsSet.builder()
                 .subject(user.getUsername())
                 .issuer(issuer)
-                .audience(audienceList)
                 .issuedAt(now)
                 .notBefore(now)
                 .expiresAt(now.plus(tokenSeconds, ChronoUnit.SECONDS))
                 .id(UUID.randomUUID().toString())
-                .claim(KEY_NAME, user.getFullName())
-                .claim(KEY_ROLES, roles)
                 .claim(KEY_TYPE, type)
-                .claim(KEY_USER_ID, user.getId().toString())
                 .build();
-    }
-
-    /**
-     * Ensure required claims are present and non-empty for refresh tokens. Throws AuthenticationException when invalid.
-     * @param jwt decoded token
-     */
-    private void validateRequiredClaims(Jwt jwt) {
-        if (jwt == null) {
-            throw new AuthenticationException("error.authentication.invalid.refresh.token");
-        }
-
-        // issuer
-        String iss = jwt.getIssuer() == null ? null : jwt.getIssuer().toString();
-        if (iss == null || iss.isBlank()) {
-            throw new AuthenticationException("error.authentication.invalid.refresh.token");
-        }
-
-        // subject
-        String sub = jwt.getSubject();
-        if (sub == null || sub.isBlank()) {
-            throw new AuthenticationException("error.authentication.invalid.refresh.token");
-        }
-
-        // type
-        String type = jwt.getClaimAsString(KEY_TYPE);
-        if (type == null || type.isBlank()) {
-            throw new AuthenticationException("error.authentication.invalid.refresh.token");
-        }
-
-        // audience
-        List<String> aud = jwt.getAudience();
-        if (aud == null || aud.isEmpty()) {
-            throw new AuthenticationException("error.authentication.invalid.refresh.token");
-        }
-
-        // roles
-        List<String> roles = jwt.getClaimAsStringList(KEY_ROLES);
-        if (roles == null || roles.isEmpty()) {
-            throw new AuthenticationException("error.authentication.invalid.refresh.token");
-        }
     }
 }

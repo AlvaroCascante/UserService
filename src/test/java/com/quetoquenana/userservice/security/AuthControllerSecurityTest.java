@@ -19,11 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.Instant;
 
 import static com.quetoquenana.userservice.util.Constants.Headers.APP_NAME;
 import static org.mockito.ArgumentMatchers.any;
@@ -70,6 +73,9 @@ class AuthControllerSecurityTest {
     @MockitoBean
     private JwtDecoder jwtDecoder;
 
+    @MockitoBean(name = "refreshJwtDecoder")
+    private JwtDecoder refreshJwtDecoder;
+
     @MockitoBean
     private JwtEncoder jwtEncoder;
 
@@ -109,33 +115,40 @@ class AuthControllerSecurityTest {
     @Test
     @DisplayName("POST /api/auth/refresh returns 400 when app header is missing")
     void refresh_MissingHeader_Returns400() throws Exception {
+        when(refreshJwtDecoder.decode("refresh-token")).thenReturn(buildRefreshJwt());
+
         mockMvc.perform(post("/api/auth/refresh")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"refreshToken":"refresh-token"}
-                                """))
-                .andExpect(status().isInternalServerError());
+                        .header("Authorization", "Bearer refresh-token"))
+                .andExpect(status().isBadRequest());
 
         verify(tokenService, never()).refresh(any(), any());
     }
 
     @Test
-    @DisplayName("POST /api/auth/refresh returns 200 without authentication")
-    void refresh_PermitAll_Returns200() throws Exception {
-        when(tokenService.refresh("refresh-token", "USR")).thenReturn(new TokenResponse("access", "refresh", 3600L));
+    @DisplayName("POST /api/auth/refresh returns 401 when bearer token is missing")
+    void refresh_MissingBearerToken_Returns401() throws Exception {
+        mockMvc.perform(post("/api/auth/refresh")
+                        .header(APP_NAME, "USR"))
+                .andExpect(status().isUnauthorized());
+
+        verify(tokenService, never()).refresh(any(), any());
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/refresh returns 200 for valid bearer refresh token")
+    void refresh_BearerAuthentication_Returns200() throws Exception {
+        when(refreshJwtDecoder.decode("refresh-token")).thenReturn(buildRefreshJwt());
+        when(tokenService.refresh(any(), eq("USR"))).thenReturn(new TokenResponse("access", "refresh", 3600L));
 
         mockMvc.perform(post("/api/auth/refresh")
                         .header(APP_NAME, "USR")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"refreshToken":"refresh-token"}
-                                """))
+                        .header("Authorization", "Bearer refresh-token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").value("access"))
                 .andExpect(jsonPath("$.refreshToken").value("refresh"))
                 .andExpect(jsonPath("$.expiresIn").value(3600));
 
-        verify(tokenService).refresh("refresh-token", "USR");
+        verify(tokenService).refresh(any(), eq("USR"));
     }
 
     @Test
@@ -241,6 +254,22 @@ class AuthControllerSecurityTest {
 
         verify(authUserService).getFirebaseSession("USR");
         verify(tokenService).createTokensForUser("firebase-user@example.com", "USR");
+    }
+
+    private Jwt buildRefreshJwt() {
+        Instant now = Instant.now();
+        return Jwt.withTokenValue("refresh-token")
+                .header("alg", "RS256")
+                .header("typ", "JWT")
+                .header("kid", "test-key")
+                .subject("refresh-user@example.com")
+                .issuer("https://auth.example")
+                .issuedAt(now)
+                .notBefore(now.minusSeconds(5))
+                .expiresAt(now.plusSeconds(300))
+                .claim("jti", "refresh-jti")
+                .claim("type", "refresh")
+                .build();
     }
 }
 

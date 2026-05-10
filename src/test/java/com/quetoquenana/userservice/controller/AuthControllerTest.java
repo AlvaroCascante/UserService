@@ -1,6 +1,13 @@
 package com.quetoquenana.userservice.controller;
 
-import com.quetoquenana.userservice.dto.*;
+import com.quetoquenana.userservice.dto.ApiResponse;
+import com.quetoquenana.userservice.dto.ChangePasswordRequest;
+import com.quetoquenana.userservice.dto.CompleteRegistrationResponse;
+import com.quetoquenana.userservice.dto.PersonCreateRequest;
+import com.quetoquenana.userservice.dto.ResetUserRequest;
+import com.quetoquenana.userservice.dto.TokenResponse;
+import com.quetoquenana.userservice.dto.UserCreateFromFirebaseRequest;
+import com.quetoquenana.userservice.dto.UserCreateFromFirebaseResponse;
 import com.quetoquenana.userservice.service.AuthUserService;
 import com.quetoquenana.userservice.service.SecurityService;
 import com.quetoquenana.userservice.service.TokenService;
@@ -84,17 +91,16 @@ class AuthControllerTest {
 
     @Test
     void refresh_shouldReturnTokensFromTokenService() {
-        RefreshRequest request = new RefreshRequest();
-        request.setRefreshToken("refresh-token");
+        Authentication authentication = mock(Authentication.class);
         TokenResponse expected = new TokenResponse("access-token", "next-refresh-token", 3600L);
 
-        when(tokenService.refresh("refresh-token", "USR")).thenReturn(expected);
+        when(tokenService.refresh(authentication, "USR")).thenReturn(expected);
 
-        ResponseEntity<TokenResponse> response = authController.refresh(request, "USR");
+        ResponseEntity<TokenResponse> response = authController.refresh(authentication, "USR");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertSame(expected, response.getBody());
-        verify(tokenService).refresh("refresh-token", "USR");
+        verify(tokenService).refresh(authentication, "USR");
     }
 
     @Test

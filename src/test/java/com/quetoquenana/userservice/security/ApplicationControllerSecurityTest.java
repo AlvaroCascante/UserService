@@ -68,6 +68,9 @@ class ApplicationControllerSecurityTest {
     @MockitoBean
     private JwtDecoder jwtDecoder;
 
+    @MockitoBean(name = "refreshJwtDecoder")
+    private JwtDecoder refreshJwtDecoder;
+
     @MockitoBean
     private JwtEncoder jwtEncoder;
 

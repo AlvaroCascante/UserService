@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -46,6 +47,17 @@ public class ControllerExceptionAdvice {
         log.error("AuthenticationException: {}", ex.getMessage());
         String message = messageSource.getMessage(ex.getMessageKey(), ex.getMessageArgs(), locale);
         return ResponseEntity.badRequest().body(new ApiResponse(message, HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @ExceptionHandler(ExpiredTokenException.class)
+    public ResponseEntity<ApiResponse> handleExpiredTokenException(
+            ExpiredTokenException ex,
+            Locale locale
+    ) {
+        log.error("ExpiredTokenException: {}", ex.getMessage());
+        String message = messageSource.getMessage(ex.getMessageKey(), ex.getMessageArgs(), locale);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiResponse(message, ExpiredTokenException.ERROR_CODE));
     }
 
     @ExceptionHandler(ImmutableFieldModificationException.class)
@@ -122,6 +134,13 @@ public class ControllerExceptionAdvice {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse> handleBadRequest(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse("BAD_REQUEST -- " + ex.getMessage(), HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ApiResponse> handleMissingRequestHeader(MissingRequestHeaderException ex) {
+        log.error("MissingRequestHeaderException: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponse("BAD_REQUEST -- " + ex.getMessage(), HttpStatus.BAD_REQUEST.value()));
     }

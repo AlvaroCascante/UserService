@@ -49,10 +49,10 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(
-            @Valid @RequestBody RefreshRequest request,
+            Authentication authentication,
             @RequestHeader(value = APP_NAME) String appCode
     ) {
-        TokenResponse tokens = tokenService.refresh(request.getRefreshToken(), appCode);
+        TokenResponse tokens = tokenService.refresh(authentication, appCode);
         return ResponseEntity.ok(tokens);
     }
 

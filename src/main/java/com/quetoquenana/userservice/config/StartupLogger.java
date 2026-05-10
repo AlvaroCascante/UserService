@@ -37,7 +37,8 @@ public class StartupLogger implements ApplicationRunner {
                     "security.rsa.key-suffix",
                     "spring.datasource.url",
                     "spring.datasource.username",
-                    "app.support.email"
+                    "app.support.email",
+                    "security.jwt.access-token-seconds"
         };
     }
 }

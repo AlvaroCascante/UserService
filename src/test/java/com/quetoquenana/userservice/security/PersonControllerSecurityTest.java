@@ -60,6 +60,9 @@ class PersonControllerSecurityTest {
     @MockBean
     private JwtDecoder jwtDecoder;
 
+    @MockBean(name = "refreshJwtDecoder")
+    private JwtDecoder refreshJwtDecoder;
+
     @MockBean
     private JwtEncoder jwtEncoder;
 

@@ -5,6 +5,6 @@ import org.springframework.security.core.Authentication;
 
 public interface TokenService {
     TokenResponse createTokens(Authentication authentication, String appCode);
-    TokenResponse refresh(String refreshToken, String appCode);
+    TokenResponse refresh(Authentication authentication, String appCode);
     TokenResponse createTokensForUser(String username, String appCode);
 }
