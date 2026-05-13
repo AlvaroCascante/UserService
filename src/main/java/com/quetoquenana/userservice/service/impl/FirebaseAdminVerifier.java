@@ -39,17 +39,20 @@ public class FirebaseAdminVerifier implements FirebaseTokenVerifier {
     private final boolean requireEmailVerified;
     private final String expectedAudience;
     private final long maxAuthAgeSeconds;
-    private final String authEmulatorHost;
 
     @Autowired
     public FirebaseAdminVerifier(
             @Value("${FIREBASE_CHECK_REVOKED:false}") boolean checkRevoked,
             @Value("${FIREBASE_REQUIRE_EMAIL_VERIFIED:false}") boolean requireEmailVerified,
             @Value("${FIREBASE_EXPECTED_AUD:}") String expectedAudience,
-            @Value("${FIREBASE_MAX_AUTH_AGE_SECONDS:0}") long maxAuthAgeSeconds,
-            @Value("${FIREBASE_AUTH_EMULATOR_HOST:}") String authEmulatorHost
+            @Value("${FIREBASE_MAX_AUTH_AGE_SECONDS:0}") long maxAuthAgeSeconds
     ) {
-        this(FirebaseAuth.getInstance(), checkRevoked, requireEmailVerified, expectedAudience, maxAuthAgeSeconds, authEmulatorHost);
+        this(FirebaseAuth.getInstance(),
+                checkRevoked,
+                requireEmailVerified,
+                expectedAudience,
+                maxAuthAgeSeconds
+        );
     }
 
     FirebaseAdminVerifier(
@@ -57,15 +60,13 @@ public class FirebaseAdminVerifier implements FirebaseTokenVerifier {
             boolean checkRevoked,
             boolean requireEmailVerified,
             String expectedAudience,
-            long maxAuthAgeSeconds,
-            String authEmulatorHost
+            long maxAuthAgeSeconds
     ) {
         this.firebaseAuth = firebaseAuth;
         this.checkRevoked = checkRevoked;
         this.requireEmailVerified = requireEmailVerified;
         this.expectedAudience = expectedAudience;
         this.maxAuthAgeSeconds = maxAuthAgeSeconds;
-        this.authEmulatorHost = authEmulatorHost;
     }
 
     @Override
@@ -159,10 +160,6 @@ public class FirebaseAdminVerifier implements FirebaseTokenVerifier {
         try {
             JWT parsedToken = JWTParser.parse(trimmedToken);
 
-            if (isAuthEmulatorEnabled()) {
-                return trimmedToken;
-            }
-
             if (!(parsedToken instanceof SignedJWT signedJwt)) {
                 throw new InvalidFirebaseTokenException(
                         "Received an unsigned Firebase emulator-style token, but FIREBASE_AUTH_EMULATOR_HOST is not configured for this backend. Use a production Firebase ID token or enable the Firebase Auth emulator for local development."
@@ -181,9 +178,5 @@ public class FirebaseAdminVerifier implements FirebaseTokenVerifier {
                     e
             );
         }
-    }
-
-    private boolean isAuthEmulatorEnabled() {
-        return authEmulatorHost != null && !authEmulatorHost.isBlank();
     }
 }

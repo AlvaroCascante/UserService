@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 class FirebaseAdminVerifierTest {
 
     private final FirebaseAuth firebaseAuth = mock(FirebaseAuth.class);
-    private final FirebaseAdminVerifier verifier = new FirebaseAdminVerifier(firebaseAuth, false, false, "", 0, "");
+    private final FirebaseAdminVerifier verifier = new FirebaseAdminVerifier(firebaseAuth, false, false, "", 0);
 
     @Test
     @DisplayName("verify rejects non-JWT payloads with a clear message")
@@ -74,21 +74,6 @@ class FirebaseAdminVerifierTest {
 
         assertEquals(decoded, result);
         verify(firebaseAuth).verifyIdToken(tokenWithKid);
-    }
-
-    @Test
-    @DisplayName("verify allows emulator tokens when emulator mode is enabled")
-    void verify_allowsUnsignedEmulatorTokenWhenEmulatorEnabled() throws Exception {
-        FirebaseAdminVerifier emulatorVerifier = new FirebaseAdminVerifier(firebaseAuth, false, false, "", 0, "localhost:9099");
-        String emulatorToken = emulatorJwt();
-        FirebaseToken decoded = mock(FirebaseToken.class);
-        when(decoded.getUid()).thenReturn("Ako3Vt678p3yqC7BAZsDeJvkFme3");
-        when(firebaseAuth.verifyIdToken(emulatorToken)).thenReturn(decoded);
-
-        FirebaseToken result = emulatorVerifier.verify(emulatorToken);
-
-        assertEquals(decoded, result);
-        verify(firebaseAuth).verifyIdToken(emulatorToken);
     }
 
     private static String unsignedJwt(String kid) {
