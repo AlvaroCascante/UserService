@@ -194,7 +194,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         // check if mapping already exists for this user and application
         List<AppRoleUser> existingMappings = appRoleUserRepository.findByUserIdAndRoleApplicationId(user.getId(), applicationId);
         if (!existingMappings.isEmpty()) {
-            throw new RecordNotFoundException("user.not.found");
+            throw new RecordNotFoundException("user.not.found", externalId);
         }
         return AppRoleUser.of(user, role);
     }

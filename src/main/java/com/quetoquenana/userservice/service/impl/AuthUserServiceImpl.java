@@ -13,6 +13,7 @@ import com.quetoquenana.userservice.service.ApplicationService;
 import com.quetoquenana.userservice.service.AuthUserService;
 import com.quetoquenana.userservice.service.FirebaseTokenVerifier;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -24,6 +25,7 @@ import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_NAME_USER;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthUserServiceImpl implements AuthUserService {
 
     private final ApplicationService  applicationService;
@@ -71,7 +73,10 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     @Override
     public UserCreateFromFirebaseResponse getFirebaseSession(String appCode) {
+        log.debug("AuthUserServiceImpl getFirebaseSession: appCode={}", appCode);
         FirebaseToken decoded = firebaseTokenVerifier.verify(getToken());
+
+        log.debug("AuthUserServiceImpl getFirebaseSession: Uid()={}", decoded.getUid());
         AppRoleUser appRoleUser = applicationService.getUser(appCode, decoded.getUid());
         return new UserCreateFromFirebaseResponse(
                 appRoleUser.getUser().getId().toString(),
