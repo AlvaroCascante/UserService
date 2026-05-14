@@ -10,6 +10,7 @@ import com.quetoquenana.userservice.service.ApplicationService;
 import com.quetoquenana.userservice.service.CurrentUserService;
 import com.quetoquenana.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import static com.quetoquenana.userservice.util.Constants.Roles.ROLE_NAME_USER;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationRepository applicationRepository;
@@ -179,17 +181,23 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public AppRoleUser getUser(String applicationCode, String externalId) {
+
+        log.debug("ApplicationServiceImpl getUser -- applicationCode={}", applicationCode);
         Application application = applicationRepository.findByCode(applicationCode)
                 .orElseThrow(RecordNotFoundException::new);
+
         UUID applicationId = application.getId();
+        log.debug("ApplicationServiceImpl getUser -- applicationId={}", applicationId);
 
         // find matching app role for the application
         AppRole role = appRoleRepository.findByApplicationIdAndRoleName(applicationId, ROLE_NAME_USER)
                 .orElseThrow(RecordNotFoundException::new);
+        log.debug("ApplicationServiceImpl getUser -- role={}", role.getRoleName());
 
         // Step 1: see if a User with the username already exists. If yes, reuse it.
         User user = userService.findByExternalId(externalId)
                 .orElseThrow(RecordNotFoundException::new);
+        log.debug("ApplicationServiceImpl getUser -- user={}", user.getUsername());
 
         // check if mapping already exists for this user and application
         List<AppRoleUser> existingMappings = appRoleUserRepository.findByUserIdAndRoleApplicationId(user.getId(), applicationId);

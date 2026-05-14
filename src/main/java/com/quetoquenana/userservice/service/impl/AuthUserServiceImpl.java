@@ -76,7 +76,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         log.debug("AuthUserServiceImpl getFirebaseSession: appCode={}", appCode);
         FirebaseToken decoded = firebaseTokenVerifier.verify(getToken());
 
-        log.debug("AuthUserServiceImpl getFirebaseSession: Uid()={}", decoded.getUid());
+        log.debug("AuthUserServiceImpl getFirebaseSession: Uid={}", decoded.getUid());
         AppRoleUser appRoleUser = applicationService.getUser(appCode, decoded.getUid());
         return new UserCreateFromFirebaseResponse(
                 appRoleUser.getUser().getId().toString(),
