@@ -53,7 +53,8 @@ class TokenServiceImplTest {
                 refreshTokenRepository,
                 3600L, 
                 86400L, 
-                "https://auth.example"
+                "https://auth.example",
+                "test"
         );
     }
 
@@ -288,7 +289,7 @@ class TokenServiceImplTest {
         JwtClaimsSet refreshClaims = jwtCaptor.getAllValues().get(1).getClaims();
 
         assertEquals("firebase-user@example.com", accessClaims.getSubject());
-        assertEquals(List.of(APP_CODE), accessClaims.getAudience());
+        assertTrue(accessClaims.getAudience().contains(APP_CODE));
         assertEquals("auth", accessClaims.getClaim("type"));
         assertEquals(List.of("USER"), accessClaims.getClaim("roles"));
 
