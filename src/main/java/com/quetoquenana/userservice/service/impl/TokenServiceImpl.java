@@ -40,6 +40,7 @@ public class TokenServiceImpl implements TokenService {
     private final long accessTokenSeconds;
     private final long refreshTokenSeconds;
     private final String issuer;
+    private final String audience;
 
     public TokenServiceImpl(
             UserService userService,
@@ -48,7 +49,8 @@ public class TokenServiceImpl implements TokenService {
             RefreshTokenRepository refreshTokenRepository,
             @Value("${security.jwt.access-token-seconds:60}") long accessTokenSeconds,
             @Value("${security.jwt.refresh-token-seconds:604800}") long refreshTokenSeconds,
-            @Value("${security.jwt.issuer}") String issuer
+            @Value("${security.jwt.issuer}") String issuer,
+            @Value("${security.jwt.aud}") String audience
     ) {
         this.userService = userService;
         this.userDetailsService = userDetailsService;
@@ -57,6 +59,7 @@ public class TokenServiceImpl implements TokenService {
         this.accessTokenSeconds = accessTokenSeconds;
         this.refreshTokenSeconds = refreshTokenSeconds;
         this.issuer = issuer;
+        this.audience = audience;
     }
 
     @Override
@@ -66,13 +69,13 @@ public class TokenServiceImpl implements TokenService {
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername(), appCode);
 
-        return getTokenResponse(user, appCode, getRoles(userDetails.getAuthorities()));
+        return generateToken(user, appCode, getRoles(userDetails.getAuthorities()));
     }
 
     @NonNull
-    private TokenResponse getTokenResponse(User user, String appCode, List<String> roles) {
+    private TokenResponse generateToken(User user, String appCode, List<String> roles) {
         Instant now = Instant.now();
-        List<String> audienceList = List.of(appCode);
+        List<String> audienceList = List.of(audience, appCode);
 
         JwtClaimsSet claims = buildCommonClaims(now, user, TYPE_AUTH, accessTokenSeconds, audienceList, roles);
         String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
@@ -115,7 +118,7 @@ public class TokenServiceImpl implements TokenService {
         }
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername(), appCode);
 
-        return getTokenResponse(user, appCode, getRoles(userDetails.getAuthorities()));
+        return generateToken(user, appCode, getRoles(userDetails.getAuthorities()));
     }
 
     @Override
@@ -123,7 +126,7 @@ public class TokenServiceImpl implements TokenService {
         User user = userService.findByUsername(username)
                 .orElseThrow(() -> new AuthenticationException("error.authentication"));
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername(), appCode);
-        return getTokenResponse(user, appCode, getRoles(userDetails.getAuthorities()));
+        return generateToken(user, appCode, getRoles(userDetails.getAuthorities()));
     }
 
     private void persistRefreshToken(User user, String appCode, String refreshToken, Instant issuedAt) {
